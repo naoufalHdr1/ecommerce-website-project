@@ -2,6 +2,7 @@
 
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import dbClient from '../config/db.js';
 
 // Defining the User Schema
 const userSchema = new mongoose.Schema(
@@ -19,7 +20,7 @@ const userSchema = new mongoose.Schema(
  */
 class User {
   constructor() {
-    this.userModel = mongoose.model('User', userSchema)
+    this.userModel = mongoose.model('users', userSchema)
   }
 
   /**
