@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import dbClient from './config/db.js';
+import usersRoutes from './routes/usersRoutes.js'
 
 // Load environment variables
 dotenv.config();
@@ -18,6 +19,9 @@ dbClient.connect(process.env.MONGO_URI);
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
+
+// Use the users routes
+app.use('/users', usersRoutes);
 
 // Handel graceful shutdown
 process.on('SIGINT', async () => {
