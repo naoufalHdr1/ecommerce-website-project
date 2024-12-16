@@ -37,8 +37,8 @@ class AuthController {
   static async login(req, res) {
     const { email, password } = req.body;
 
-    if (!email) return res.status(400).json({ error: 'Miising email' });
-    if (!password) return res.status(400).json({ error: 'Miising password' });
+    if (!email) return res.status(400).json({ error: 'Missing email' });
+    if (!password) return res.status(400).json({ error: 'Missing password' });
 
     try {
       // Check if user exists

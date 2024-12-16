@@ -59,28 +59,30 @@ describe('AuthController Tests', () => {
     });
 
     it('should not register a user with missing fields', async () => {
-      let res;
-
       // Missing data
-      res = await request(app).post('/register');
+      const res = await request(app).post('/register').send({
+        name: '',
+        email: '',
+        password: '',
+      });
       expect(res).to.have.status(400);
       expect(res.body).to.have.property('error', 'Missing name');
 
       // Missing email
-      res = await request(app).post('/register').send({
+      const res1 = await request(app).post('/register').send({
         name: testUser.name,
         password: testUser.password,
       });
-      expect(res).to.have.status(400);
-      expect(res.body).to.have.property('error', 'Missing email');
+      expect(res1).to.have.status(400);
+      expect(res1.body).to.have.property('error', 'Missing email');
 
       // Missing password
-      res = await request(app).post('/register').send({
+      const res2 = await request(app).post('/register').send({
         name: testUser.name,
         email: testUser.email,
       });
-      expect(res).to.have.status(400);
-      expect(res.body).to.have.property('error', 'Missing password');
+      expect(res2).to.have.status(400);
+      expect(res2.body).to.have.property('error', 'Missing password');
     });
 
     it('should not register a user with an already registered email', async () => {
@@ -91,6 +93,69 @@ describe('AuthController Tests', () => {
       });
       expect(res).to.have.status(400);
       expect(res.body).to.have.property('error', 'User already exists');
+    });
+  });
+
+  describe('POST /login', () => {
+    it('should log in a user successfully with valid credentials', async () => {
+      const res = await request(app).post('/login').send({
+        email: testUser.email,
+        password: testUser.password,
+      });
+      expect(res).to.have.status(200);
+      expect(res.body).to.have.property('token').that.is.a('string');
+    });
+
+    it('should not login with missing fields', async () => {
+      // Missing data
+      const res = await request(app).post('/login').send({
+        email: '',
+        password: '',
+      });
+      expect(res).to.have.status(400);
+      expect(res.body).to.have.property('error', 'Missing email');
+
+      // Missing email
+      const res1 = await request(app).post('/login').send({
+        password: testUser.password,
+      });
+      expect(res1).to.have.status(400);
+      expect(res1.body).to.have.property('error', 'Missing email');
+
+      // Missing password
+      const res2 = await request(app).post('/login').send({
+        email: testUser.email,
+      });
+      expect(res2).to.have.status(400);
+      expect(res2.body).to.have.property('error', 'Missing password');
+    });
+
+
+    it('should not log in a user with incorrect data', async () => {
+      // Incorrect email
+      const res = await request(app).post('/login').send({
+        email: 'nonexistent@exmaple.com',
+        password: testUser.password,
+      });
+      expect(res).to.have.status(401);
+      expect(res.body).to.have.property('error', 'Invalid email or password');
+
+      // Incorrect password
+      const res1 = await request(app).post('/login').send({
+        email: testUser.email,
+        password: 'wrongPassword123',
+      });
+      expect(res1).to.have.status(401);
+      expect(res1.body).to.have.property('error', 'Invalid email or password');
+    });
+
+    it('should not log in a user with incorrect data', async () => {
+      const res = await request(app).post('/login').send({
+        email: testUser.email,
+        password: 'wrongPassword123',
+      });
+      expect(res).to.have.status(401);
+      expect(res.body).to.have.property('error', 'Invalid email or password');
     });
   });
 });
