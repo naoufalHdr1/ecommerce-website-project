@@ -73,7 +73,7 @@ class AuthController {
   static async getCurrentUser(req, res) {
     try {
       const user = await User.findById(req.user.id).select('-password');
-      if (!user) return res.status(401).json({ error: 'User not found' })
+      if (!user) return res.status(404).json({ error: 'User not found' })
 
       return res.status(200).json(user);
     } catch (err) {

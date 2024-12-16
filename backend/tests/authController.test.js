@@ -6,6 +6,7 @@ import User from '../models/User.js'
 import chaiHttp from 'chai-http';
 import { use, expect } from 'chai';
 import app from '../server.js';
+import jwt from 'jsonwebtoken';
 
 const chai = use(chaiHttp);
 const request = chai.request.execute;
@@ -17,6 +18,7 @@ let testUser = {
   password: 'password123!'
 };
 let userCreated;
+let authToken;
 
 describe('AuthController Tests', () => {
   before(async function () {
@@ -104,6 +106,9 @@ describe('AuthController Tests', () => {
       });
       expect(res).to.have.status(200);
       expect(res.body).to.have.property('token').that.is.a('string');
+      
+      // Save the token for later tests
+      authToken = res.body.token;
     });
 
     it('should not login with missing fields', async () => {
@@ -157,5 +162,44 @@ describe('AuthController Tests', () => {
       expect(res).to.have.status(401);
       expect(res.body).to.have.property('error', 'Invalid email or password');
     });
+  });
+
+  describe('GET /me', () => {
+    it('should return the current user details when authenticated', async () => {
+      const res = await request(app).get('/me')
+        .set('Authorization', `Beared ${authToken}`);
+      expect(res).to.have.status(200);
+      expect(res.body).to.have.property('_id');
+      expect(mongoose.Types.ObjectId.isValid(res.body._id)).to.be.true;
+      expect(res.body).to.have.property('name', testUser.name);
+      expect(res.body).to.have.property('email', testUser.email);
+      expect(res.body).to.have.property('role', 'customer');
+      expect(res.body).to.not.have.property('password');
+    });
+
+    it('should return 401 if no token is provided', async() => {
+      const res = await request(app).get('/me');
+      expect(res).to.have.status(401);
+      expect(res.body).to.have.property('error', 'Unauthorized');
+    });
+
+    it('should return 401 if token is invalid', async() => {
+      const res = await request(app).get('/me')
+        .set('Authorization', `Bearer fakeToken`);
+      expect(res).to.have.status(401);
+      expect(res.body).to.have.property('error', 'Unauthorized: Invalid or expired token');
+    });
+
+    it('should return 404 if token is valid but user not found', async() => {
+      // Generate a JWT for a fake user
+      const fakeId = new mongoose.Types.ObjectId();
+      const token = jwt.sign({ id: fakeId }, process.env.JWT_SECRET, { expiresIn: '5m' });
+
+      const res = await request(app).get('/me')
+        .set('Authorization', `Bearer ${token}`);
+      expect(res).to.have.status(404);
+      expect(res.body).to.have.property('error', 'User not found');
+    });
+
   });
 });
