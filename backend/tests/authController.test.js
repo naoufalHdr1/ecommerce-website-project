@@ -200,6 +200,37 @@ describe('AuthController Tests', () => {
       expect(res).to.have.status(404);
       expect(res.body).to.have.property('error', 'User not found');
     });
+  });
 
+  describe('POST /forgot-password', () => {
+    it('should send a password reset email for a valid user', async () => {
+      const res = await request(app).post('/forgot-password').send({
+        email: testUser.email,
+      });
+      expect(res).to.have.status(200);
+      expect(res.body).to.have.property('message', 'Password reset email sent');
+
+      // Check if the user record is updated
+      const user = await User.findOne({ email: testUser.email });
+      expect(user).to.exist;
+      expect(user.resetPasswordToken).to.not.be.undefined;
+      expect(user.resetPasswordToken).to.be.a('string');
+      expect(user.resetPasswordExpires).to.not.be.undefined;
+      expect(user.resetPasswordExpires).to.be.an.instanceof(Date);
+    });
+
+    it('should return 400 if the email is missing', async () => {
+      const res = await request(app).post('/forgot-password');
+      expect(res).to.have.status(400);
+      expect(res.body).to.have.property('error', 'Missing email');
+    });
+
+    it('should return 404 if the email does not exist', async () => {
+      const res = await request(app).post('/forgot-password').send({
+        email: 'nonexisting@example.com'
+      });
+      expect(res).to.have.status(404);
+      expect(res.body).to.have.property('error', 'User not found');
+    });
   });
 });

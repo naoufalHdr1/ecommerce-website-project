@@ -103,7 +103,7 @@ class AuthController {
 
       // TODO: Send email to user
 
-      return res(200).json({ message: 'Password reset email sent'});
+      return res.status(200).json({ message: 'Password reset email sent'});
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
