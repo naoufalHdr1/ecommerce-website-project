@@ -24,7 +24,7 @@ describe('UsersController Tests', () => {
       await mongoose.disconnect();
     }
 
-    this.timeout(5000);
+    this.timeout(10000);
 
     // Start in-memory MongoDB server
     mongoServer = await MongoMemoryServer.create();

@@ -1,0 +1,96 @@
+// tests/User.test.js
+
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import User from '../models/User.js'
+import chaiHttp from 'chai-http';
+import { use, expect } from 'chai';
+import app from '../server.js';
+
+const chai = use(chaiHttp);
+const request = chai.request.execute;
+
+let mongoServer;
+let testUser = {
+  name: 'Bob',
+  email: 'bob@example.com',
+  password: 'password123!'
+};
+let userCreated;
+
+describe('AuthController Tests', () => {
+  before(async function () {
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect();
+    }
+
+    this.timeout(10000);
+
+    // Start in-memory MongoDB server
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    await mongoose.connect(uri);
+  });
+
+  after(async () => {
+    await mongoServer.stop();
+    await mongoose.disconnect();
+  });
+
+  describe('POST /register', () => {
+    it('should register a new user successfully', async () => {
+      const res = await request(app).post('/register').send(testUser);
+    
+      expect(res).to.have.status(201);
+      expect(res.body).to.have.property('id');
+      expect(mongoose.Types.ObjectId.isValid(res.body.id)).to.be.true;
+      expect(res.body).to.have.property('email', 'bob@example.com');
+    
+      // Save the created user for later tests
+      userCreated = res.body;
+
+      // Check if the user is created successfully
+      const user = await User.findOne({ email: testUser.email });
+      expect(user).to.exist;
+      expect(user.name).to.equal(testUser.name);
+      expect(user.email).to.equal(testUser.email);
+      // Password should be hashed
+      expect(user.password).to.not.equal(testUser.password);
+    });
+
+    it('should not register a user with missing fields', async () => {
+      let res;
+
+      // Missing data
+      res = await request(app).post('/register');
+      expect(res).to.have.status(400);
+      expect(res.body).to.have.property('error', 'Missing name');
+
+      // Missing email
+      res = await request(app).post('/register').send({
+        name: testUser.name,
+        password: testUser.password,
+      });
+      expect(res).to.have.status(400);
+      expect(res.body).to.have.property('error', 'Missing email');
+
+      // Missing password
+      res = await request(app).post('/register').send({
+        name: testUser.name,
+        email: testUser.email,
+      });
+      expect(res).to.have.status(400);
+      expect(res.body).to.have.property('error', 'Missing password');
+    });
+
+    it('should not register a user with an already registered email', async () => {
+      const res = await request(app).post('/register').send({
+        name: testUser.name,
+        email: userCreated.email,
+        password: testUser.password,
+      });
+      expect(res).to.have.status(400);
+      expect(res.body).to.have.property('error', 'User already exists');
+    });
+  });
+});

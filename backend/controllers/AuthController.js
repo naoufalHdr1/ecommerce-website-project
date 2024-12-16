@@ -14,18 +14,18 @@ class AuthController {
     if (!name) return res.status(400).json({ error: 'Missing name' });
     if (!email) return res.status(400).json({ error: 'Missing email' });
     if (!password) return res.status(400).json({ error: 'Missing password' });
+
     try {
       // Check if the user already exists
       const existingUser = await User.findOne({ email });
-      if (!name) return res.status(400).json({ error: 'User already exists' });
+      if (existingUser) return res.status(400).json({ error: 'User already exists' });
 
       // Hash the password and create a new user
       const hashedPassword = await User().hashPassword(password);
       const newUser = new User({ name, email, password: hashedPassword });
       await newUser.save();
 
-      // Mock email verification (todo after)
-      console.log(`Verification email sent to ${email}`)
+      // TO-DO: Add email verification
 
       return res.status(201).json({ id: newUser._id, email: newUser.email });
     } catch (err) {
