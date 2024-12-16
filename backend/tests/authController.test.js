@@ -7,6 +7,7 @@ import chaiHttp from 'chai-http';
 import { use, expect } from 'chai';
 import app from '../server.js';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 const chai = use(chaiHttp);
 const request = chai.request.execute;
@@ -16,9 +17,8 @@ let testUser = {
   name: 'Bob',
   email: 'bob@example.com',
   password: 'password123!'
-};
-let userCreated;
-let authToken;
+}, userCreated;
+let authToken, resetToken;
 
 describe('AuthController Tests', () => {
   before(async function () {
@@ -139,7 +139,7 @@ describe('AuthController Tests', () => {
     it('should not log in a user with incorrect data', async () => {
       // Incorrect email
       const res = await request(app).post('/login').send({
-        email: 'nonexistent@exmaple.com',
+        email: 'non_existent@exmaple.com',
         password: testUser.password,
       });
       expect(res).to.have.status(401);
@@ -217,6 +217,9 @@ describe('AuthController Tests', () => {
       expect(user.resetPasswordToken).to.be.a('string');
       expect(user.resetPasswordExpires).to.not.be.undefined;
       expect(user.resetPasswordExpires).to.be.an.instanceof(Date);
+
+      // Save the reset-token for later tests
+      resetToken = user.resetPasswordToken;
     });
 
     it('should return 400 if the email is missing', async () => {
@@ -227,10 +230,65 @@ describe('AuthController Tests', () => {
 
     it('should return 404 if the email does not exist', async () => {
       const res = await request(app).post('/forgot-password').send({
-        email: 'nonexisting@example.com'
+        email: 'non_existing@example.com'
       });
       expect(res).to.have.status(404);
       expect(res.body).to.have.property('error', 'User not found');
+    });
+  });
+
+  describe('POST /reset-password', () => {
+    it('should reset the password for a valid token and password', async () => {
+      const newPassword = 'newPassword123!';
+      const res = await request(app).post('/reset-password').send({
+        token: resetToken,
+        newPassword,
+      });
+      expect(res).to.have.status(200);
+      expect(res.body).to.have.property('message', 'Password has been reset successfully');
+
+      // Check if the user password has changed
+      const user = await User.findOne({ email: testUser.email });
+      const isMatch = await bcrypt.compare(newPassword, user.password);
+      expect(isMatch).to.be.true;
+      expect(user.resetPasswordToken).to.be.undefined;
+      expect(user.resetPasswordExpires).to.be.undefined;
+    });
+
+    it('should return 400 for an invalid token', async () => {
+      const res = await request(app).post('/reset-password').send({
+        token: 'invalidToken',
+        newPassword: 'newPassword123!',
+      });
+      expect(res).to.have.status(400);
+      expect(res.body).to.have.property('error', 'Invalid token');
+    });
+
+    it('should return 400 for an expired token', async () => {
+      // Mock a user with an expired password token
+      const newUser = new User({
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123',
+        resetPasswordToken: 'validToken',
+        resetPasswordExpires: Date.now() - 15 * 60 * 1000,
+      });
+      await newUser.save();
+
+      const res = await request(app).post('/reset-password').send({
+        token: 'validToken',
+        newPassword: 'newPassword123!',
+      });
+      expect(res).to.have.status(400);
+      expect(res.body).to.have.property('error', 'Expired token');
+    });
+
+    it('should return 400 if the password is missing', async () => {
+      const res = await request(app).post('/reset-password').send({
+        token: 'validToken',
+      });
+      expect(res).to.have.status(400);
+      expect(res.body).to.have.property('error', 'Token and new password are required');
     });
   });
 });

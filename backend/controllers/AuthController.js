@@ -92,6 +92,14 @@ class AuthController {
       const user = await User.findOne({ email })
       if (!user) return res.status(404).json({ error: 'User not found' });
 
+      /* TODO: 
+       * If the token exists and hasn't expired:
+       *   resend the same token instead of creating a new one.
+       *   If the token has expired, create a new one.
+       * Automatically Delete Expired Tokens using background job
+       * Storing the token in a separate Token model
+       */
+
       // Generate a reset token
       const resetToken = crypto.randomBytes(32).toString('hex');
       const hashedToken = await bcrypt.hash(resetToken, 10);
@@ -113,19 +121,15 @@ class AuthController {
   static async resetPassword(req, res) {
     const { token, newPassword } = req.body;
 
-    if (!token || newPassword)
+    if (!token || !newPassword)
       return res.status(400).json({ error: 'Token and new password are required' });
 
     try {
       // Check token expiry
-      const user = await User.findOne({
-        resetPasswordExpires: { $gt: Date.now() },
-      });
-      if (!user) return res.status(400).json({ error: 'Invalid or expired token' });
-
-      // Verify the token
-      const isTokenValid = await bcrypt.compare(token, user.resetPasswordToken);
-      if (!isTokenValid) return res.status(400).json({ error: 'Invalid token' });
+      const user = await User.findOne({ resetPasswordToken: token });
+      if (!user) return res.status(400).json({ error: 'Invalid token' });
+      if(user.resetPasswordExpires < Date.now())
+      	return res.status(400).json({ error: 'Expired token' });
 
       // Update the user's password
       const hashedPassword = await User().hashPassword(newPassword);
