@@ -108,6 +108,40 @@ class AuthController {
       return res.status(500).json({ error: err.message });
     }
   }
+
+  /* Verifies the token and updates the password. */
+  static async resetPassword(req, res) {
+    const { token, newPassword } = req.body;
+
+    if (!token || newPassword)
+      return res.status(400).json({ error: 'Token and new password are required' });
+
+    try {
+      // Check token expiry
+      const user = await User.findOne({
+        resetPasswordExpires: { $gt: Date.now() },
+      });
+      if (!user) return res.status(400).json({ error: 'Invalid or expired token' });
+
+      // Verify the token
+      const isTokenValid = await bcrypt.compare(token, user.resetPasswordToken);
+      if (!isTokenValid) return res.status(400).json({ error: 'Invalid token' });
+
+      // Update the user's password
+      const hashedPassword = await User().hashPassword(newPassword);
+      user.password = hashedPassword;
+
+      // Clear the reset token fields
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+
+      await user.save();
+      
+      return res.status(200).json({ message: 'Password has been reset successfully' });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
 }
 
 export default AuthController;

@@ -13,6 +13,7 @@ router.post('/logout', AuthController.logout);
 router.get('/me', verifyToken, AuthController.getCurrentUser);
 
 // Password rest routes
-router.post('forgot-password', AuthController.forgotPassword);
+router.post('/forgot-password', AuthController.forgotPassword);
+router.post('/reset-password', AuthController.resetPassword);
 
 export default router;
