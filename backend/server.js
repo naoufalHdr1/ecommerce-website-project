@@ -3,25 +3,22 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import dbClient from './config/db.js';
 import usersRoutes from './routes/usersRoutes.js'
+import authRoutes from './routes/authRoutes.js'
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 
-//Middleware
+// Middleware
 app.use(express.json());
 app.use(cors());
 
 dbClient.connect(process.env.MONGO_URI);
 
-// Test route
-app.get('/', (req, res) => {
-  res.send('API is running...');
-});
-
-// Use the users routes
+// Routes
 app.use('/users', usersRoutes);
+app.use('/', authRoutes);
 
 // Handel graceful shutdown
 process.on('SIGINT', async () => {
