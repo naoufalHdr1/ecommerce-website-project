@@ -3,6 +3,7 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 class AuthController {
 
@@ -25,11 +26,11 @@ class AuthController {
       const newUser = new User({ name, email, password: hashedPassword });
       await newUser.save();
 
-      // TO-DO: Add email verification
+      // TODO: Send Email to user
 
       return res.status(201).json({ id: newUser._id, email: newUser.email });
     } catch (err) {
-      return res.status(400).json({ error: err.message });
+      return res.status(500).json({ error: err.message });
     }
   }
 
@@ -60,7 +61,7 @@ class AuthController {
 
       res.status(200).json({ token });
     } catch (err) {
-      return res.status(400).json({ error: err.message });
+      return res.status(500).json({ error: err.message });
     }
   }
 
@@ -77,10 +78,36 @@ class AuthController {
 
       return res.status(200).json(user);
     } catch (err) {
-      return res.status(400).json({ error: err.message });
+      return res.status(500).json({ error: err.message });
     }
   }
 
+  /* Generates a password reset token and sends it to the user’s email */
+  static async forgotPassword(req, res) {
+    const { email } = req.body;
+
+    if (!email) return res.status(400).json({ error: 'Missing email' });
+
+    try {
+      const user = await User.findOne({ email })
+      if (!user) return res.status(404).json({ error: 'User not found' });
+
+      // Generate a reset token
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const hashedToken = await bcrypt.hash(resetToken, 10);
+
+      // Save the hashed token and expiration to the user's record
+      user.resetPasswordToken = hashedToken;
+      user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+      await user.save();
+
+      // TODO: Send email to user
+
+      return res(200).json({ message: 'Password reset email sent'});
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
 }
 
 export default AuthController;
