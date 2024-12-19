@@ -4,6 +4,7 @@ import cors from 'cors';
 import dbClient from './config/db.js';
 import usersRoutes from './routes/usersRoutes.js'
 import authRoutes from './routes/authRoutes.js'
+import productRoutes from './routes/productRoutes.js'
 
 // Load environment variables
 dotenv.config();
@@ -19,6 +20,7 @@ dbClient.connect(process.env.MONGO_URI);
 // Routes
 app.use('/users', usersRoutes);
 app.use('/', authRoutes);
+app.use('/products', productRoutes);
 
 // Handel graceful shutdown
 process.on('SIGINT', async () => {
