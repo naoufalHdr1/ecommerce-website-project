@@ -84,6 +84,24 @@ class ProductsController {
       res.status(500).json({ error: err.message });
     }
   }
+
+  /*
+   * DELETE /products/:id
+   * Remove a product.
+   */
+  static async deleteProduct(req, res) {
+    const { id } = req.params;
+
+    try {
+      const deletedProduct = await Product.findByIdAndDelete(id);
+      if (!deletedProduct)
+        return res.status(404).json({ error: 'Product not found'});
+
+      return res.status(200);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
 }
 
 export default ProductsController;
