@@ -2,7 +2,7 @@
 
 import express from 'express';
 import AuthController from '../controllers/AuthController.js';
-import verifyToken from '../middleware/verifyToken.js';
+import { verifyToken, checkAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 

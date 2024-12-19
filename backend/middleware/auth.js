@@ -3,7 +3,7 @@
 import jwt from 'jsonwebtoken';
 
 /* Middleware for Token Validation */
-const verifyToken = (req, res, next) => {
+export const verifyToken = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Unauthorized' });
 
@@ -19,4 +19,15 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-export default verifyToken;
+/* Middleware to check a user's role.*/
+export const checkAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (user.role !== 'admin')
+      res.statuas(403).json({ error: 'Access denied. Admins only.' })
+
+    next();
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+};

@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 class ProductsController {
 
   /* Get all products */
-  static async getProducts(req, res) {
+  static async getAllProducts(req, res) {
     const { page = 0 } = req.query;
     const PAGE_SIZE = 20;
 
@@ -23,7 +23,7 @@ class ProductsController {
     }
   }
 
-  static async getProductById(req, res) {
+  static async getProduct(req, res) {
     const productId = req.params.id;
 
     try {

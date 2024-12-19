@@ -5,8 +5,11 @@ import ProductsController from '../controllers/ProductsController.js';
 
 const router = express.Router();
 
-router.get('/', ProductsController.getProducts);
-router.get('/:id', ProductsController.getProductById);
-router.post('/create', ProductsController.createProduct);
+// Public
+router.get('/',  ProductsController.getAllProducts);
+router.get('/:id', ProductsController.getProduct);
+
+// Admin Only
+router.post('/', verifyToken, checkAdmin, ProductsController.createProduct);
 
 export default router;
