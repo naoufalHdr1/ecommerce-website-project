@@ -28,6 +28,20 @@ class ProductsController {
       res.status(500).json({ error: err.message });
     }
   }
+
+  static async createProduct(req, res) {
+    const { name, description, price, stock, image } = req.body;
+
+    try {
+      // Create and save a new user
+      const product = new Product({ name, description, price, stock, image });
+      await product.save();
+
+      return res.status(201).json(product);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
 }
 
 export default ProductsController;
