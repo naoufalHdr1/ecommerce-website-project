@@ -7,9 +7,17 @@ class ProductsController {
 
   /* Get all products */
   static async getProducts(req, res) {
+    const { page = 0 } = req.query;
+    const PAGE_SIZE = 20;
+
     try {
-      const products = await Product.find();
-      return res.json(products);
+      // Retrieve all products with pagination
+      const products = await Product.aggregate([
+        { $skip: parseInt(page, 10) * PAGE_SIZE },
+        { $limit: PAGE_SIZE },
+      ]);
+
+      return res.json(response);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
