@@ -2,6 +2,7 @@
 
 import express from 'express';
 import ProductsController from '../controllers/ProductsController.js';
+import { verifyToken, checkAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -11,5 +12,6 @@ router.get('/:id', ProductsController.getProduct);
 
 // Admin Only
 router.post('/', verifyToken, checkAdmin, ProductsController.createProduct);
+router.put('/:id', ProductsController.updateProduct);
 
 export default router;
