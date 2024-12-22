@@ -1,0 +1,53 @@
+/* File: InputField.css  */
+
+/* Enhanced form controls */
+.form-control {
+  border: none;
+  border-bottom: 2px solid #ddd;
+  border-radius: 0;
+  box-shadow: none;
+  transition: border-color 0.3s;
+  padding: 12px 0 12px 0;
+  font-size: 16px;
+}
+
+.form-control:focus {
+  border-bottom-color: #3b444b; 
+  box-shadow: none;
+}
+
+/* Floating label effect */
+.form-group {
+  position: relative;
+}
+
+.form-label {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #555;
+  transition: all 0.2s ease;
+  pointer-events: none; /* Prevents label from interfering with input */
+}
+
+/* When the input is focused or filled, the label moves and shrinks */
+.form-control:focus + .form-label,
+.form-control:not(:placeholder-shown) + .form-label {
+  top: -8px;
+  font-size: 12px;
+}
+
+/* Target autofill state */
+input:-webkit-autofill {
+    background-color: #fff;
+    box-shadow: 0 0 0px 1000px #fff inset;
+}
+
+/* Optionally, for better appearance you can add other styles */
+input:-webkit-autofill:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0px 1000px #fff inset;
+}
+
