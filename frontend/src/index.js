@@ -18,6 +18,7 @@ import './components/Home/HomeBanner/HomeBanner.css';
 import './components/Home/Products/FeaturedProducts.css';
 import './components/Home/Collections/Collection.css';
 import './components/Home/Collections/categoryCard.css';
+import './components/Home/services/benefitsSection.css';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

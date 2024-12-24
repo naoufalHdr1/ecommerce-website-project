@@ -46,7 +46,7 @@
   position: absolute;
   width: 50px;
   height: 3px;
-  background-color: #f76c6c; /* Accent color */
+  background-color: #f76c6c;
   bottom: -5px;
   left: 50%;
   transform: translateX(-50%);

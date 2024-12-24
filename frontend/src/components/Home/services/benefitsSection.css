@@ -1,0 +1,41 @@
+/* Styling for Benefits Section */
+
+/* Title and Description */
+
+/* Benefits Card */
+.benefit-card {
+  transition: transform 0.5s ease, box-shadow 0.3s ease;
+}
+
+.benefit-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.benefit-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-top: 1rem;
+}
+
+.benefit-description {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .section-description {
+    font-size: 1rem;
+  }
+
+  .benefit-icon {
+    font-size: 1.8rem;
+  }
+}
