@@ -1,6 +1,7 @@
 // middleware/verifyToken.js
 
 import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
 /* Middleware for Token Validation */
 export const verifyToken = (req, res, next) => {
@@ -24,7 +25,7 @@ export const checkAdmin = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
     if (user.role !== 'admin')
-      res.statuas(403).json({ error: 'Access denied. Admins only.' })
+      res.status(403).json({ error: 'Access denied. Admins only.' })
 
     next();
   } catch (err) {

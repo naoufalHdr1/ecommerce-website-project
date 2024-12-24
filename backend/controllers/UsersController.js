@@ -9,12 +9,12 @@ class UsersController {
 
   /* Creates a new user. */
   static async createUser(req, res) {
-    const { name, email, password } = req.body;
+    const { name, email, password, role} = req.body;
 
     // Validate input in the controller
-    if (!name) return res.status(400).json({ error: 'Miising name' });
-    if (!email) return res.status(400).json({ error: 'Miising email' });
-    if (!password) return res.status(400).json({ error: 'Miising password' });
+    if (!name) return res.status(400).json({ error: 'Missing name' });
+    if (!email) return res.status(400).json({ error: 'Missing email' });
+    if (!password) return res.status(400).json({ error: 'Missing password' });
 
     try {
       // Check if the user already exists
@@ -23,7 +23,7 @@ class UsersController {
 
       // Create and save a new user
       const hashedPassword = await User().hashPassword(password);
-      const newUser = new User({ name, email, password: hashedPassword });
+      const newUser = new User({ name, email, password: hashedPassword, role });
       await newUser.save();
 
       res.status(201).json({ id: newUser._id, email: newUser.email });

@@ -1,0 +1,47 @@
+/* Fixed Background Image Section */
+.hero-background-image {
+  width: 100%;
+  background-position: center;
+}
+
+.hero-background-image {
+  object-fit: cover;
+}
+
+/* Small screen sizes */
+@media (max-width: 768px) {
+  .hero-background-image {
+    height: 200px;
+    background-position: right;
+  }
+}
+
+/* Hero Section Styling */
+.hero-section {
+  margin-top: 200px; /* Add margin to push the hero section below the fixed image */
+  background: linear-gradient(to right, #f8f9fa, #e9ecef);
+  padding: 80px 0;
+}
+
+.hero-section h1 {
+  color: #343a40;
+}
+
+.hero-section p {
+  color: #6c757d;
+}
+
+.breadcrumb {
+  background: transparent;
+  margin-top: 20px;
+}
+
+.breadcrumb a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+

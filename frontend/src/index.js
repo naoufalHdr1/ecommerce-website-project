@@ -20,6 +20,7 @@ import './components/Home/Collections/Collection.css';
 import './components/Home/Collections/categoryCard.css';
 import './components/Home/services/benefitsSection.css';
 import './components/footer/footer.css';
+import './components/categories/heroSection/hero.css';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

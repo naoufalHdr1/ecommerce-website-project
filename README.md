@@ -88,10 +88,10 @@ A simple e-commerce website built using modern technologies to provide a seamles
 ## Roadmap
 
 ### Phase 1: Core Features
-- [x] User authentication
-- [x] Product listings
-- [x] Shopping cart
-- [x] Order history
+- [ ] User authentication
+- [ ] Product listings
+- [ ] Shopping cart
+- [ ] Order history
 
 ### Phase 2: Enhancements
 - [ ] Responsive design improvements
