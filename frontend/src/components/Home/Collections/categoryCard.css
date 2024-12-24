@@ -1,0 +1,64 @@
+/* Main styling for the category card */
+.category-card {
+  height: 250px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+  background-color: #f8f9fa;
+}
+
+.category-card:hover {
+  transform: scale(1.01); /* Slight scaling of the card */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Image zoom effect */
+.category-card .image-container {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.category-card img {
+  object-fit: cover;
+  transition: transform 0.5s ease-in-out;
+  position: absolute;
+  left: 20%;
+}
+
+.category-card:hover img {
+  transform: scale(1.1); /* Slight zoom on the image */
+}
+
+/* Category info (top-right corner) */
+.category-info {
+  text-align: left !important;
+}
+
+.category-info h2 {
+  font-size: 1.5rem;
+}
+
+.category-info p {
+  font-size: 0.9rem;
+  margin: 0;
+  color: #6c757d;
+}
+
+/* Shop Now button (bottom-left corner) */
+.shop-now-container {
+  z-index: 2;
+}
+
+.category-card .shop-now {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  font-weight: bold;
+}
+
+.category-card:hover .shop-now {
+  opacity: 1; /* Fade-in effect */
+  display: block !important;
+}
+
