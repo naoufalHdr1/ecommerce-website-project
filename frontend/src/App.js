@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Home from './pages/Home';
 import './App.css';
 import Header from './components/Header/Header.js';
+import Footer from './components/footer/footer.js';
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
           <Route path="/register" element={<Register />} />
         </Routes>
       </main>
+
+      <Footer />
     </>
   );
 }
