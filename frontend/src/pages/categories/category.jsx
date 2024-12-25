@@ -62,7 +62,7 @@ const Categories = () => {
 
   const data = categoryData[category];
 
-  // Handle invalid category (optional)
+  // Handle invalid category
   if (!data) {
     return <div>Category not found</div>;
   }
