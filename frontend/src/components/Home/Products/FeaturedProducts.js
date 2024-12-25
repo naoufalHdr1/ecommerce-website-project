@@ -10,12 +10,6 @@ const featuredProducts = [
 const HighlightsSection = () => {
   return (
     <section className="container my-5">
-      <div className="text-center mb-5">
-        <h2 className="section-title">Featured Products</h2>
-        <p className="section-subtitle">
-          Discover our carefully curated collection of products designed to elevate your style and enhance your everyday life.
-        </p>
-      </div>
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-2 g-md-4">
         {featuredProducts.map((product) => (
           <div
@@ -31,11 +25,10 @@ const HighlightsSection = () => {
                 <div className="overlay position-absolute w-100 h-100"></div>
               </a>
               <div className="text py-3 pb-4 px-3">
-                <div className="d-flex justify-content-between">
-                  <div className="cat mb-2 text-muted fs-6">
+                  <div className="cat text-muted fs-6">
                     <span>{product.category}</span>
                   </div>
-                  <div className="rating">
+                  <div className="rating mb-2">
                     <p className="text-right mb-0">
                       {[...Array(5)].map((_, index) => (
                         <i
@@ -46,7 +39,6 @@ const HighlightsSection = () => {
                       ))}
                     </p>
                   </div>
-                </div>
                 <h3 className="product-name fs-6 fw-normal">
                   <a href="#">{product.name}</a>
                 </h3>

@@ -21,14 +21,14 @@
 }
 
 .category-card img {
-  object-fit: cover;
   transition: transform 0.5s ease-in-out;
   position: absolute;
-  left: 20%;
+  left: 35%;
+  height: inherit;
 }
 
 .category-card:hover img {
-  transform: scale(1.1); /* Slight zoom on the image */
+  transform: scale(1.07); /* Slight zoom on the image */
 }
 
 /* Category info (top-right corner) */

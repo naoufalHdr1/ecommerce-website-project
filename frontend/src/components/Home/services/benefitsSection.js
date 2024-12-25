@@ -21,14 +21,6 @@ const BenefitsSection = () => {
 
   return (
     <div className="benefits-section container py-5">
-      {/* Title */}
-      <div className="text-center mb-5">
-        <h1 className="section-title">Why Choose Us</h1>
-        <p className="section-description text-muted">
-          Experience the best shopping with our commitment to quality, fast delivery, and exceptional service.
-        </p>
-      </div>
-
       {/* Benefits List */}
       <div className="row text-center g-4">
         {benefits.map((benefit, index) => (
