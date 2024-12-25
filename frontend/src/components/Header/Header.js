@@ -27,7 +27,7 @@ const Header = () => {
         <div className="d-flex justify-content-between align-items-center">
           {/* Logo */}
           <a href="/" className="header-logo">
-            <img src="logo.png" alt="Male Fashion Logo" className="img-fluid" style={{ maxWidth: "150px" }} />
+            <img src="/logo.png" alt="Male Fashion Logo" className="img-fluid" style={{ maxWidth: "150px" }} />
           </a>
 
           {/* Navbar Toggler (small screens) */}

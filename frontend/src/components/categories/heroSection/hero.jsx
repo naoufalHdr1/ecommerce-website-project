@@ -1,28 +1,28 @@
 import Title from "../../Home/title/title.jsx";
 
-const titles = {
-  title: "Explore Men’s Categories",
-  description: "Find the perfect fit for every occasion. Discover our exclusive range of men’s clothing and accessories designed to elevate your style."
-}
+const HeroSection = ({ title, description, banner, category }) => {
+  let isBanner = false;
 
-const HeroSection = () => {
+  if (banner && banner.length > 0)
+    isBanner = true;
+
   return (
     <div>
       {/* Fixed Image Section */}
-      <div className="d-flex justify-content-center">
-        <img src="categoryBanner.jpg" alt="category banner" className="hero-background-image d-block d-md-none"/>
-        <img src="categoryBanner.jpeg" alt="category banner" className="hero-background-image d-md-block d-none"/>
+      <div className={`${isBanner ? "d-flex justify-content-center" : "d-none"}`}>
+        <img src={banner[0]} alt="category banner" className="hero-background-image d-md-block d-none"/>
+        <img src={banner[1]} alt="category banner" className="hero-background-image d-block d-md-none"/>
       </div>
 
       {/* Hero Content Section */}
       <Title
-        title={titles.title}
-        description={titles.description}
+        title={title}
+        description={description}
       />
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb justify-content-center">
           <li class="breadcrumb-item"><a href="/">Home</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Men's Categories</li>
+          <li class="breadcrumb-item active" aria-current="page">{category}'s categories</li>
         </ol>
       </nav>
     </div>

@@ -1,10 +1,10 @@
 import React from "react";
 
 const featuredProducts = [
-  { id: 1, name: "Nike Free RN 2019 iD", category: "Shoes", price: 120, image: "product1.jpg", rating: 4 },
-  { id: 2, name: "Leather Handbag", category: "Bags", price: 200, image: "product2.jpg", rating: 5 },
-  { id: 3, name: "Summer Hat", category: "Accessories", price: 50, image: "product3.jpg", rating: 3 },
-  { id: 4, name: "Adidas Running Shoes", category: "Shoes", price: 140, image: "product4.jpg", rating: 5 },
+  { id: 1, name: "Nike Free RN 2019 iD", category: "Shoes", price: 120, image: "/product1.jpg", rating: 4 },
+  { id: 2, name: "Leather Handbag", category: "Bags", price: 200, image: "/product2.jpg", rating: 5 },
+  { id: 3, name: "Summer Hat", category: "Accessories", price: 50, image: "/product3.jpg", rating: 3 },
+  { id: 4, name: "Adidas Running Shoes", category: "Shoes", price: 140, image: "/product4.jpg", rating: 5 },
 ];
 
 const HighlightsSection = () => {
