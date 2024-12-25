@@ -1,0 +1,13 @@
+.category-products-page {
+  display: flex;
+}
+
+.filter-sidebar-container {
+  flex-shrink: 0;
+}
+
+.products-grid-container {
+  padding: 20px;
+  width: 100%;
+}
+

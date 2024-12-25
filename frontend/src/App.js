@@ -7,6 +7,8 @@ import './App.css';
 import Header from './components/Header/Header.js';
 import Footer from './components/footer/footer.js';
 import Category from './pages/categories/category.jsx';
+import CategoryProductsPage from './components/categories/categoryProductsPage/categoryProductsPage.jsx';
+
 
 function App() {
   return (
@@ -19,6 +21,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/categories/:category" element={<Category />} />
+          <Route path="/a" element={<CategoryProductsPage />} />
         </Routes>
       </main>
 
