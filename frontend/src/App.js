@@ -6,12 +6,16 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Category from "./pages/categories/category";
 import CategoryProductsPage from "./components/categories/categoryProductsPage/categoryProductsPage";
+import Dashboard from "./pages/dashboard/dashboard";
 
 function App() {
   return (
     <NotificationProvider>
       <Router>
         <Routes>
+          {/* Dashboard route without Layout */}
+          <Route path="/dashboard" element={<Dashboard />} />
+
           {/* All other routes wrapped with Layout */}
           <Route
             path="/*"
