@@ -9,7 +9,6 @@ import Footer from './components/footer/footer.js';
 import Category from './pages/categories/category.jsx';
 import CategoryProductsPage from './components/categories/categoryProductsPage/categoryProductsPage.jsx';
 
-
 function App() {
   return (
     <>

@@ -28,7 +28,7 @@ const CategoryProductsPage = () => {
   };
 
   return (
-    <div className="category-products-page d-flex">
+    <div className="category-products-page d-md-flex">
       <div className="filter-sidebar-container">
         <FilterSidebar filters={filters} onFilterChange={handleFilterChange} />
       </div>
