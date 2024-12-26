@@ -15,7 +15,7 @@ import './components/InputField/InputField.css';
 import './components/Banner/Banner.css';
 import './components/Header/Header.css';
 import './components/Home/HomeBanner/HomeBanner.css';
-import './components/Home/Products/FeaturedProducts.css';
+import './components/Home/Products/product.css';
 import './components/Home/Collections/Collection.css';
 import './components/Home/Collections/categoryCard.css';
 import './components/Home/services/benefitsSection.css';

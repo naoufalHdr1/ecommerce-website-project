@@ -1,7 +1,7 @@
 import HeroSection from '../../components/categories/heroSection/hero.jsx';
 import CategoriesSection  from '../../components/Home/Collections/Collection.js';
 import Title from '../../components/Home/title/title.jsx';
-import FeaturedProducts from '../../components/Home/Products/FeaturedProducts.js';
+import Product from '../../components/Home/Products/product.jsx';
 import { useParams } from "react-router-dom";
 
 // Sample data for each category
@@ -51,10 +51,18 @@ const categoryData = {
     categories: [],
   },
 };
+
 const categories = [
   { title: "Shirts", image: "/shirts.png" },
   { title: "Jumpers", image: "/jumpers.png" },
   { title: "Jackets", image: "/jackets.png" },
+];
+
+const featuredProducts = [
+  { id: 1, name: "Nike Free RN 2019 iD", category: "Shoes", price: 120, image: "/product1.jpg", rating: 4 },
+  { id: 2, name: "Leather Handbag", category: "Bags", price: 200, image: "/product2.jpg", rating: 5 },
+  { id: 3, name: "Summer Hat", category: "Accessories", price: 50, image: "/product3.jpg", rating: 3 },
+  { id: 4, name: "Adidas Running Shoes", category: "Shoes", price: 140, image: "/product4.jpg", rating: 5 },
 ];
 
 const Categories = () => {
@@ -77,7 +85,13 @@ const Categories = () => {
       />
       <CategoriesSection categories={data.categories} />
       <Title title="You might also like"/>
-      <FeaturedProducts />
+      <section className="container my-5">
+        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-2 g-md-4">
+          {featuredProducts.map((product) => (
+            <Product product={product}/>
+          ))}
+        </div>
+     </section>
     </>
   );
 }
