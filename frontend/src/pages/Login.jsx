@@ -4,11 +4,13 @@ import { useNavigate } from "react-router-dom";
 import InputField from '../components/InputField/InputField.js';
 import BannerSection from '../components/Banner/Banner.js';
 import { loginUser } from '../utils/api.js';
+import { useNotifications } from '../utils/notificationContext';
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { addNotification } = useNotifications();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -16,17 +18,11 @@ const Login = () => {
       const data = await loginUser(email, password);
       if (data?.token) {
         sessionStorage.setItem('token', data.token);
-        toast.success('Login successful!', {
-          position: 'top-right',
-          autoClose: 3000,
-        });
+        addNotification('Login successful!', 'success');
         navigate('/');
       }
     } catch (err) {
-      toast.error(err, {
-        position: 'top-right',
-        autoClose: 3000,
-      });
+      addNotification(err, 'error');
     };
   }
 

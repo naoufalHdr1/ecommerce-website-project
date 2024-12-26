@@ -1,29 +1,27 @@
 import React, { useState } from "react";
-import api from "../utils/api";
+import { registerUser } from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import InputField from '../components/InputField/InputField';
 import BannerSection from '../components/Banner/Banner';
+import { useNotifications } from '../utils/notificationContext';
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { addNotification } = useNotifications();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("/register", { name, email, password });
-      
-      if (res && res.data && res.data.id) {
-        alert("Registration successful! Please log in.");
-        navigate("/login");
-      } else {
-        alert("Registration failed.");
+      const res = await registerUser(name, email, password);
+      if (res && res.email && res.id) {
+        addNotification('Registration successful! Please log in.', 'success');
+        navigate('/login');
       }
     } catch (err) {
-      console.error("Error during registration:", err);
-      alert("Registration failed: Please try again.");
+      addNotification(err, 'error');
     }
   };
 

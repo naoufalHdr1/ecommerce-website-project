@@ -1,32 +1,37 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Home from './pages/Home';
-import './App.css';
-import Header from './components/Header/Header.js';
-import Footer from './components/footer/footer.js';
-import Category from './pages/categories/category.jsx';
-import CategoryProductsPage from './components/categories/categoryProductsPage/categoryProductsPage.jsx';
+import { NotificationProvider } from "./utils/notificationContext";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "./components/layouts/layout.js";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Category from "./pages/categories/category";
+import CategoryProductsPage from "./components/categories/categoryProductsPage/categoryProductsPage";
 
 function App() {
   return (
-    <>
-      <Header />
-      
-      <main>
+    <NotificationProvider>
+      <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/categories/:category" element={<Category />} />
-          <Route path="/a" element={<CategoryProductsPage />} />
+          {/* All other routes wrapped with Layout */}
+          <Route
+            path="/*"
+            element={
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/categories/:category" element={<Category />} />
+                  <Route path="/a" element={<CategoryProductsPage />} />
+                </Routes>
+              </Layout>
+            }
+          />
         </Routes>
-      </main>
-
-      <Footer />
-    </>
+      </Router>
+    </NotificationProvider>
   );
 }
 
 export default App;
+
