@@ -1,29 +1,34 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import InputField from '../components/InputField/InputField.js';
 import BannerSection from '../components/Banner/Banner.js';
-import api from '../utils/api';
+import { loginUser } from '../utils/api.js';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/login', { email, password });
-      if (res?.data?.token) {
-        sessionStorage.setItem("token", res.data.token);
-        navigate("/");
-      } else {
-        alert("Login failed: No token received.");
+      const data = await loginUser(email, password);
+      if (data?.token) {
+        sessionStorage.setItem('token', data.token);
+        toast.success('Login successful!', {
+          position: 'top-right',
+          autoClose: 3000,
+        });
+        navigate('/');
       }
     } catch (err) {
-      console.error("Error during login:", err);
-      alert("Login failed: Please try again.");
-    }
-  };
+      toast.error(err, {
+        position: 'top-right',
+        autoClose: 3000,
+      });
+    };
+  }
 
   return (
     <div className="d-flex vh-100">
@@ -75,6 +80,8 @@ const Login = () => {
               Log in
             </button>
           </form>
+          {/* Add ToastContainer for notifications */}
+          <ToastContainer />
 
           <p className="text-center text-muted mt-3">
             Don’t have an account? 
@@ -90,4 +97,3 @@ const Login = () => {
 };
 
 export default Login;
-
