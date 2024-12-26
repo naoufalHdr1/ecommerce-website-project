@@ -17,7 +17,7 @@ const Login = () => {
     try {
       const data = await loginUser(email, password);
       if (data?.token) {
-        sessionStorage.setItem('token', data.token);
+        localStorage.setItem('token', data.token);
         addNotification('Login successful!', 'success');
         navigate('/');
       }
