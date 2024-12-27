@@ -24,6 +24,7 @@ import './components/categories/heroSection/hero.css';
 import './components/categories/categoryProductsPage/productsGrid.css';
 import './components/categories/categoryProductsPage/filterSidebar.css';
 import './components/categories/categoryProductsPage/categoryProductsPage.jsx';
+import './components/dashboard/sidebar.css'
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
