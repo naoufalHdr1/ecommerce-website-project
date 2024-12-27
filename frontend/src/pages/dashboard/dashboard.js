@@ -7,7 +7,7 @@ import DemoTheme from '../../components/dashboard/demoTheme';
 import DemoRouter from '../../components/dashboard/demoRouter';
 import Branding from '../../components/dashboard/branding';
 import SkeletonGrid from '../../components/dashboard/skeletonGrid';
-import DashboardOverview from '../../components/dashboard/dashboardOverview';
+import DashboardOverview from '../../components/dashboard/dashboardSection/dashboardOverview';
 
 const Dashboard = (props) => {
   const { window } = props;
