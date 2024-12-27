@@ -7,8 +7,9 @@ import DemoTheme from '../../components/dashboard/demoTheme';
 import DemoRouter from '../../components/dashboard/demoRouter';
 import Branding from '../../components/dashboard/branding';
 import SkeletonGrid from '../../components/dashboard/skeletonGrid';
+import DashboardOverview from '../../components/dashboard/dashboardOverview';
 
-export default function Dashboard(props) {
+const Dashboard = (props) => {
   const { window } = props;
   const router = DemoRouter('/dashboard');
   const demoWindow = window ? window() : undefined;
@@ -23,9 +24,15 @@ export default function Dashboard(props) {
     >
       <DashboardLayout>
         <PageContainer>
+          {/* Dashboard Overview Section */}
+          {router.pathname === '/dashboard' && <DashboardOverview />}
+
+          {/* Placeholder Skeleton Grid */}
           <SkeletonGrid />
         </PageContainer>
       </DashboardLayout>
     </AppProvider>
   );
-}
+};
+
+export default Dashboard;
