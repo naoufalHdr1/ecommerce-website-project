@@ -4,6 +4,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
+import Inventory2RoundedIcon from '@mui/icons-material/Inventory2Rounded';
 
 const NavigationConfig = [
   {
@@ -14,6 +15,11 @@ const NavigationConfig = [
     segment: 'dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
+  },
+  {
+    segment: 'products',
+    title: 'Products',
+    icon: <Inventory2RoundedIcon />,
   },
   {
     segment: 'orders',
