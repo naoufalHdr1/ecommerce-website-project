@@ -9,7 +9,7 @@ class BaseController {
    * GET /items
    * Retrieve a list of items (with pagination).
    */
-  async getAll(req, res) {
+  static async getAll(req, res) {
     const { page = 0 } = req.query;
     const PAGE_SIZE = 20;
 
@@ -28,7 +28,7 @@ class BaseController {
    * GET /items/:id
    * Retrieve details of a specific item.
    */
-  async getById(req, res) {
+  static async getById(req, res) {
     const { id } = req.params;
 
     try {
@@ -45,7 +45,7 @@ class BaseController {
    * POST /items
    * Add a new item.
    */
-  async create(req, res) {
+  static async create(req, res) {
     try {
       const newItem = new this.model(req.body);
       await newItem.save();
@@ -60,7 +60,7 @@ class BaseController {
    * PUT /items/:id
    * Update an item.
    */
-  async update(req, res) {
+  static async update(req, res) {
     const { id } = req.params;
 
     try {
@@ -81,7 +81,7 @@ class BaseController {
    * DELETE /items/:id
    * Delete an item.
    */
-  async delete(req, res) {
+  static async delete(req, res) {
     const { id } = req.params;
 
     try {

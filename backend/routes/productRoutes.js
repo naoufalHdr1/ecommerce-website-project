@@ -7,12 +7,12 @@ import { verifyToken, checkAdmin } from '../middleware/auth.js';
 const router = express.Router();
 
 // Public
-router.get('/',  ProductsController.getAllProducts);
-router.get('/:id', ProductsController.getProduct);
+router.get('/', ProductsController.getAll.bind(ProductsController));
+router.get('/:id', ProductsController.getById.bind(ProductsController));
 
 // Admin Only
-router.post('/', verifyToken, checkAdmin, ProductsController.createProduct);
-router.put('/:id', verifyToken, checkAdmin, ProductsController.updateProduct);
-router.delete('/:id', verifyToken, checkAdmin, ProductsController.deleteProduct);
+router.post('/', verifyToken, checkAdmin, ProductsController.create.bind(ProductsController));
+router.put('/:id', verifyToken, checkAdmin, ProductsController.update.bind(ProductsController));
+router.delete('/:id', verifyToken, checkAdmin, ProductsController.delete.bind(ProductsController));
 
 export default router;
