@@ -2,7 +2,7 @@
 
 import express from 'express';
 import AuthController from '../controllers/AuthController.js';
-import { verifyToken, checkAdmin } from '../middleware/auth.js';
+import { verifyToken, checkAdmin, userRole } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -11,6 +11,7 @@ router.post('/register', AuthController.register);
 router.post('/login', AuthController.login);
 router.post('/logout', AuthController.logout);
 router.get('/me', verifyToken, AuthController.getCurrentUser);
+router.get('/validate', verifyToken, userRole);
 
 // Password rest routes
 router.post('/forgot-password', AuthController.forgotPassword);

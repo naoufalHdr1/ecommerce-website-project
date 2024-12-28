@@ -32,3 +32,17 @@ export const checkAdmin = async (req, res, next) => {
     res.status(500).json({ error: err.message })
   }
 };
+
+/* Middleware to validate the user role */
+export const userRole = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ role: user.role });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
