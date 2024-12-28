@@ -6,6 +6,7 @@ import usersRoutes from './routes/usersRoutes.js'
 import authRoutes from './routes/authRoutes.js'
 import productRoutes from './routes/productRoutes.js'
 import categoryRoutes from './routes/categoryRoutes.js'
+import subcategoryRoutes from './routes/subcategoryRoutes.js'
 
 // Load environment variables
 dotenv.config();
@@ -23,6 +24,7 @@ app.use('/users', usersRoutes);
 app.use('/', authRoutes);
 app.use('/products', productRoutes);
 app.use('/categories', categoryRoutes);
+app.use('/subcategories', subcategoryRoutes);
 
 // Handel graceful shutdown
 process.on('SIGINT', async () => {

@@ -1,4 +1,4 @@
-// controllers/ProductsController.js
+// controllers/CategoriesController.js
 
 import Category from '../models/category.js';
 import Subcategory from '../models/subcategory.js';
