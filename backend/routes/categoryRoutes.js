@@ -1,18 +1,9 @@
 // routes/categoryRoutes.js
 
-import express from 'express';
-import CategoriesController from '../controllers/CategoriesController.js';
-import { verifyToken, checkAdmin } from '../middleware/auth.js';
+import Category from '../models/category.js';
+import Subcategory from '../models/subcategory.js';
+import { generateRoute } from '../utils/routeFactory.js'
 
-const router = express.Router();
-
-// Public
-router.get('/', CategoriesController.getAll.bind(CategoriesController));
-router.get('/:id', CategoriesController.getById.bind(CategoriesController));
-
-// Admin Only
-router.post('/', verifyToken, checkAdmin, CategoriesController.create.bind(CategoriesController));
-router.put('/:id', verifyToken, checkAdmin, CategoriesController.update.bind(CategoriesController));
-router.delete('/:id', verifyToken, checkAdmin, CategoriesController.delete.bind(CategoriesController));
+const router = generateRoute(Category, Subcategory);
 
 export default router;
