@@ -5,6 +5,7 @@ import dbClient from './config/db.js';
 import usersRoutes from './routes/usersRoutes.js'
 import authRoutes from './routes/authRoutes.js'
 import productRoutes from './routes/productRoutes.js'
+import categoryRoutes from './routes/categoryRoutes.js'
 
 // Load environment variables
 dotenv.config();
@@ -21,6 +22,7 @@ dbClient.connect(process.env.MONGO_URI);
 app.use('/users', usersRoutes);
 app.use('/', authRoutes);
 app.use('/products', productRoutes);
+app.use('/categories', categoryRoutes);
 
 // Handel graceful shutdown
 process.on('SIGINT', async () => {
