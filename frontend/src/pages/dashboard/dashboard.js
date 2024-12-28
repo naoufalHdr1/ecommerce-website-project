@@ -6,8 +6,8 @@ import NavigationConfig from '../../components/dashboard/navigationConfig';
 import DemoTheme from '../../components/dashboard/demoTheme';
 import DemoRouter from '../../components/dashboard/demoRouter';
 import Branding from '../../components/dashboard/branding';
-import SkeletonGrid from '../../components/dashboard/skeletonGrid';
 import DashboardOverview from '../../components/dashboard/dashboardSection/dashboardOverview';
+import ProductOverview from '../../components/dashboard/productSection/productOverview';
 
 const Dashboard = (props) => {
   const { window } = props;
@@ -27,8 +27,9 @@ const Dashboard = (props) => {
           {/* Dashboard Overview Section */}
           {router.pathname === '/dashboard' && <DashboardOverview />}
 
-          {/* Placeholder Skeleton Grid */}
-          <SkeletonGrid />
+          {/* Products Overview Section */}
+          {router.pathname === '/products' && <ProductOverview />}
+
         </PageContainer>
       </DashboardLayout>
     </AppProvider>

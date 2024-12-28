@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Typography, TextField, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ProductTable from './productTable';
 import EditProductDialog from './editProductDialog';
@@ -11,6 +11,10 @@ const ProductOverview = () => {
     { id: 2, name: 'Sneakers', category: 'Footwear', inventory: 30 },
     { id: 3, name: 'Backpack', category: 'Accessories', inventory: 20 },
   ]);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [inventoryFilter, setInventoryFilter] = useState('');
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -47,15 +51,24 @@ const ProductOverview = () => {
     setIsAddOpen(false);
   };
 
+  const filteredProducts = products.filter((product) => {
+    const matchesSearchQuery = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = categoryFilter ? product.category === categoryFilter : true;
+    const matchesInventory =
+      inventoryFilter === 'low'
+        ? product.inventory < 10
+        : inventoryFilter === 'in-stock'
+        ? product.inventory > 0
+        : inventoryFilter === 'out-of-stock'
+        ? product.inventory === 0
+        : true;
+
+    return matchesSearchQuery && matchesCategory && matchesInventory;
+  });
+
   return (
     <Box p={0}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-        flexWrap="wrap"
-      >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} flexWrap="wrap">
         <Typography variant="h5" fontWeight="bold">
           Product Listings
         </Typography>
@@ -64,8 +77,51 @@ const ProductOverview = () => {
         </Button>
       </Box>
 
+      <Box display="flex" gap={2} mb={3} flexWrap="wrap">
+        {/* Search Products Input */}
+        <TextField
+          label="Search Products"
+          variant="outlined"
+          size="small"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{ flex: 1, minWidth: '200px' }} // Adjust width
+        />
+
+        {/* Category Filter */}
+        <FormControl size="small" sx={{ flex: 1, minWidth: '200px' }}>
+          <InputLabel>Category</InputLabel>
+          <Select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            label="Category"
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="Clothing">Clothing</MenuItem>
+            <MenuItem value="Footwear">Footwear</MenuItem>
+            <MenuItem value="Accessories">Accessories</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Inventory Status Filter */}
+        <FormControl size="small" sx={{ flex: 1, minWidth: '200px' }}>
+          <InputLabel>Inventory Status</InputLabel>
+          <Select
+            value={inventoryFilter}
+            onChange={(e) => setInventoryFilter(e.target.value)}
+            label="Inventory Status"
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="low">Low Stock</MenuItem>
+            <MenuItem value="in-stock">In Stock</MenuItem>
+            <MenuItem value="out-of-stock">Out of Stock</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+
       <ProductTable
-        products={products}
+        products={filteredProducts}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
@@ -87,3 +143,4 @@ const ProductOverview = () => {
 };
 
 export default ProductOverview;
+
