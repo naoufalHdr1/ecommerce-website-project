@@ -99,12 +99,23 @@ const ProductSection = () => {
 
   const handleAddSave = async (newProduct) => {
     try {
+      // Create a product
       const res = await api.post('/products', newProduct, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setProducts((prevProducts) => [...prevProducts, res.data]);
+      const createdProduct = res.data
+
+      // Update the products field in the subcategory
+      await api.put(`/subcategories/${createdProduct.subcategory_id}`, { products: createdProduct._id }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Update local state
+      setProducts((prevProducts) => [...prevProducts, createdProduct]);
       setIsAddOpen(false);
     } catch (err) {
       console.error('Error adding product:', err);
