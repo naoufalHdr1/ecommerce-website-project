@@ -126,7 +126,19 @@ const CategorySection = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setSubcategories((prevSubcategories) => [...prevSubcategories, res.data]);
+      
+      const createdSubcat = res.data
+
+      await api.put(`/categories/${createdSubcat.category_id}/add-item`,
+        { subcategories: createdSubcat._id},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        },
+      );
+
+      setSubcategories((prevSubcategories) => [...prevSubcategories, createdSubcat]);
       setIsAddSubcategoryOpen(false);
     } catch (err) {
       console.error('Error adding category:', err);

@@ -21,7 +21,7 @@ const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId }) => {
                     size="small"
                     variant="outlined"
                     startIcon={<EditIcon />}
-                    onClick={() => onEdit(params.row)}
+                    onClick={() => onEdit(params.row._id)}
                   >
                     Edit
                   </Button>
@@ -32,7 +32,7 @@ const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId }) => {
                     variant="contained"
                     color="error"
                     startIcon={<DeleteIcon />}
-                    onClick={() => onDelete(params.row.id)}
+                    onClick={() => onDelete(params.row._id)}
                   >
                     Delete
                   </Button>

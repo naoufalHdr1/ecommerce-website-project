@@ -56,23 +56,25 @@ const ProductSection = () => {
     subcategory: subcategoryMap[product.subcategory_id] || 'Unknown Subcategory',
   }));
 
-  const handleEdit = (product) => {
+  const handleEdit = (id) => {
+    const product = products.find((product) => product._id === id)
     setSelectedProduct(product);
     setIsEditOpen(true);
   };
 
   const token = localStorage.getItem("token");
 
-  const handleEditSave = async (updatedProduct) => {
+  const handleEditSave = async (editedProduct) => {
     try {
-      const res = await api.put(`/products/${updatedProduct.id}`, updatedProduct, {
+      const { _id, ...updatedProduct } = editedProduct;
+      const res = await api.put(`/products/${_id}`, updatedProduct, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
-          product.id === updatedProduct.id ? res.data : product
+          product._id === _id ? res.data : product
         )
       );
       setIsEditOpen(false);
@@ -85,8 +87,12 @@ const ProductSection = () => {
     const confirm = window.confirm('Are you sure you want to delete this product?');
     if (confirm) {
       try {
-        await api.delete(`/products/${id}`);
-        setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
+        await api.delete(`/products/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setProducts((prevProducts) => prevProducts.filter((product) => product._id !== id));
       } catch (err) {
         console.error('Error deleting product:', err);
       }
@@ -218,6 +224,7 @@ const ProductSection = () => {
         product={selectedProduct}
         onClose={() => setIsEditOpen(false)}
         onSave={handleEditSave}
+        _categories={categories}
       />
 
       <AddProductDialog

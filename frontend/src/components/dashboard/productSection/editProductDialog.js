@@ -1,47 +1,233 @@
-import React from 'react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Button,
+  Box,
+  Stack,
+  IconButton,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+} from '@mui/material';
+import { AddPhotoAlternate, Close } from '@mui/icons-material';
+import { api } from '../../../utils/api';
+import { API_BASE_URL } from '../../../utils/config';
 
-const EditProductDialog = ({ open, product, onClose, onSave }) => {
-  const [editedProduct, setEditedProduct] = React.useState(product || {});
+const EditProductDialog = ({ open, product, onClose, onSave, _categories }) => {
+  const [editedProduct, setEditedProduct] = useState(product || {});
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    setCategories(_categories);
+  }, [_categories]);
+
+  useEffect(() => {
     setEditedProduct(product || {});
+    setUploadedImages(
+      (product?.images || []).map((image) =>
+        image.startsWith('/uploads/')
+          ? `${API_BASE_URL}${image}`
+          : image
+      )
+    );
+    if (product?.category_id) {
+      fetchSubcategories(product.category_id);
+    }
   }, [product]);
+
+  const fetchSubcategories = async (categoryId) => {
+    try {
+      const res = await api.get(`/subcategories/findBy?category_id=${categoryId}`);
+      setSubcategories(res.data);
+    } catch (err) {
+      console.error('Error fetching subcategories:', err);
+    }
+  };
+
+  const handleCategoryChange = (event) => {
+    const selectedCategoryId = event.target.value;
+    const selectedCategory = categories.find((cat) => cat._id === selectedCategoryId);
+
+    setEditedProduct((prev) => ({
+      ...prev,
+      category_id: selectedCategoryId,
+      category: selectedCategory,
+      subcategory_id: null,
+      subcategory: null,
+    }));
+
+    if (selectedCategoryId) {
+      fetchSubcategories(selectedCategoryId);
+    } else {
+      setSubcategories([]);
+    }
+  };
+
+  const handleSubcategoryChange = (event) => {
+    const selectedSubcategoryId = event.target.value;
+    const selectedSubcategory = subcategories.find((sub) => sub._id === selectedSubcategoryId);
+
+    setEditedProduct((prev) => ({
+      ...prev,
+      subcategory_id: selectedSubcategoryId,
+      subcategory: selectedSubcategory,
+    }));
+  };
+
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const imagePreviews = files.map((file) => URL.createObjectURL(file));
+    setUploadedImages((prev) => [...prev, ...imagePreviews]);
+    setEditedProduct((prev) => ({
+      ...prev,
+      images: [...(prev.images || []), ...files],
+    }));
+  };
+
+  const handleRemoveImage = (index) => {
+    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
+    setEditedProduct((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
 
   const handleSave = () => {
     onSave(editedProduct);
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>Edit Product</DialogTitle>
       <DialogContent>
-        <TextField
-          margin="dense"
-          label="Product Name"
-          fullWidth
-          value={editedProduct.name || ''}
-          onChange={(e) => setEditedProduct({ ...editedProduct, name: e.target.value })}
-        />
-        <TextField
-          margin="dense"
-          label="Category"
-          fullWidth
-          value={editedProduct.category || ''}
-          onChange={(e) => setEditedProduct({ ...editedProduct, category: e.target.value })}
-        />
-        <TextField
-          margin="dense"
-          label="Inventory"
-          type="number"
-          fullWidth
-          value={editedProduct.inventory || ''}
-          onChange={(e) => setEditedProduct({ ...editedProduct, inventory: +e.target.value })}
-        />
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <TextField
+            label="Product Name"
+            fullWidth
+            value={editedProduct.name || ''}
+            onChange={(e) =>
+              setEditedProduct({ ...editedProduct, name: e.target.value })
+            }
+          />
+          <TextField
+            label="Description"
+            fullWidth
+            multiline
+            rows={3}
+            value={editedProduct.description || ''}
+            onChange={(e) =>
+              setEditedProduct({ ...editedProduct, description: e.target.value })
+            }
+          />
+          <TextField
+            label="Price"
+            type="number"
+            fullWidth
+            value={editedProduct.price || ''}
+            onChange={(e) =>
+              setEditedProduct({ ...editedProduct, price: parseFloat(e.target.value) || 0 })
+            }
+          />
+          <TextField
+            label="Stock"
+            type="number"
+            fullWidth
+            value={editedProduct.stock || ''}
+            onChange={(e) =>
+              setEditedProduct({ ...editedProduct, stock: parseInt(e.target.value, 10) || 0 })
+            }
+          />
+          {/* Category Select */}
+          <FormControl fullWidth>
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={editedProduct.category_id || ''}
+              onChange={handleCategoryChange}
+            >
+              {categories.map((cat) => (
+                <MenuItem key={cat._id} value={cat._id}>
+                  {cat.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {/* Subcategory Select */}
+          <FormControl fullWidth>
+            <InputLabel>Subcategory</InputLabel>
+            <Select
+              value={editedProduct.subcategory_id || ''}
+              onChange={handleSubcategoryChange}
+              disabled={!editedProduct.category_id}
+            >
+              {subcategories.map((sub) => (
+                <MenuItem key={sub._id} value={sub._id}>
+                  {sub.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {/* Images */}
+          <Box>
+            <Button
+              variant="contained"
+              component="label"
+              startIcon={<AddPhotoAlternate />}
+            >
+              Upload Images
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+              />
+            </Button>
+            <Stack direction="row" spacing={2} sx={{ mt: 2, flexWrap: 'wrap' }}>
+              {uploadedImages.map((image, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    position: 'relative',
+                    width: 100,
+                    height: 100,
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <img
+                    src={image}
+                    alt={`Uploaded ${index}`}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  <IconButton
+                    size="small"
+                    onClick={() => handleRemoveImage(index)}
+                    sx={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      '&:hover': { backgroundColor: 'rgba(255, 255, 255, 1)' },
+                    }}
+                  >
+                    <Close fontSize="small" />
+                  </IconButton>
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSave} variant="contained">
+        <Button onClick={handleSave} variant="contained" color="primary">
           Save
         </Button>
       </DialogActions>
@@ -50,4 +236,3 @@ const EditProductDialog = ({ open, product, onClose, onSave }) => {
 };
 
 export default EditProductDialog;
-
