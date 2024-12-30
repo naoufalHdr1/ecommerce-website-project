@@ -1,12 +1,9 @@
 // Add a new item.
 export const create = (model) => async (req, res) => {
-  console.log("model:", model);
-  console.log("create data recieved:", req.body);
   try {
     const data = await model.create(req.body);
     res.status(201).json(data);
   } catch (err) {
-    console.log(err)
     res.status(500).json({ error: err.message });
   }
 };
@@ -52,7 +49,28 @@ export const getByQuery = (model) => async (req, res) => {
   }
 };
 
-// Update an item by Id
+export const updateById = (model) => async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Use $set to update fields explicitly
+    const updatedItem = await model.findByIdAndUpdate(
+      id,
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedItem) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    res.json(updatedItem);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/* Update an item by Id
 export const updateById = (model) => async (req, res) => {
   const { id } = req.params;
 
@@ -67,10 +85,10 @@ export const updateById = (model) => async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+*/
 
 export const updateListFieldById = (model) => async (req, res) => {
   const { id } = req.params;
-  console.log('/put data recieved=', req.body)
 
   try {
     const updatedSubcategory = await Subcategory.findByIdAndUpdate(
@@ -81,7 +99,6 @@ export const updateListFieldById = (model) => async (req, res) => {
 
     res.status(200).json(updatedSubcategory);
   } catch (err) {
-    console.log(err)
     res.status(500).json({ error: 'Error updating subcategory' });
   }
 };
@@ -89,6 +106,7 @@ export const updateListFieldById = (model) => async (req, res) => {
 // Delete an item.
 export const deleteById = (model) => async (req, res) => {
   const { id } = req.params;
+	console.log("1 id:", id)
 
   try {
     const data = await model.findByIdAndDelete(id);
@@ -102,6 +120,7 @@ export const deleteById = (model) => async (req, res) => {
 // Delete an item with it's subData.
 export const deleteBySub = (model, subModel) => async (req, res) => {
   const { id } = req.params;
+	console.log("2 id:", id)
   const { deleteSubData = false } = req.body
 
   try {
