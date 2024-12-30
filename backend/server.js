@@ -7,6 +7,7 @@ import authRoutes from './routes/authRoutes.js'
 import productRoutes from './routes/productRoutes.js'
 import categoryRoutes from './routes/categoryRoutes.js'
 import subcategoryRoutes from './routes/subcategoryRoutes.js'
+import uploadRoutes from './routes/uploadRoutes.js'
 
 // Load environment variables
 dotenv.config();
@@ -22,6 +23,7 @@ dbClient.connect(process.env.MONGO_URI);
 // Routes
 app.use('/users', usersRoutes);
 app.use('/', authRoutes);
+app.use('/', uploadRoutes);
 app.use('/products', productRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/subcategories', subcategoryRoutes);

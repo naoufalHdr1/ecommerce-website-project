@@ -4,7 +4,8 @@ const categorySchema = mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
     description: { type: String, required: true },
-    image: { type: String, required: true },
+    image: [{ type: String }],
+    banner: [{ type: String }],
     subcategories : [
       {
         type: mongoose.Schema.Types.ObjectId,
