@@ -19,8 +19,6 @@ const ProductSection = () => {
   const [products, setProducts] = useState([]);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [subcategoryFilter, setSubcategoryFilter] = useState('');
   const [inventoryFilter, setInventoryFilter] = useState('');
 
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -47,17 +45,29 @@ const ProductSection = () => {
 
   // Create lookup maps for categories and subcategories
   const categoryMap = Object.fromEntries(categories.map((cat) => [cat._id, cat.name]));
-  const subcategoryMap = Object.fromEntries(subcategories.map((subcat) => [subcat._id, subcat.name]));
+  const subcategoryMap = Object.fromEntries(
+    subcategories.map((subcat) => [
+      subcat._id,
+      { name: subcat.name, category_id: subcat.category_id },
+    ])
+  );
 
   // Transform products to include category and subcategory names
-  const transformedProducts = products.map((product) => ({
-    ...product,
-    category: categoryMap[product.category_id] || 'Unknown Category',
-    subcategory: subcategoryMap[product.subcategory_id] || 'Unknown Subcategory',
-  }));
+  const transformedProducts = products.map((product) => {
+    const subcategory = subcategoryMap[product.subcategory_id];
+    const categoryName = subcategory ? categoryMap[subcategory.category_id] : '';
+    const subcategoryName = subcategory ? subcategory.name : '';
+
+    return {
+      ...product,
+      category_id: subcategory ? subcategory.category_id : null,
+      category: categoryName,
+      subcategory: subcategoryName,
+    };
+  });
 
   const handleEdit = (id) => {
-    const product = products.find((product) => product._id === id)
+    const product = filteredProducts.find((product) => product._id === id)
     setSelectedProduct(product);
     setIsEditOpen(true);
   };
@@ -67,11 +77,12 @@ const ProductSection = () => {
   const handleEditSave = async (editedProduct) => {
     try {
       const { _id, ...updatedProduct } = editedProduct;
-      const res = await api.put(`/products/${_id}`, updatedProduct, {
+      const res = await api.put(`/products/${_id}/add`, updatedProduct, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
           product._id === _id ? res.data : product
@@ -83,16 +94,30 @@ const ProductSection = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (product) => {
     const confirm = window.confirm('Are you sure you want to delete this product?');
     if (confirm) {
       try {
-        await api.delete(`/products/${id}`, {
+        const res = await api.delete(`/products/${product._id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setProducts((prevProducts) => prevProducts.filter((product) => product._id !== id));
+
+        const deletedProduct = res.data;
+
+        // Update the products field in the subcategory
+        await api.put(`/subcategories/${deletedProduct.subcategory_id}/add-item`,
+        { operation: 'pull',
+          data : { products: deletedProduct._id }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setProducts((prevProducts) => prevProducts.filter((product) => product._id !== deletedProduct._id));
       } catch (err) {
         console.error('Error deleting product:', err);
       }
@@ -114,11 +139,15 @@ const ProductSection = () => {
       const createdProduct = res.data
 
       // Update the products field in the subcategory
-      await api.put(`/subcategories/${createdProduct.subcategory_id}`, { products: createdProduct._id }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      await api.put(`/subcategories/${createdProduct.subcategory_id}/add-item`,
+        { operation: 'push',
+          data : { products: createdProduct._id }
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
       // Update local state
       setProducts((prevProducts) => [...prevProducts, createdProduct]);
@@ -130,8 +159,7 @@ const ProductSection = () => {
 
   const filteredProducts = transformedProducts.filter((product) => {
     const matchesSearchQuery = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = categoryFilter ? product.category_id === categoryFilter : true;
-    const matchesSubcategory = subcategoryFilter ? product.subcategory_id === subcategoryFilter : true;
+
     const matchesInventory =
       inventoryFilter === 'low'
         ? product.stock < 10
@@ -141,7 +169,7 @@ const ProductSection = () => {
         ? product.stock === 0
         : true;
 
-    return matchesSearchQuery && matchesCategory && matchesSubcategory && matchesInventory;
+    return matchesSearchQuery && matchesInventory;
   });
 
   return (
@@ -164,38 +192,6 @@ const ProductSection = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           sx={{ flex: 1, minWidth: '200px' }}
         />
-
-        <FormControl size="small" sx={{ flex: 1, minWidth: '200px' }}>
-          <InputLabel>Category</InputLabel>
-          <Select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            label="Category"
-          >
-            <MenuItem value="">All</MenuItem>
-            {categories.map((category) => (
-              <MenuItem key={category.id} value={category.id}>
-                {category.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl size="small" sx={{ flex: 1, minWidth: '200px' }}>
-          <InputLabel>SubCategory</InputLabel>
-          <Select
-            value={subcategoryFilter}
-            onChange={(e) => setSubcategoryFilter(e.target.value)}
-            label="SubCategory"
-          >
-            <MenuItem value="">All</MenuItem>
-            {subcategories.map((subcategory) => (
-              <MenuItem key={subcategory.id} value={subcategory.id}>
-                {subcategory.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
 
         <FormControl size="small" sx={{ flex: 1, minWidth: '200px' }}>
           <InputLabel>Inventory Status</InputLabel>

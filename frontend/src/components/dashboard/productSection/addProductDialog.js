@@ -16,13 +16,11 @@ const AddProductDialog = ({ open, onClose, onSave, _categories }) => {
   const [newProduct, setNewProduct] = useState({
     name: '',
     description: '',
-    price: '',
+    price: 0,
     stock: 0,
     sizes: [],
     colors: [],
     images: [],
-    category_id: null,
-    subcategory_id: null,
   });
   const [activeTab, setActiveTab] = useState(0);
   const [uploadedImages, setUploadedImages] = useState([]);
@@ -40,15 +38,14 @@ const AddProductDialog = ({ open, onClose, onSave, _categories }) => {
       const productData = {
         ...newProduct,
         images: uploadedImageUrls,
-        category_id: newProduct.category?._id,
-        subcategory_id: newProduct.subcategory?._id,
+        subcategory_id: newProduct.subcategory?._id || null,
       };
 
       onSave(productData);
       setNewProduct({
         name: '',
         description: '',
-        price: '',
+        price: 0,
         stock: 0,
         sizes: [],
         colors: [],
@@ -156,6 +153,7 @@ const AddProductDialog = ({ open, onClose, onSave, _categories }) => {
               label="Price"
               variant="standard"
               size="small"
+              type="number"
               value={newProduct.price}
               onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
               fullWidth
@@ -234,8 +232,8 @@ const AddProductDialog = ({ open, onClose, onSave, _categories }) => {
                   key={index}
                   sx={{
                     position: 'relative',
-                    width: 120, // Increased size
-                    height: 120, // Increased size
+                    width: 120,
+                    height: 120,
                     borderRadius: 2,
                     overflow: 'hidden',
                     boxShadow: 1,

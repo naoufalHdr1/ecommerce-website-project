@@ -15,7 +15,7 @@ import {
   FormControl,
 } from '@mui/material';
 import { AddPhotoAlternate, Close } from '@mui/icons-material';
-import { api } from '../../../utils/api';
+import { api, uploadImages } from '../../../utils/api';
 import { API_BASE_URL } from '../../../utils/config';
 
 const EditProductDialog = ({ open, product, onClose, onSave, _categories }) => {
@@ -53,12 +53,11 @@ const EditProductDialog = ({ open, product, onClose, onSave, _categories }) => {
 
   const handleCategoryChange = (event) => {
     const selectedCategoryId = event.target.value;
-    const selectedCategory = categories.find((cat) => cat._id === selectedCategoryId);
 
     setEditedProduct((prev) => ({
       ...prev,
-      category_id: selectedCategoryId,
-      category: selectedCategory,
+      category_id: selectedCategoryId || null,
+      category: selectedCategoryId ? categories.find((cat) => cat._id === selectedCategoryId) : null,
       subcategory_id: null,
       subcategory: null,
     }));
@@ -72,12 +71,13 @@ const EditProductDialog = ({ open, product, onClose, onSave, _categories }) => {
 
   const handleSubcategoryChange = (event) => {
     const selectedSubcategoryId = event.target.value;
-    const selectedSubcategory = subcategories.find((sub) => sub._id === selectedSubcategoryId);
 
     setEditedProduct((prev) => ({
       ...prev,
-      subcategory_id: selectedSubcategoryId,
-      subcategory: selectedSubcategory,
+      subcategory_id: selectedSubcategoryId || null,
+      subcategory: selectedSubcategoryId
+        ? subcategories.find((sub) => sub._id === selectedSubcategoryId)
+        : null,
     }));
   };
 
@@ -92,15 +92,63 @@ const EditProductDialog = ({ open, product, onClose, onSave, _categories }) => {
   };
 
   const handleRemoveImage = (index) => {
-    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
-    setEditedProduct((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
+    setUploadedImages((prev) => prev.filter((_, i) => i !== index)); 
+    setEditedProduct((prev) => {
+      const updatedImages = [...prev.images];
+      updatedImages.splice(index, 1);
+      return {
+        ...prev,
+        images: updatedImages,
+      };
+    });
   };
 
-  const handleSave = () => {
-    onSave(editedProduct);
+  const handleSave = async () => {
+    try {
+      // Allowed fields to be sent
+      const allowedFields = [
+        '_id',
+        'name',
+        'description',
+        'price',
+        'stock',
+        'images',
+        'sizes',
+        'colors',
+        'subcategory_id',
+      ];
+
+      // Always include `_id`
+      const modifiedFields = {
+        _id: editedProduct._id,
+      };
+
+      // Add only modified fields
+      Object.keys(editedProduct).forEach((key) => {
+        if (
+    allowedFields.includes(key) &&
+    key !== '_id' &&
+    editedProduct[key] !== product[key]
+        ) {
+    modifiedFields[key] = editedProduct[key];
+        }
+      });
+
+      // Handle images
+      const newImages = editedProduct.images || [];
+
+      // Separate new and existing images
+      const imagesToUpload = newImages.filter((img) => img instanceof File);
+      const imagesToKeep = newImages.filter((img) => typeof img === 'string');
+
+      // Upload new images and add to `imagesToKeep`
+      const uploadedImageUrls = await uploadImages(imagesToUpload);
+      modifiedFields.images = [...imagesToKeep, ...uploadedImageUrls];
+
+      onSave(modifiedFields);
+    } catch (err) {
+      console.error('Error saving product:', err);
+    }
   };
 
   return (
@@ -151,6 +199,7 @@ const EditProductDialog = ({ open, product, onClose, onSave, _categories }) => {
               value={editedProduct.category_id || ''}
               onChange={handleCategoryChange}
             >
+              <MenuItem value="">None</MenuItem>
               {categories.map((cat) => (
                 <MenuItem key={cat._id} value={cat._id}>
                   {cat.name}
@@ -158,6 +207,7 @@ const EditProductDialog = ({ open, product, onClose, onSave, _categories }) => {
               ))}
             </Select>
           </FormControl>
+
           {/* Subcategory Select */}
           <FormControl fullWidth>
             <InputLabel>Subcategory</InputLabel>

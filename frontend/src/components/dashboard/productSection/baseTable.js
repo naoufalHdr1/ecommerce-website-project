@@ -32,7 +32,7 @@ const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId }) => {
                     variant="contained"
                     color="error"
                     startIcon={<DeleteIcon />}
-                    onClick={() => onDelete(params.row._id)}
+                    onClick={() => onDelete(params.row)}
                   >
                     Delete
                   </Button>
