@@ -1,3 +1,9 @@
+import { checkDocumentExists } from '../utils/helper.js';
+import Subcategory from '../models/subcategory.js';
+import Category from '../models/category.js';
+import Product from '../models/Product.js';
+import mongoose from 'mongoose';
+
 // Add a new item.
 export const create = (model) => async (req, res) => {
   try {
@@ -87,15 +93,72 @@ export const updateById = (model) => async (req, res) => {
 };
 */
 
-export const updateListFieldById = (model) => async (req, res) => {
+export const updateProductById = (model) => async (req, res) => {
   const { id } = req.params;
+  const {subcategory_id, ...updateData } = req.body;
+  let subcategory = null;
 
   try {
-    const updatedSubcategory = await Subcategory.findByIdAndUpdate(
+    const existingProduct = await model.findById(id);
+    if (!existingProduct) return res.status(404).json({ error: "Product not found" });
+
+    // Check if category and subcategory exist
+    try {
+      if (subcategory_id) {
+        subcategory = await checkDocumentExists(Subcategory, subcategory_id, 'subcategory_id')
+      }
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    // Handle subcategory change
+    if (existingProduct.subcategory_id !== subcategory_id) {
+      await Subcategory.updateOne(
+        { _id: existingProduct.subcategory_id },
+        { $pull: { products: id } },
+      );
+    }
+
+    if (subcategory_id) {
+      await Subcategory.updateOne(
+        { _id: subcategory_id },
+        { $addToSet: { products: id } },
+      );
+    }
+
+    // Update the product
+    const updatedProduct = await model.findByIdAndUpdate(
       id,
-      { $push: req.body },
-      { new: true }
+      { $set: req.body },
+      { new: true, runValidators: true,}
     );
+
+    res.json(updatedProduct);
+  } catch (err) {
+    res.status(500).json({ error: 'Error updating item' });
+  }
+}
+
+export const updateListFieldById = (model) => async (req, res) => {
+  const { id } = req.params;
+  const { operation, data } = req.body
+  let updatedSubcategory;
+
+  try {
+    if (operation === 'push') {
+      updatedSubcategory = await model.findByIdAndUpdate(
+        id,
+        { $push: data },
+        { new: true }
+      );
+    } else {
+      updatedSubcategory = await model.findByIdAndUpdate(
+        id,
+        { $pull: data },
+        { new: true }
+      );
+
+    }
 
     res.status(200).json(updatedSubcategory);
   } catch (err) {
@@ -106,12 +169,11 @@ export const updateListFieldById = (model) => async (req, res) => {
 // Delete an item.
 export const deleteById = (model) => async (req, res) => {
   const { id } = req.params;
-	console.log("1 id:", id)
 
   try {
     const data = await model.findByIdAndDelete(id);
     if (!data) return res.status(404).json({ error: 'Item not found' });
-    res.status(200).json({ message: 'Deleted successfully' });
+    res.status(200).json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -120,7 +182,6 @@ export const deleteById = (model) => async (req, res) => {
 // Delete an item with it's subData.
 export const deleteBySub = (model, subModel) => async (req, res) => {
   const { id } = req.params;
-	console.log("2 id:", id)
   const { deleteSubData = false } = req.body
 
   try {

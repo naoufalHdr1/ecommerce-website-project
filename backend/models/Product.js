@@ -6,10 +6,10 @@ import mongoose from 'mongoose';
 const ProductSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    description: { type: String, required: true },
-    price: { type: String, required: true },
-    stock: { type: Number, required: true, min: 0 },
-    images: [{ type: String }],
+    description: { type: String },
+    price: { type: Number, default: 0 },
+    stock: { type: Number, min: 0, default: 0 },
+    images: { type: [String], default: ['/uploads/product-placeholder.png'] },
     sizes: [{ type: String }],
     colors: [
       {
@@ -20,10 +20,7 @@ const ProductSchema = new mongoose.Schema(
     subcategory_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Subcategory',
-    },
-    category_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
+      default: null,
     },
   },
   {
