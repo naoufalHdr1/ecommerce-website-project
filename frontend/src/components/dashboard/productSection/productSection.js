@@ -94,30 +94,18 @@ const ProductSection = () => {
     }
   };
 
-  const handleDelete = async (product) => {
+  const handleDelete = async (deleteProduct) => {
     const confirm = window.confirm('Are you sure you want to delete this product?');
     if (confirm) {
       try {
-        const res = await api.delete(`/products/${product._id}`, {
+        await api.delete(`/products/delete`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          data: deleteProduct,
         });
 
-        const deletedProduct = res.data;
-
-        // Update the products field in the subcategory
-        await api.put(`/subcategories/${deletedProduct.subcategory_id}/add-item`,
-        { operation: 'pull',
-          data : { products: deletedProduct._id }
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setProducts((prevProducts) => prevProducts.filter((product) => product._id !== deletedProduct._id));
+        setProducts((prevProducts) => prevProducts.filter((product) => product._id !== deleteProduct._id));
       } catch (err) {
         console.error('Error deleting product:', err);
       }
