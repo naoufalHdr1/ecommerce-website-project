@@ -3,10 +3,13 @@ import Subcategory from '../models/subcategory.js';
 import Category from '../models/category.js';
 import Product from '../models/Product.js';
 import mongoose from 'mongoose';
+import fs from 'fs';
+import path from 'path';
+import { __dirname } from '../server.js';
+
 
 // Add a new item.
 export const createProduct = (model) => async (req, res) => {
-  console.log("req body=", req.body);
   const { subcategory_id, ...productData } = req.body;
 
   try {
@@ -27,21 +30,17 @@ export const createProduct = (model) => async (req, res) => {
       }
     }
 
-    console.log("newProduct=", newProduct);
     res.status(201).json(newProduct);
   } catch (err) {
-	  console.log(err)
     res.status(500).json({ error: err.message });
   }
 };
 
 export const create = (model) => async (req, res) => {
-        console.log(req.body)
   try {
     const data = await model.create(req.body);
     res.status(201).json(data);
   } catch (err) {
-          console.log(err)
     res.status(500).json({ error: err.message });
   }
 };
@@ -127,7 +126,7 @@ export const updateById = (model) => async (req, res) => {
 
 export const updateProductById = (model) => async (req, res) => {
   const { id } = req.params;
-  const {subcategory_id, ...updateData } = req.body;
+  const {subcategory_id, images, ...updateData } = req.body;
   let subcategory = null;
 
   try {
@@ -156,6 +155,21 @@ export const updateProductById = (model) => async (req, res) => {
         { _id: subcategory_id },
         { $addToSet: { products: id } },
       );
+    }
+
+    // Handle image deletion from uploads folder
+    if (images) {
+      const existingImages = existingProduct.images || [];
+      const imagesToDelete = existingImages.filter((image) => !images.includes(image));
+
+      imagesToDelete.forEach((image) => {
+        const imagePath = path.join(__dirname, image);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        } else {
+          console.warn(`Image file not found: ${imagePath}`)
+        }
+      });
     }
 
     // Update the product
@@ -259,6 +273,18 @@ export const deleteProductById = (model) => async (req, res) => {
       });
     }
 
+    // Handle image deletion
+    if (product.images && product.images.length > 0) {
+      product.images.forEach((image) => {
+        const imagePath = path.join(__dirname, image);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        } else {
+          console.warn(`Image file not found: ${imagePath}`)
+        }
+      });
+    }
+
     await product.deleteOne();
 
     return res.status(200).json({ message: "Product deleted successfully" });
@@ -267,3 +293,49 @@ export const deleteProductById = (model) => async (req, res) => {
   }
 };
 
+export const deleteBulk = (model) => async (req, res) => {
+  const productsToDelete = req.body;
+
+  if (!Array.isArray(productsToDelete) || productsToDelete.length === 0) {
+    return res.status(400).json({ error: 'No product provided' });
+  }
+
+  const productIds = productsToDelete.map((product) => product._id);
+
+  try {
+    // Check if each product exists
+    const products = await model.find({ _id: { $in: productIds } });
+    if (!products) {
+      return res.status(404).json({ error: "No matching products found" });
+    }
+
+    // Update related subcategories
+    const subcategoryUpdates = products.map(async (product) => {
+      if (product.subcategory_id) {
+        return Subcategory.findByIdAndUpdate(product.subcategory_id, {
+          $pull: { products: product._id },
+        });
+      }
+      return null;
+    });
+
+    // Delete product images
+    products.forEach((product) => {
+      if (product.images && product.images.length > 0) {
+        product.images.forEach((image) => {
+          const imagePath = path.join(__dirname, image);
+          if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+          else console.warn(`Image file not found: ${imagePath}`)
+        });
+      }
+    });
+
+    await Promise.all(subcategoryUpdates);
+
+    await model.deleteMany({ _id: { $in: productIds } });
+
+    return res.status(200).json({ message: "Products deleted successfully" });
+  } catch (err) {
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
