@@ -10,6 +10,7 @@ export const create = (model) => async (req, res) => {
     const data = await model.create(req.body);
     res.status(201).json(data);
   } catch (err) {
+	  console.log(err)
     res.status(500).json({ error: err.message });
   }
 };
@@ -102,7 +103,7 @@ export const updateProductById = (model) => async (req, res) => {
     const existingProduct = await model.findById(id);
     if (!existingProduct) return res.status(404).json({ error: "Product not found" });
 
-    // Check if category and subcategory exist
+    // Check if subcategory exist
     try {
       if (subcategory_id) {
         subcategory = await checkDocumentExists(Subcategory, subcategory_id, 'subcategory_id')
@@ -199,3 +200,39 @@ export const deleteBySub = (model, subModel) => async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const deleteProductById = (model) => async (req, res) => {
+  const { _id, subcategory_id } = req.body;
+
+  try {
+    const product = await model.findById(_id);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    if (subcategory_id) {
+      const subcategory = await Subcategory.findById(subcategory_id);
+      if (!subcategory) {
+        return res.status(400).json({ error: `Invalid Subcategory ID` });
+      }
+
+      // Check for mismatch
+      if (subcategory_id !== product.subcategory_id?.toString()) {
+        return res.status(400).json({
+          error: `Mismatch: Subcategory ID in request (${subcategory_id}) does not match product's subcategory ID (${product.subcategory_id})`,
+        });
+      }
+
+      await Subcategory.findByIdAndUpdate(product.subcategory_id, {
+        $pull: { products: _id },
+      });
+    }
+
+    await product.deleteOne();
+
+    return res.status(200).json({ message: "Product deleted successfully" });
+  } catch (err) {
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
