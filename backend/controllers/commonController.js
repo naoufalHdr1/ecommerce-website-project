@@ -5,12 +5,43 @@ import Product from '../models/Product.js';
 import mongoose from 'mongoose';
 
 // Add a new item.
+export const createProduct = (model) => async (req, res) => {
+  console.log("req body=", req.body);
+  const { subcategory_id, ...productData } = req.body;
+
+  try {
+    const newProduct = await model.create({
+      ...productData,
+      subcategory_id: subcategory_id || null,
+    });
+
+    if (subcategory_id) {
+      const subcategory = await Subcategory.findById(subcategory_id);
+      if (!subcategory) {
+        console.warn(`Invalid Subcategory ID: ${subcategory_id}`);
+        console.warn('Product will be created without a valid subcategory.');
+      } else {
+        await Subcategory.findByIdAndUpdate(subcategory_id, {
+          $addToSet: { products: newProduct._id },
+        });
+      }
+    }
+
+    console.log("newProduct=", newProduct);
+    res.status(201).json(newProduct);
+  } catch (err) {
+	  console.log(err)
+    res.status(500).json({ error: err.message });
+  }
+};
+
 export const create = (model) => async (req, res) => {
+        console.log(req.body)
   try {
     const data = await model.create(req.body);
     res.status(201).json(data);
   } catch (err) {
-	  console.log(err)
+          console.log(err)
     res.status(500).json({ error: err.message });
   }
 };
