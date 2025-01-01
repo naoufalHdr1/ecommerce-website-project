@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box, Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId }) => {
-  // Extend columns to include actions if `onEdit` or `onDelete` are provided
+const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId, onBulkDelete }) => {
+  const [rowSelectionModel, setRowSelectionModel] = useState([]);
+
   const enhancedColumns = [
     ...columns,
     ...(onEdit || onDelete
@@ -58,6 +59,10 @@ const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId }) => {
         pageSize={5}
         rowsPerPageOptions={[5, 10, 20]}
         checkboxSelection
+        rowSelectionModel={rowSelectionModel}
+        onRowSelectionModelChange={(newRowSelectionModel) => {
+          setRowSelectionModel(newRowSelectionModel);
+        }}
         disableSelectionOnClick
         autoHeight
         getRowId={getRowId || ((row) => row._id)}
@@ -77,6 +82,17 @@ const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId }) => {
           },
         }}
       />
+      {rowSelectionModel.length > 0 && (
+        <Box mt={2} display="flex" justifyContent="flex-end">
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => onBulkDelete(rowSelectionModel)}
+          >
+            Delete Selected ({rowSelectionModel.length})
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

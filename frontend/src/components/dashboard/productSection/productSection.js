@@ -148,6 +148,28 @@ const ProductSection = () => {
     return matchesSearchQuery && matchesInventory;
   });
 
+  const handleBulkDelete = async (selectedIds) => {
+    const confirm = window.confirm('Are you sure you want to delete the selected products?');
+    if (confirm) {
+      try {
+        const productsToDelete = products.filter((product) => selectedIds.includes(product._id))
+
+        await api.delete('/products/bulk-delete', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          data: productsToDelete,
+        });
+
+        setProducts((prevProducts) =>
+          prevProducts.filter((product) => !selectedIds.includes(product._id))
+        );
+      } catch (err) {
+        console.error('Error deleting products:', err);
+      }
+    }
+  };
+
   return (
     <Box p={0}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} flexWrap="wrap">
@@ -189,6 +211,7 @@ const ProductSection = () => {
         columns={columns}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onBulkDelete={handleBulkDelete}
       />
 
       <EditProductDialog
