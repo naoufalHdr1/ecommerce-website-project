@@ -1,4 +1,4 @@
-import { checkDocumentExists } from '../utils/helper.js';
+import { checkDocumentExists, deleteFiles } from '../utils/helper.js';
 import Subcategory from '../models/subcategory.js';
 import Category from '../models/category.js';
 import Product from '../models/Product.js';
@@ -7,7 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import { __dirname } from '../server.js';
 
-// Add a new item.
+// Add a new item. (Generalized create operation)
 export const createItem = (childModel, parentModel = null) => async (req, res) => {
   // Determine if a parent relationship exists
   const isParentRequired = parentModel !== null;
@@ -108,83 +108,77 @@ export const updateById = (model) => async (req, res) => {
   }
 };
 
-/* Update an item by Id
-export const updateById = (model) => async (req, res) => {
+// update an Item by Id (Generalized update operation)
+export const updateItemById = (childModel, parentModel = null) => async (req, res) => {
   const { id } = req.params;
+  const { images, banners, ...updateData } = req.body;
+  const parentKey = parentModel
+    ? childModel.modelName === 'Product'
+      ? 'subcategory_id'
+      : 'category_id'
+    : null;
+
+  const parentId = parentKey ? req.body[parentKey] : null;
 
   try {
-    const updatedItem = await model.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!updatedItem) return res.status(404).json({ error: 'Item not found' });
-    res.json(updatedItem);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-*/
+    const existingItem = await childModel.findById(id);
+    if (!existingItem) return res.status(404).json({ error: `${childModel.modelName} not found` });
 
-export const updateProductById = (model) => async (req, res) => {
-  const { id } = req.params;
-  const {subcategory_id, images, ...updateData } = req.body;
-  let subcategory = null;
+    if (parentModel && parentKey) {
+      let parentItem = null;
 
-  try {
-    const existingProduct = await model.findById(id);
-    if (!existingProduct) return res.status(404).json({ error: "Product not found" });
-
-    // Check if subcategory exist
-    try {
-      if (subcategory_id) {
-        subcategory = await checkDocumentExists(Subcategory, subcategory_id, 'subcategory_id')
-      }
-    } catch (err) {
-      return res.status(400).json({ error: err.message });
-    }
-
-    // Handle subcategory change
-    if (existingProduct.subcategory_id !== subcategory_id) {
-      await Subcategory.updateOne(
-        { _id: existingProduct.subcategory_id },
-        { $pull: { products: id } },
-      );
-    }
-
-    if (subcategory_id) {
-      await Subcategory.updateOne(
-        { _id: subcategory_id },
-        { $addToSet: { products: id } },
-      );
-    }
-
-    // Handle image deletion from uploads folder
-    if (images) {
-      const existingImages = existingProduct.images || [];
-      const imagesToDelete = existingImages.filter((image) => !images.includes(image));
-
-      imagesToDelete.forEach((image) => {
-        const imagePath = path.join(__dirname, image);
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-        } else {
-          console.warn(`Image file not found: ${imagePath}`)
+      if (parentId) {
+        parentItem = await parentModel.findById(parentId);
+        if (!parentItem) {
+          return res.status(400).json({ error: `Invalid ${parentKey}: ${parentId}` });
         }
-      });
+      }
+
+      if (existingItem[parentKey] && existingItem[parentKey] !== parentId) {
+        await parentModel.updateOne(
+          { _id: existingItem[parentKey] },
+          { $pull: { [childModel.modelName.toLowerCase() + 's']: id } },
+        );
+      }
+
+      if (parentId) {
+        await parentModel.updateOne(
+          { _id: parentId },
+          { $addToSet: { [childModel.modelName.toLowerCase() + 's']: id } },
+        );
+      }
     }
 
-    // Update the product
-    const updatedProduct = await model.findByIdAndUpdate(
+    // Handle image deletion
+    if (images && existingItem.images) {
+      const existingImages = existingItem.images || [];
+      const imagesToDelete = existingImages.filter((image) => !images.includes(image));
+      deleteFiles(imagesToDelete);
+    }
+
+    // Handle banner deletion
+    if (banners && existingItem.banners) {
+      const existingBanners = existingItem.banners || [];
+      const bannersToDelete = existingBanners.filter((banner) => !banners.includes(banner));
+      deleteFiles(bannersToDelete);
+    }
+
+    const updatedItem = await childModel.findByIdAndUpdate(
       id,
-      { $set: req.body },
-      { new: true, runValidators: true,}
+      { $set: {
+        ...updateData,
+        ...(images && { images }),
+        ...(banners && { banners }),
+      }},
+      { new: true, runValidators: true },
     );
 
-    res.json(updatedProduct);
+    res.json(updatedItem);
   } catch (err) {
-    res.status(500).json({ error: 'Error updating item' });
+    console.error(err);
+    res.status(500).json({ error: `Error updating ${childModel.modelName}` });
   }
-}
+};
 
 export const updateListFieldById = (model) => async (req, res) => {
   const { id } = req.params;

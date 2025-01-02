@@ -1,7 +1,7 @@
 // utils/routeFactory.js
 import express from 'express';
 import { verifyToken, checkAdmin } from '../middleware/auth.js';
-import { getAll, getById, getByQuery, updateById, deleteById, deleteBySub, updateListFieldById, updateProductById, deleteProductById, createItem, deleteBulk } from '../controllers/commonController.js';
+import { getAll, getById, getByQuery, updateById, deleteById, deleteBySub, updateListFieldById, updateItemById, deleteProductById, createItem, deleteBulk } from '../controllers/commonController.js';
 
 
 export const generateRoute = (childModel, parentModel) => {
@@ -12,10 +12,10 @@ export const generateRoute = (childModel, parentModel) => {
   router.get('/findBy', getByQuery(childModel));
   router.get('/:id', getById(childModel));
   // Admin Only
-  router.post('/create', verifyToken, checkAdmin, createItem(childModel, parentModel));
-  router.put('/:id', verifyToken, checkAdmin, updateById(childModel));
-  router.put('/:id/add-item', verifyToken, checkAdmin, updateListFieldById(childModel));
-  router.put('/:id/add', verifyToken, checkAdmin, updateProductById(childModel));
+  router.post('/', verifyToken, checkAdmin, createItem(childModel, parentModel));
+  // router.put('/:id', verifyToken, checkAdmin, updateById(childModel));
+  // router.put('/:id/add-item', verifyToken, checkAdmin, updateListFieldById(childModel));
+  router.put('/:id', verifyToken, checkAdmin, updateItemById(childModel, parentModel));
   router.delete('/delete', verifyToken, checkAdmin, deleteProductById(childModel));
   router.delete('/bulk-delete', verifyToken, checkAdmin, deleteBulk(childModel));
   if (parentModel) {

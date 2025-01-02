@@ -15,6 +15,7 @@ const ProductSchema = new mongoose.Schema(
       {
         name: { type: String },
         value: { type: String },
+        _id: false,
       },
     ],
     subcategory_id: {
