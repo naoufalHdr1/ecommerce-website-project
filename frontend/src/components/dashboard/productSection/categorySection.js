@@ -121,6 +121,7 @@ const CategorySection = () => {
 
   const handleAddSubcategorySave = async (newSubcategory) => {
     try {
+	    console.log("subcategory=", newSubcategory);
       const res = await api.post('/subcategories', newSubcategory, {
         headers: {
           Authorization: `Bearer ${token}`,
