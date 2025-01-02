@@ -7,39 +7,40 @@ import fs from 'fs';
 import path from 'path';
 import { __dirname } from '../server.js';
 
-
 // Add a new item.
-export const createProduct = (model) => async (req, res) => {
-  const { subcategory_id, ...productData } = req.body;
+export const createItem = (childModel, parentModel = null) => async (req, res) => {
+  // Determine if a parent relationship exists
+  const isParentRequired = parentModel !== null;
+  const parentKey = isParentRequired
+    ? childModel.modelName === 'Product'
+      ? 'subcategory_id'
+      : 'category_id'
+    : null;
+
+  const { [parentKey]: parentId, ...itemData } = req.body;
 
   try {
-    const newProduct = await model.create({
-      ...productData,
-      subcategory_id: subcategory_id || null,
+    // Create the new item
+    const newItem = await childModel.create({
+      ...itemData,
+      ...(isParentRequired && { [parentKey]: parentId || null }),
     });
 
-    if (subcategory_id) {
-      const subcategory = await Subcategory.findById(subcategory_id);
-      if (!subcategory) {
-        console.warn(`Invalid Subcategory ID: ${subcategory_id}`);
-        console.warn('Product will be created without a valid subcategory.');
+    // Handle subItem (subcategory or category) updates if needed
+    if (isParentRequired && parentId) {
+      const parentItem = await parentModel.findById(parentId);
+      if (!parentItem) {
+        console.warn(`Invalid ${parentKey}: ${parentId}`);
+        console.warn('Item will be created without a valid parent item.');
       } else {
-        await Subcategory.findByIdAndUpdate(subcategory_id, {
-          $addToSet: { products: newProduct._id },
+        const updateField = childModel.modelName === 'Product' ? 'products' : 'subcategories';
+        await parentModel.findByIdAndUpdate(parentId, {
+          $addToSet: { [updateField]: newItem._id },
         });
       }
     }
 
-    res.status(201).json(newProduct);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-export const create = (model) => async (req, res) => {
-  try {
-    const data = await model.create(req.body);
-    res.status(201).json(data);
+    res.status(201).json(newItem);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
