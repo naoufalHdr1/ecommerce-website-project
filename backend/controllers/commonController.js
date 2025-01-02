@@ -134,17 +134,18 @@ export const updateItemById = (childModel, parentModel = null) => async (req, re
         }
       }
 
+      const parentField = parentModel.modelName === 'Subcategory' ? 'products' : 'subcategories';
       if (existingItem[parentKey] && existingItem[parentKey] !== parentId) {
         await parentModel.updateOne(
           { _id: existingItem[parentKey] },
-          { $pull: { [childModel.modelName.toLowerCase() + 's']: id } },
+          { $pull: { [parentField]: id } },
         );
       }
 
       if (parentId) {
         await parentModel.updateOne(
           { _id: parentId },
-          { $addToSet: { [childModel.modelName.toLowerCase() + 's']: id } },
+          { $addToSet: { [parentField]: id } },
         );
       }
     }
@@ -241,49 +242,60 @@ export const deleteBySub = (model, subModel) => async (req, res) => {
   }
 };
 
-export const deleteProductById = (model) => async (req, res) => {
-  const { _id, subcategory_id } = req.body;
+// Delete an item (Generalized)
+export const deleteProductById = (childModel, parentModel = null) => async (req, res) => {
+  // Determine if a parent relationship exists
+  const isParentRequired = parentModel !== null;
+  const parentKey = isParentRequired
+    ? childModel.modelName === 'Product'
+      ? 'subcategory_id'
+      : 'category_id'
+    : null;
+
+  const { _id, [parentKey]: parent_id } = req.body;
 
   try {
-    const product = await model.findById(_id);
-    if (!product) {
-      return res.status(404).json({ error: "Product not found" });
+    // Find the item to delete
+    const item = await childModel.findById(_id);
+    if (!item) {
+      return res.status(404).json({ error: `${childModel.modelName} not found` });
     }
 
-    if (subcategory_id) {
-      const subcategory = await Subcategory.findById(subcategory_id);
-      if (!subcategory) {
-        return res.status(400).json({ error: `Invalid Subcategory ID` });
+    // Handle parent relationship if parentModel is provided
+    if (parentModel && parent_id) {
+      const parent = await parentModel.findById(parent_id);
+      if (!parent) {
+        return res.status(400).json({ error: `Invalid ${parentModel.modelName} ID` });
       }
 
-      // Check for mismatch
-      if (subcategory_id !== product.subcategory_id?.toString()) {
+      // Check for parent-child mismatch
+      if (parent_id !== item[parentKey]?.toString()) {
         return res.status(400).json({
-          error: `Mismatch: Subcategory ID in request (${subcategory_id}) does not match product's subcategory ID (${product.subcategory_id})`,
+          error: `Mismatch: Parent ID in request (${parent_id}) does not match item's ${parentKey} (${item[parentKey]})`,
         });
       }
 
-      await Subcategory.findByIdAndUpdate(product.subcategory_id, {
-        $pull: { products: _id },
+      // Remove reference from parent
+      const parentField = parentModel.modelName === 'Subcategory' ? 'products' : 'subcategories';
+      await parentModel.findByIdAndUpdate(parent_id, {
+        $pull: { [parentField]: _id },
       });
     }
 
-    // Handle image deletion
-    if (product.images && product.images.length > 0) {
-      product.images.forEach((image) => {
-        const imagePath = path.join(__dirname, image);
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-        } else {
-          console.warn(`Image file not found: ${imagePath}`)
-        }
-      });
-    }
+    // Handle file deletions (images or banners)
+    const fileFields = ['images', 'banners'];
+    fileFields.forEach((field) => {
+      const files = item[field];
+      if (files && files.length > 0) {
+        deleteFiles(files);
+      }
+    });
 
-    await product.deleteOne();
+    await item.deleteOne();
 
-    return res.status(200).json({ message: "Product deleted successfully" });
+    return res.status(200).json({ message: `${childModel.modelName} deleted successfully` });
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };

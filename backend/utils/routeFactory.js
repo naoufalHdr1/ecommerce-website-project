@@ -16,7 +16,7 @@ export const generateRoute = (childModel, parentModel) => {
   // router.put('/:id', verifyToken, checkAdmin, updateById(childModel));
   // router.put('/:id/add-item', verifyToken, checkAdmin, updateListFieldById(childModel));
   router.put('/:id', verifyToken, checkAdmin, updateItemById(childModel, parentModel));
-  router.delete('/delete', verifyToken, checkAdmin, deleteProductById(childModel));
+  router.delete('/', verifyToken, checkAdmin, deleteProductById(childModel, parentModel));
   router.delete('/bulk-delete', verifyToken, checkAdmin, deleteBulk(childModel));
   if (parentModel) {
     router.delete('/:id', verifyToken, checkAdmin, deleteBySub(childModel, parentModel));
