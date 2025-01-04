@@ -17,25 +17,25 @@ const AddCategoryDialog = ({ open, onClose, onSave }) => {
   const [newCategory, setNewCategory] = useState({
     name: '',
     description: '',
-    image: null,
-    banner: null,
+    images: null,
+    banners: null,
   });
   const [uploadedImage, setUploadedImage] = useState(null);
   const [uploadedBanner, setUploadedBanner] = useState(null);
 
   const handleSave = async () => {
     try {
-      const uploadedImageUrl = await uploadImages(newCategory.image);
-      const uploadedBannerUrl = await uploadImages(newCategory.banner);
+      const uploadedImageUrl = await uploadImages(newCategory.images);
+      const uploadedBannerUrl = await uploadImages(newCategory.banners);
 
       const categoryData = {
         ...newCategory,
-        image: uploadedImageUrl,
-        banner: uploadedBannerUrl,
+        images: uploadedImageUrl,
+        banners: uploadedBannerUrl,
       };
 
       onSave(categoryData);
-      setNewCategory({ name: '', description: '', image: null, banner: null });
+      setNewCategory({ name: '', description: '', images: null, banners: null });
       setUploadedImage(null);
       setUploadedBanner(null);
       onClose();
@@ -50,10 +50,10 @@ const AddCategoryDialog = ({ open, onClose, onSave }) => {
       const previewUrl = URL.createObjectURL(file);
       if (type === 'image') {
         setUploadedImage(previewUrl);
-        setNewCategory((prev) => ({ ...prev, image: file }));
+        setNewCategory((prev) => ({ ...prev, images: file }));
       } else {
         setUploadedBanner(previewUrl);
-        setNewCategory((prev) => ({ ...prev, banner: file }));
+        setNewCategory((prev) => ({ ...prev, banners: file }));
       }
     }
   };
@@ -61,10 +61,10 @@ const AddCategoryDialog = ({ open, onClose, onSave }) => {
   const handleRemoveImage = (type) => {
     if (type === 'image') {
       setUploadedImage(null);
-      setNewCategory((prev) => ({ ...prev, image: null }));
+      setNewCategory((prev) => ({ ...prev, images: null }));
     } else {
       setUploadedBanner(null);
-      setNewCategory((prev) => ({ ...prev, banner: null }));
+      setNewCategory((prev) => ({ ...prev, banners: null }));
     }
   };
 

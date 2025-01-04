@@ -1,5 +1,6 @@
 import ProductSection from './productSection';
 import CategorySection from './categorySection';
+import AAA from './a';
 
 const ProductOverview = () => {
   return (
@@ -8,6 +9,8 @@ const ProductOverview = () => {
       <ProductSection />
       <hr/>
       <CategorySection />
+      <hr/>
+      <AAA />
     </>
   );
 };

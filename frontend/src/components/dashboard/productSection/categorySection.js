@@ -103,6 +103,7 @@ const CategorySection = () => {
 
   const handleAddCategorySave = async (newCategory) => {
     try {
+	    console.log("new category=", newCategory)
       const res = await api.post('/categories', newCategory, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -128,18 +129,7 @@ const CategorySection = () => {
         },
       });
       
-      const createdSubcat = res.data
-
-      await api.put(`/categories/${createdSubcat.category_id}/add-item`,
-        { subcategories: createdSubcat._id},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          }
-        },
-      );
-
-      setSubcategories((prevSubcategories) => [...prevSubcategories, createdSubcat]);
+      setSubcategories((prevSubcategories) => [...prevSubcategories, res.data]);
       setIsAddSubcategoryOpen(false);
     } catch (err) {
       console.error('Error adding category:', err);

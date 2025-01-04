@@ -21,26 +21,25 @@ const AddSubcategoryDialog = ({ open, onClose, onSave, _categories }) => {
   const [newSubcategory, setNewSubcategory] = useState({
     name: '',
     description: '',
-    image: null,
+    images: null,
     category_id: '',
   });
   const [uploadedImage, setUploadedImage] = useState(null);
 
   const handleSave = async () => {
     try {
-      const uploadedImageUrl = await uploadImages(newSubcategory.image);
+      const uploadedImageUrl = await uploadImages(newSubcategory.images);
 
       const subcategoryData = {
         ...newSubcategory,
-        image: uploadedImageUrl,
+        images: uploadedImageUrl,
       };
-	    console.log('subcategoryData:', subcategoryData)
 
       onSave(subcategoryData);
       setNewSubcategory({
         name: '',
         description: '',
-        image: null,
+        images: null,
         category_id: '',
       });
       setUploadedImage(null);
@@ -55,13 +54,13 @@ const AddSubcategoryDialog = ({ open, onClose, onSave, _categories }) => {
     if (file) {
       const previewUrl = URL.createObjectURL(file);
       setUploadedImage(previewUrl);
-      setNewSubcategory((prev) => ({ ...prev, image: file }));
+      setNewSubcategory((prev) => ({ ...prev, images: file }));
     }
   };
 
   const handleRemoveImage = () => {
     setUploadedImage(null);
-    setNewSubcategory((prev) => ({ ...prev, image: null }));
+    setNewSubcategory((prev) => ({ ...prev, images: null }));
   };
 
   return (
