@@ -11,7 +11,7 @@ const ProductOverview = () => {
       <hr/>
       <CategorySection />
       <hr/>
-      <AAA />
+      <AAA type="products"/>
     </StateProvider>
   );
 };

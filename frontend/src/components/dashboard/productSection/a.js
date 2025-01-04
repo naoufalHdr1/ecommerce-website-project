@@ -9,24 +9,19 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import AddDialog from './dialog';
 import { api } from '../../../utils/api';
+import { useStateContext } from "./stateContext";
 
-const dummyData = {
-  rows: [
-    { id: 1, name: 'John Doe', age: 25, country: 'USA', isAdmin: true },
-    { id: 2, name: 'Jane Smith', age: 30, country: 'Canada', isAdmin: false },
-    { id: 3, name: 'Alice Johnson', age: 28, country: 'UK', isAdmin: true },
-    { id: 4, name: 'Bob Brown', age: 35, country: 'Australia', isAdmin: false },
-  ],
-  columns: [
-    { field: 'name', headerName: 'Name', width: 200 },
-    { field: 'age', headerName: 'Age', width: 100 },
-    { field: 'country', headerName: 'Country', width: 150 },
-    { field: 'isAdmin', headerName: 'Admin', width: 100, type: 'boolean' },
-  ],
-};
+const columns = [
+  { field: 'name', headerName: 'Product Name', width: 200 },
+  { field: 'category', headerName: 'Category', width: 150 },
+  { field: 'subcategory', headerName: 'Subcategory', width: 150 },
+  { field: 'stock', headerName: 'Inventory', type: 'number', width: 100 },
+];
 
-export default function AAA() {
-  const [items, setItems] = useState([]);
+export default function AAA({ type }) {
+  const { state, dispatch } = useStateContext();
+  const items = state[type];
+
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const token = localStorage.getItem("token");
@@ -43,18 +38,25 @@ export default function AAA() {
     setDialogOpen(true);
   };
 
+  console.log('items=', items);
+
   const handleAddSave = async (newItem) => {
     try {
       // Create a Item
       console.log('New Item=', newItem)
-      const res = await api.post('/products/create', newItem, {
+      const res = await api.post('/products', newItem, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
       // Update local state
-      setItems((prevItems) => [...prevItems, res.data]);
+      console.log("type=", type);
+      console.log(`ADD_${type.toUpperCase()}`)
+      dispatch({ type: `ADD_${type.toUpperCase()}`, payload: res.data });
+      setTimeout(() => {
+        console.log('Products after addition:', state.products);
+      }, 0);
       setDialogOpen(false);
     } catch (err) {
       console.error('Error adding product:', err);
@@ -83,8 +85,9 @@ export default function AAA() {
 
       <DataGrid
         loading={loading}
-        rows={dummyData.rows}
-        columns={dummyData.columns}
+        rows={items}
+        getRowId={(row) => row._id}
+        columns={columns}
         checkboxSelection
         disableRowSelectionOnClick
         slots={{ toolbar: GridToolbar }}
@@ -98,8 +101,9 @@ export default function AAA() {
       {/* Product Dialog */}
       <AddDialog
         open={dialogOpen}
-        onClose={() => setDialogOpen(false)} />
-        onSave={handleAddSave} />
+        onClose={() => setDialogOpen(false)}
+        onSave={handleAddSave}
+      />
     </div>
   );
 }

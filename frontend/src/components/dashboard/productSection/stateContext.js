@@ -20,7 +20,7 @@ const reducer = (state, action) => {
       return { ...state, subcategories: action.payload };
 
     // Adding Data to State
-    case "ADD_PRODUCT":
+    case "ADD_PRODUCTS":
       return {
         ...state,
         products: [...state.products, action.payload],
