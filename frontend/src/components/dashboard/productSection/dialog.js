@@ -33,7 +33,7 @@ const steps = [
   { title: 'Upload Images', description: 'Upload images of the product to showcase it visually.' },
 ];
 
-export default function AddDialog({ open, onClose, onSave }) {
+export default function AddDialog({ open, onClose, onSave, item }) {
   const { state } = useStateContext();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
@@ -68,6 +68,13 @@ export default function AddDialog({ open, onClose, onSave }) {
     setCategories(categoryNames);
     setSubcategories(subcategoryMap);
   }, [state.categories, state.subcategories]);
+
+  // Initialize form data with the product data
+  useEffect(() => {
+    if (item) {
+      setFormData(item);
+    }
+  }, [item]);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({
@@ -127,9 +134,7 @@ export default function AddDialog({ open, onClose, onSave }) {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Add Item</DialogTitle>
-      <h5>{state.categories.map((cat) => cat.name)}</h5>
-      <h5>{state.subcategories.map((subcat) => subcat.name)}</h5>
+      <DialogTitle>{item ? 'Edit' : 'Add'} Item</DialogTitle>
       <DialogContent>
         <Box sx={{ width: '100%' }}>
           <Stepper activeStep={activeStep}>

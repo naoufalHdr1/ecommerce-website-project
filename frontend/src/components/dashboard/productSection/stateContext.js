@@ -50,7 +50,7 @@ const reducer = (state, action) => {
       return { ...state, categories: [...state.categories, action.payload] };
 
     // Updating Data to state
-    case "EDIT_PRODUCT":
+    case "EDIT_PRODUCTS":
       return {
         ...state,
         subcategories: state.subcategories.map((subcategory) => {
@@ -130,7 +130,7 @@ const reducer = (state, action) => {
       };
 
     // Delete data from state
-    case "DELETE_PRODUCT":
+    case "DELETE_PRODUCTS":
       return {
         ...state,
         products: state.products.filter((product) => product._id !== action.payload._id),

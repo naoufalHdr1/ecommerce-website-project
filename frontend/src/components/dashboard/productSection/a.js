@@ -4,12 +4,21 @@ import {
   Button,
   Tooltip,
   Typography,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
-import AddDialog from './dialog';
+import CustomDialog from './dialog';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { api } from '../../../utils/api';
 import { useStateContext } from "./stateContext";
+import BaseTable from './baseTablee';
 
 const columns = [
   { field: 'name', headerName: 'Product Name', width: 200 },
@@ -23,17 +32,11 @@ export default function AAA({ type }) {
   const { state, dispatch } = useStateContext();
   const items = state[type];
 
-  const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const subcategoryMap = {};
   state.subcategories.forEach((subcat) => {
@@ -64,14 +67,13 @@ export default function AAA({ type }) {
   // Preprocess the products
   const processedProducts = preprocessProducts(state.products);
 
-  const handleDialogOpen = () => {
-    setDialogOpen(true);
+  /* ADDING AN ITEM */
+  const handleAddDialog = () => {
+    setIsAddOpen(true);
   };
-
 
   const handleAddSave = async (newItem) => {
     try {
-      // Create a Item
       const res = await api.post('/products', newItem, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -82,11 +84,63 @@ export default function AAA({ type }) {
       dispatch({ type: `ADD_${type.toUpperCase()}`, payload: res.data });
       setTimeout(() => {
       }, 0);
-      setDialogOpen(false);
+      setIsAddOpen(false);
     } catch (err) {
-      console.error('Error adding product:', err);
+      console.error('Error adding item:', err);
     }
   };
+
+  /* EDITING AN ITEM */
+  const handleEditDialog = (item) => {
+    setSelectedItem(item);
+    setIsEditOpen(true);
+  };
+
+  const handleEditSave = async (item) => {
+    try {
+      const res = await api.put(`/products/${item._id}`, item, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      dispatch({ type: `EDIT_${type.toUpperCase()}`, payload: res.data });
+      setIsEditOpen(false);
+    } catch (err) {
+      console.error('Error updating item:', err);
+    }
+  };
+
+  /* DELETING AN ITEM */
+  const handleDeleteDialog = (item) => {
+    setSelectedItem(item);
+    setIsDeleteOpen(true);
+  };
+
+  const handleDelete = async (confirm = false) => {
+    if (!confirm) {
+      setIsDeleteOpen(false);
+      return;
+    }
+
+    try {
+      await api.delete(`/products/${selectedItem._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: selectedItem,
+      });
+
+      dispatch({ type: `DELETE_${type.toUpperCase()}`, payload: selectedItem });
+      setIsDeleteOpen(false);
+    } catch (err) {
+      console.error('Error deleting item:', err);
+    }
+  };
+
+  const handleBulkDelete = () => {
+  };
+
 
   return (
     <div style={{ height: 400, width: '100%' }}>
@@ -102,33 +156,60 @@ export default function AAA({ type }) {
           Product List
         </Typography>
         <Tooltip title="Add Item">
-          <Button variant="outlined" startIcon={<AddIcon />} onClick={handleDialogOpen}>
+          <Button variant="outlined" startIcon={<AddIcon />} onClick={handleAddDialog}>
             Add Product
           </Button>
         </Tooltip>
       </Box>
 
-      <DataGrid
-        loading={loading}
+      <BaseTable
         rows={processedProducts}
-        getRowId={(row) => row._id}
         columns={columns}
-        checkboxSelection
-        disableRowSelectionOnClick
-        slots={{ toolbar: GridToolbar }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-          },
-        }}
+        onEdit={handleEditDialog}
+        onDelete={handleDeleteDialog}
+        onBulkDelete={handleBulkDelete}
       />
 
-      {/* Product Dialog */}
-      <AddDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+      {/* Add Product Dialog */}
+      <CustomDialog
+        open={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
         onSave={handleAddSave}
       />
+
+      {/* Edit Product Dialog */}
+      <CustomDialog
+        open={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        onSave={handleEditSave}
+        item={selectedItem}
+      />
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+      >
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete the selected item(s)? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleDelete(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => handleDelete(true)}
+            color="error"
+            variant="contained"
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </div>
   );
 }
