@@ -128,6 +128,8 @@ export default function AddDialog({ open, onClose, onSave }) {
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>Add Item</DialogTitle>
+      <h5>{state.categories.map((cat) => cat.name)}</h5>
+      <h5>{state.subcategories.map((subcat) => subcat.name)}</h5>
       <DialogContent>
         <Box sx={{ width: '100%' }}>
           <Stepper activeStep={activeStep}>

@@ -24,6 +24,7 @@ import { api } from '../../../utils/api';
 import BaseTable from './baseTable';
 import AddCategoryDialog from './addCategoryDialog';
 import AddSubcategoryDialog from './addSubcategoryDialog';
+import { useStateContext } from './stateContext';
 
 const columns = [
   { field: 'name', headerName: 'Subcategory Name', flex: 1, minWidth: 150 },
@@ -39,6 +40,7 @@ const CategorySection = () => {
 
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isAddSubcategoryOpen, setIsAddSubcategoryOpen] = useState(false);
+  const { state, dispatch } = useStateContext();
 
   const token = localStorage.getItem("token");
 
@@ -103,12 +105,12 @@ const CategorySection = () => {
 
   const handleAddCategorySave = async (newCategory) => {
     try {
-	    console.log("new category=", newCategory)
       const res = await api.post('/categories', newCategory, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      dispatch({ type: 'ADD_CATEGORY', payload: res.data });
       setCategories((prevCategories) => [...prevCategories, res.data]);
       setIsAddCategoryOpen(false);
     } catch (err) {
@@ -129,6 +131,7 @@ const CategorySection = () => {
         },
       });
       
+      dispatch({ type: 'ADD_SUBCATEGORY', payload: res.data });
       setSubcategories((prevSubcategories) => [...prevSubcategories, res.data]);
       setIsAddSubcategoryOpen(false);
     } catch (err) {
