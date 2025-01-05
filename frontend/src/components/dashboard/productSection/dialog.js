@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -22,8 +22,10 @@ import {
   ImageList,
   ImageListItem,
   IconButton,
+  Autocomplete,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useStateContext } from './stateContext';
 
 const steps = [
   { title: 'Product Information', description: 'Fill in the basic details about the product, including its name, category, price, and stock.' },
@@ -32,27 +34,40 @@ const steps = [
 ];
 
 export default function AddDialog({ open, onClose, onSave }) {
+  const { state } = useStateContext();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
     name: '',
-    price: '',
-    stock: '',
+    price: 0,
+    stock: 0,
     sizes: [],
     colors: [],
     category: '',
-    subcategory: '',
+    subcategory_id: '',
     description: '',
     images: [],
   });
-
   const sizesOptions = ['S', 'M', 'L', 'XL'];
   const colorsOptions = ['Red', 'Blue', 'Green', 'Yellow'];
-  const categories = ['Men', 'Women', 'Kids'];
-  const subcategories = {
-    Men: ['Shirts', 'Pants'],
-    Women: ['Dresses', 'Tops'],
-    Kids: ['Toys', 'Clothing'],
-  };
+  const [error, setError] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState({});
+
+  useEffect(() => {
+    const categoryNames = state.categories.map((category) => category.name);
+
+    // Map subcategories by category name
+    const subcategoryMap = {};
+    state.categories.forEach((category) => {
+      const subcats = state.subcategories
+        .filter((subcat) => subcat.category_id === category._id)
+        .map((subcat) => ({ id: subcat._id, name: subcat.name }));
+      subcategoryMap[category.name] = subcats;
+    });
+
+    setCategories(categoryNames);
+    setSubcategories(subcategoryMap);
+  }, [state.categories, state.subcategories]);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({
@@ -60,11 +75,14 @@ export default function AddDialog({ open, onClose, onSave }) {
       [field]: value,
       ...(field === 'category' && { subcategory: '' }),
     }));
+    if (field === 'name' && value) {
+      setError(false);
+    }
   };
 
   const handleNext = () => {
     if (activeStep === 0 && !formData.name) {
-      alert('Name is required to proceed.');
+      setError(true);
       return;
     }
     setActiveStep((prevStep) => prevStep + 1);
@@ -72,11 +90,6 @@ export default function AddDialog({ open, onClose, onSave }) {
 
   const handleBack = () => {
     setActiveStep((prevStep) => prevStep - 1);
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-    setFormData({ title: '', description: '', images: [] });
   };
 
   const handleImageUpload = (event) => {
@@ -95,15 +108,16 @@ export default function AddDialog({ open, onClose, onSave }) {
   };
 
   const handleSave = () => {
-    onSave(formData);
+    const { category, ...dataToSend } = formData;
+    onSave(dataToSend);
     setFormData({
       name: '',
-      price: '',
-      stock: '',
+      price: 0,
+      stock: 0,
       sizes: [],
       colors: [],
       category: '',
-      subcategory: '',
+      subcategory_id: '',
       description: '',
       images: [],
     });
@@ -139,6 +153,8 @@ export default function AddDialog({ open, onClose, onSave }) {
                   value={formData.name}
                   onChange={(e) => handleChange('name', e.target.value)}
                   variant="standard"
+                  error={error}
+                  helperText={error ? 'Name is required to proceed.' : ''}
                 />
 
                 <Box sx={{ display: 'flex', gap: 2 }}>
@@ -159,14 +175,14 @@ export default function AddDialog({ open, onClose, onSave }) {
                   <FormControl variant="standard" sx={{ flex: 1 }}>
                     <InputLabel>Subcategory</InputLabel>
                     <Select
-                      value={formData.subcategory}
-                      onChange={(e) => handleChange('subcategory', e.target.value)}
+                      value={formData.subcategory_id}
+                      onChange={(e) => handleChange('subcategory_id', e.target.value)}
                       disabled={!formData.category}
                     >
                       {formData.category &&
                         subcategories[formData.category].map((subcategory) => (
-                          <MenuItem key={subcategory} value={subcategory}>
-                            {subcategory}
+                          <MenuItem key={subcategory} value={subcategory.id}>
+                            {subcategory.name}
                           </MenuItem>
                         ))}
                     </Select>
@@ -212,34 +228,35 @@ export default function AddDialog({ open, onClose, onSave }) {
                   </FormControl>
 
                   <FormControl variant="standard" sx={{ flex: 1 }}>
-                    <InputLabel>Colors</InputLabel>
-                    <Select
+                    <Autocomplete
                       multiple
+                      options={colorsOptions}
                       value={formData.colors}
-                      onChange={(e) => handleChange('colors', e.target.value)}
-                      renderValue={(selected) => (
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                          {selected.map((color) => (
-                            <Chip
-                              key={color}
-                              label={color}
-                              sx={{
-                                backgroundColor: color.toLowerCase(),
-                                color: '#fff',
-                                borderRadius: '50%',
-                              }}
-                            />
-                          ))}
-                        </Box>
+                      getOptionLabel={(option) => option}
+                      onChange={(e, newValue) => handleChange('colors', newValue)}
+                      renderTags={(value, getTagProps) =>
+                        value.map((color, index) => (
+                          <Chip
+                            key={index}
+                            label={color}
+                            {...getTagProps({ index })}
+                            avatar={
+                              <Box
+                                sx={{
+                                  width: 16,
+                                  height: 16,
+                                  borderRadius: '50%',
+                                  backgroundColor: color.toLowerCase(),
+                                }}
+                              />
+                            }
+                          />
+                        ))
+                      }
+                      renderInput={(params) => (
+                        <TextField {...params} label="Colors" variant="standard" size="small" />
                       )}
-                    >
-                      {colorsOptions.map((color) => (
-                        <MenuItem key={color} value={color}>
-                          <Checkbox checked={formData.colors.includes(color)} />
-                          <ListItemText primary={color} />
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    />
                   </FormControl>
                 </Box>
               </Box>
