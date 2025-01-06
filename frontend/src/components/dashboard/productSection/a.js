@@ -1,21 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
   Tooltip,
   Typography,
-  IconButton,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle
 } from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import CustomDialog from './dialog';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { api } from '../../../utils/api';
 import { useStateContext } from "./stateContext";
 import BaseTable from './baseTablee';
@@ -30,7 +26,6 @@ const columns = [
 
 export default function AAA({ type }) {
   const { state, dispatch } = useStateContext();
-  const items = state[type];
 
   const token = localStorage.getItem("token");
   const [selectedItem, setSelectedItem] = useState(null);

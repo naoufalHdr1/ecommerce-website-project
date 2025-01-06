@@ -20,12 +20,13 @@ import {
   StepLabel,
   Typography,
   ImageList,
-  ImageListItem,
   IconButton,
   Autocomplete,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import { Close } from '@mui/icons-material';
 import { useStateContext } from './stateContext';
+import { uploadImages } from '../../../utils/api';
+import { API_BASE_URL } from '../../../utils/config';
 
 const steps = [
   { title: 'Product Information', description: 'Fill in the basic details about the product, including its name, category, price, and stock.' },
@@ -52,6 +53,7 @@ export default function AddDialog({ open, onClose, onSave, item }) {
   const [error, setError] = useState(false);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState({});
+  const [uploadedImages, setUploadedImages] = useState([]);
 
   useEffect(() => {
     const categoryNames = state.categories.map((category) => category.name);
@@ -73,6 +75,13 @@ export default function AddDialog({ open, onClose, onSave, item }) {
   useEffect(() => {
     if (item) {
       setFormData(item);
+      setUploadedImages(
+        (item?.images || []).map((image) =>
+          image.startsWith('/uploads/')
+          ? `${API_BASE_URL}${image}`
+          : image
+        )
+      );
     }
   }, [item]);
 
@@ -99,23 +108,33 @@ export default function AddDialog({ open, onClose, onSave, item }) {
     setActiveStep((prevStep) => prevStep - 1);
   };
 
-  const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const imagePreviews = files.map((file) => URL.createObjectURL(file));
+    setUploadedImages((prev) => [...prev, ...imagePreviews]);
     setFormData((prev) => ({
       ...prev,
-      images: [...prev.images, ...files.map((file) => URL.createObjectURL(file))],
+      images: [...prev.images, ...files],
     }));
   };
 
   const handleImageRemove = (index) => {
+    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
     setFormData((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
-  const handleSave = () => {
-    const { category, ...dataToSend } = formData;
+  const handleSave = async () => {
+    const uploadedImageUrls = await uploadImages(formData.images);
+
+    const itemData = {
+      ...formData,
+      images: uploadedImageUrls,
+    };
+
+    const { category, ...dataToSend } = itemData;
     onSave(dataToSend);
     setFormData({
       name: '',
@@ -186,12 +205,15 @@ export default function AddDialog({ open, onClose, onSave, item }) {
                       onChange={(e) => handleChange('subcategory_id', e.target.value)}
                       disabled={!formData.category}
                     >
-                      {formData.category &&
+                      {formData.category && subcategories[formData.category] ? (
                         subcategories[formData.category].map((subcategory) => (
-                          <MenuItem key={subcategory} value={subcategory.id}>
+                          <MenuItem key={subcategory.id} value={subcategory.id}>
                             {subcategory.name}
                           </MenuItem>
-                        ))}
+                        ))
+                      ) : (
+                        <MenuItem disabled>No subcategories available</MenuItem>
+                      )}
                     </Select>
                   </FormControl>
                 </Box>
@@ -298,17 +320,37 @@ export default function AddDialog({ open, onClose, onSave, item }) {
                   />
                 </Button>
                 <ImageList cols={3} rowHeight={120} gap={8}>
-                  {formData.images.map((img, index) => (
-                    <ImageListItem key={index} sx={{ position: 'relative' }}>
-                      <img src={img} alt={`Uploaded ${index}`} loading="lazy" style={{ objectFit: 'cover', height: '100%', width: '100%' }} />
+                  {uploadedImages.map((src, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        position: 'relative',
+                        width: 120,
+                        height: 120,
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        boxShadow: 1,
+                      }}
+                    >
+                      <img
+                        src={src}
+                        alt={`Uploaded ${index}`}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
                       <IconButton
                         size="small"
                         onClick={() => handleImageRemove(index)}
-                        sx={{ position: 'absolute', top: 4, right: 4, backgroundColor: 'rgba(255, 255, 255, 0.7)' }}
+                        sx={{
+                          position: 'absolute',
+                          top: 4,
+                          right: 4,
+                          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                          '&:hover': { backgroundColor: 'rgba(255, 255, 255, 1)' },
+                        }}
                       >
-                        <CloseIcon fontSize="small" />
+                        <Close fontSize="small" />
                       </IconButton>
-                    </ImageListItem>
+                    </Box>
                   ))}
                 </ImageList>
               </Box>

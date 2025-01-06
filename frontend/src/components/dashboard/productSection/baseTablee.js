@@ -52,7 +52,7 @@ const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId, onBulkDelete }) 
     <Box>
       <Box
         sx={{
-          height: 500,
+          height: 'auto',
           overflow: 'auto',
           border: '1px solid #ddd',
         }}

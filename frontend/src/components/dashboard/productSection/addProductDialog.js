@@ -33,13 +33,16 @@ const AddProductDialog = ({ open, onClose, onSave, _categories }) => {
 
   const handleSave = async () => {
     try {
+	    console.log("images before upload=", newProduct.images)
       const uploadedImageUrls = await uploadImages(newProduct.images);
+	    console.log("images urls=", uploadedImageUrls)
 
       const productData = {
         ...newProduct,
         images: uploadedImageUrls,
         subcategory_id: newProduct.subcategory?._id || null,
       };
+	    console.log("images after upload=", productData.images)
 
       onSave(productData);
       setNewProduct({
