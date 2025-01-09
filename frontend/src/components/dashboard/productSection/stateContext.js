@@ -25,20 +25,20 @@ const reducer = (state, action) => {
         ...state,
         products: [...state.products, action.payload],
         subcategories: state.subcategories.map((sub) =>
-          sub.id === action.payload.subcategory_id
+          sub._id === action.payload.subcategory_id
             ? { 
                 ...sub,
-                products: [...sub.products, action.paylod._id]
+                products: [...sub.products, action.payload._id]
             }
             : sub
         ),
       };
-    case "ADD_SUBCATEGORY":
+    case "ADD_SUBCATEGORIES":
       return {
         ...state,
         subcategories: [...state.subcategories, action.payload],
         categories: state.categories.map((cat) =>
-          cat.id === action.payload.category_id
+          cat._id === action.payload.category_id
           ? {
             ...cat,
             subcategories: [...cat.subcategories, action.payload._id]
@@ -46,7 +46,7 @@ const reducer = (state, action) => {
           : cat
         ),
       };
-    case "ADD_CATEGORY":
+    case "ADD_CATEGORIES":
       return { ...state, categories: [...state.categories, action.payload] };
 
     // Updating Data to state
@@ -85,7 +85,7 @@ const reducer = (state, action) => {
           product._id === action.payload._id ? action.payload : product
         ),
       };
-    case "EDIT_SUBCATEGORY":
+    case "EDIT_SUBCATEGORIES":
       return {
         ...state,
         categories: state.categories.map((category) => {
@@ -121,11 +121,11 @@ const reducer = (state, action) => {
           subcategory._id === action.payload._id ? action.payload : subcategory
         ),
       };
-    case "EDIT_CATEGORY":
+    case "EDIT_CATEGORIES":
       return {
         ...state,
         categories: state.categories.map((cat) =>
-          cat.id === action.payload.id ? action.payload : cat
+          cat._id === action.payload._id ? action.payload : cat
         ),
       };
 
@@ -143,7 +143,7 @@ const reducer = (state, action) => {
           : sub
         ),
       };
-    case "DELETE_SUBCATEGORY":
+    case "DELETE_SUBCATEGORIES":
       return {
         ...state,
         subcategories: state.subcategories.filter((sub) => sub._id !== action.payload._id),
@@ -156,10 +156,10 @@ const reducer = (state, action) => {
           : cat
         ),
       }
-    case "DELETE_CATEGORY":
+    case "DELETE_CATEGORIES":
       return {
         ...state,
-        categories: state.categories.filter((cat) => cat.id !== action.payload.id),
+        categories: state.categories.filter((cat) => cat._id !== action.payload._id),
       };
 
     // Default

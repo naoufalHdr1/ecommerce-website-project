@@ -1,17 +1,14 @@
-import ProductSection from './productSection';
-import CategorySection from './categorySection';
-import AAA from './a';
+import ItemList from './productSection';
 import { StateProvider } from './stateContext';
 
 const ProductOverview = () => {
   return (
     <StateProvider>
+      <ItemList type="products"/>
       <hr/>
-      <ProductSection />
+      <ItemList type="subcategories"/>
       <hr/>
-      <CategorySection />
-      <hr/>
-      <AAA type="products"/>
+      <ItemList type="categories"/>
     </StateProvider>
   );
 };

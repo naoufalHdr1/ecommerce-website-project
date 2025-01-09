@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { DataGrid } from '@mui/x-data-grid';
-import { Box, Button } from '@mui/material';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { Box, Button, Tooltip, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -14,30 +14,33 @@ const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId, onBulkDelete }) 
           {
             field: 'actions',
             headerName: 'Actions',
-            width: 200,
+            width: 150,
+            sortable: false,
+            filterable: false,
+            align: 'right',
+            headerAlign: 'right',
             renderCell: (params) => (
-              <Box display="flex" gap={1}>
-                {onEdit && (
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    startIcon={<EditIcon />}
-                    onClick={() => onEdit(params.row._id)}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, width: '100%' }}>
+                {/* Edit Button */}
+                <Tooltip title="Edit">
+                  <IconButton
+                    color="disabled"
+                    fontSize="small"
+                    onClick={() => onEdit(params.row)}
                   >
-                    Edit
-                  </Button>
-                )}
-                {onDelete && (
-                  <Button
-                    size="small"
-                    variant="contained"
-                    color="error"
-                    startIcon={<DeleteIcon />}
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+                {/* Delete Button */}
+                <Tooltip title="Delete">
+                  <IconButton
+                    color="disabled"
+                    fontSize="small"
                     onClick={() => onDelete(params.row)}
                   >
-                    Delete
-                  </Button>
-                )}
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
               </Box>
             ),
           },
@@ -46,42 +49,37 @@ const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId, onBulkDelete }) 
   ];
 
   return (
-    <Box
-      sx={{
-        marginBottom: '25px',
-        width: '100%',
-        overflowX: { xs: 'auto', sm: 'hidden' },
-      }}
-    >
-      <DataGrid
-        rows={rows}
-        columns={enhancedColumns}
-        pageSize={5}
-        rowsPerPageOptions={[5, 10, 20]}
-        checkboxSelection
-        rowSelectionModel={rowSelectionModel}
-        onRowSelectionModelChange={(newRowSelectionModel) => {
-          setRowSelectionModel(newRowSelectionModel);
-        }}
-        disableSelectionOnClick
-        autoHeight
-        getRowId={getRowId || ((row) => row._id)}
+    <Box>
+      <Box
         sx={{
-          '& .MuiDataGrid-root': {
-            backgroundColor: '#fff',
-            borderRadius: '8px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          },
-          '& .MuiDataGrid-columnHeaders': {
-            backgroundColor: '#f5f5f5',
-            fontWeight: 'bold',
-            fontSize: '0.9rem',
-          },
-          '& .MuiDataGrid-footerContainer': {
-            backgroundColor: '#f5f5f5',
-          },
+          height: 400, width: '100%'
         }}
-      />
+      >
+        <DataGrid
+          rows={rows}
+          columns={enhancedColumns}
+          checkboxSelection
+          disableRowSelectionOnClick
+          slots={{ toolbar: GridToolbar }}
+          slotProps={{
+            toolbar: {
+              showQuickFilter: true,
+            },
+          }}
+          rowSelectionModel={rowSelectionModel}
+          onRowSelectionModelChange={(newRowSelectionModel) => {
+            setRowSelectionModel(newRowSelectionModel);
+          }}
+          disableSelectionOnClick
+          getRowId={getRowId || ((row) => row._id)}
+          pagination
+          pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 10 } },
+          }}
+        />
+      </Box>
+
       {rowSelectionModel.length > 0 && (
         <Box mt={2} display="flex" justifyContent="flex-end">
           <Button
@@ -98,3 +96,4 @@ const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId, onBulkDelete }) 
 };
 
 export default BaseTable;
+
