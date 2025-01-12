@@ -5,6 +5,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import Inventory2RoundedIcon from '@mui/icons-material/Inventory2Rounded';
+import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded';
 
 const NavigationConfig = [
   {
@@ -25,6 +26,11 @@ const NavigationConfig = [
     segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
+  },
+  {
+    segment: 'users',
+    title: 'Users',
+    icon: <PeopleAltRoundedIcon />,
   },
   {
     kind: 'divider',

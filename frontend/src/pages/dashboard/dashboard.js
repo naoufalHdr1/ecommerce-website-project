@@ -8,6 +8,7 @@ import DemoRouter from '../../components/dashboard/demoRouter';
 import Branding from '../../components/dashboard/branding';
 import DashboardOverview from '../../components/dashboard/dashboardSection/dashboardOverview';
 import ProductOverview from '../../components/dashboard/productSection/productOverview';
+import UserOverview from '../../components/dashboard/userSection/userOverview';
 
 const Dashboard = (props) => {
   const { window } = props;
@@ -29,6 +30,9 @@ const Dashboard = (props) => {
 
           {/* Products Overview Section */}
           {router.pathname === '/products' && <ProductOverview />}
+
+          {/* Users Overview Section */}
+          {router.pathname === '/users' && <UserOverview />}
 
         </PageContainer>
       </DashboardLayout>
