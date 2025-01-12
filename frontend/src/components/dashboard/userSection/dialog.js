@@ -21,6 +21,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { uploadImages } from '../../../utils/api';
+import { API_BASE_URL } from '../../../utils/config';
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiPaper-root": {
@@ -61,6 +63,7 @@ const CreateUserDialog = ({ open, onClose, onSave, user }) => {
   useEffect(() => {
     if (user) {
       setFormData({ ...user, password: "" });
+      if (user?.avatar) setUploadedAvatar(`${API_BASE_URL}${user.avatar}`);
     } else {
       setFormData({
         fullName: "",
@@ -71,6 +74,7 @@ const CreateUserDialog = ({ open, onClose, onSave, user }) => {
         role: "",
         avatar: null,
       });
+      setUploadedAvatar(null);
     }
   }, [user]);
 
@@ -87,12 +91,11 @@ const CreateUserDialog = ({ open, onClose, onSave, user }) => {
 
   const handleAvatarUpload = (e) => {
     const file = e.target.files[0];
+    const preview = URL.createObjectURL(file);
+	  console.log("file=", file)
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setFormData((prev) => ({ ...prev, avatar: reader.result }));
-      };
-      reader.readAsDataURL(file);
+      setUploadedAvatar(preview);
+      setFormData((prev) => ({ ...prev, avatar: file }));
     }
   };
 
@@ -133,7 +136,7 @@ const CreateUserDialog = ({ open, onClose, onSave, user }) => {
           <Tooltip title="Upload Avatar">
             <label htmlFor="avatar-upload">
               <StyledAvatar
-                src={formData.avatar || "https://via.placeholder.com/100"}
+                src={uploadedAvatar}
                 alt="User Avatar"
               />
             </label>

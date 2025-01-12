@@ -9,11 +9,18 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Avatar,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CustomDialog from './dialog';
 import BaseTable from '../productSection/baseTable';
-import { api } from '../../../utils/api';
+import { api, uploadImages } from '../../../utils/api';
+import { API_BASE_URL } from '../../../utils/config';
+
+const getRandomColor = () => {
+  const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+  return randomColor;
+};
 
 export default function UserSection() {
   const [users, setUsers] = useState([]);
@@ -43,6 +50,22 @@ export default function UserSection() {
   }, [token]);
 
   const getColumns = () => [
+    {
+      field: "avatar",
+      headerName: "Avatar",
+      width: 100,
+      renderCell: (params) => {
+        // Construct the full avatar URL
+        const avatarUrl = params.value ? `${API_BASE_URL}${params.value}` : null;
+        const nameInitial = params.row.name ? params.row.name.charAt(0).toUpperCase() : "?";
+
+        return avatarUrl ? (
+          <Avatar src={avatarUrl} alt={params.row.fullName} />
+        ) : (
+          <Avatar>{nameInitial}</Avatar>
+        );
+      },
+    },
     { field: 'fullName', headerName: 'Full Name', width: 200 },
     { field: 'email', headerName: 'Email', width: 200 },
     { field: 'role', headerName: 'Role', width: 100 },
@@ -56,11 +79,21 @@ export default function UserSection() {
 
   const handleAddSave = async (newUser) => {
     try {
+      console.log("newUser=", newUser);
+      const uploadedImageUrl = newUser.avatar
+        ? await uploadImages(newUser.avatar)
+        : null;
+      console.log("uploaded Image Url=", uploadedImageUrl[0]);
+
+      newUser.avatar = uploadedImageUrl[0]
+
+      console.log('newUser after add image=', newUser);
       const res = await api.post('/users', newUser, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log("res=", res.data)
       setUsers((prev) => [...prev, res.data]);
       setIsAddOpen(false);
     } catch (err) {
