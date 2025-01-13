@@ -17,11 +17,6 @@ import BaseTable from '../productSection/baseTable';
 import { api, uploadImages } from '../../../utils/api';
 import { API_BASE_URL } from '../../../utils/config';
 
-const getRandomColor = () => {
-  const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-  return randomColor;
-};
-
 export default function UserSection() {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -68,32 +63,56 @@ export default function UserSection() {
     },
     { field: 'fullName', headerName: 'Full Name', width: 200 },
     { field: 'email', headerName: 'Email', width: 200 },
+    { field: 'phone', headerName: 'Phone Number', width: 180 },
+    {
+      field: 'orders',
+      headerName: 'Orders',
+      width: 100,
+      renderCell: (params) => {
+        const orders = params.row.orders;
+        return orders ? orders.length : 0;
+      }
+    },
+    {
+      field: 'reviews',
+      headerName: 'Reviews',
+      width: 100,
+      renderCell: (params) => {
+        const reviews = params.row.reviews;
+        return reviews ? reviews.length : 0;
+      }
+    },
     { field: 'role', headerName: 'Role', width: 100 },
-    { field: 'createdAt', headerName: 'Created At', width: 150 },
+    {
+      field: 'createdAt',
+      headerName: 'Created At',
+      width: 150,
+      renderCell: (params) => {
+        const date = new Date(params.value);
+        return date.toLocaleDateString();
+      }
+    },
   ];
 
   const getRows = () => users;
 
   // Handle adding a user
-  const handleAddDialog = () => setIsAddOpen(true);
+  const handleAddDialog = () => {
+    setIsAddOpen(true);
+  }
 
   const handleAddSave = async (newUser) => {
     try {
-      console.log("newUser=", newUser);
-      const uploadedImageUrl = newUser.avatar
-        ? await uploadImages(newUser.avatar)
-        : null;
-      console.log("uploaded Image Url=", uploadedImageUrl[0]);
+      if (newUser.avatar) {
+        const uploadedImageUrl = await uploadImages(newUser.avatar)
+        newUser.avatar = uploadedImageUrl[0]
+      }
 
-      newUser.avatar = uploadedImageUrl[0]
-
-      console.log('newUser after add image=', newUser);
       const res = await api.post('/users', newUser, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("res=", res.data)
       setUsers((prev) => [...prev, res.data]);
       setIsAddOpen(false);
     } catch (err) {

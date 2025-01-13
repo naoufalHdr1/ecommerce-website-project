@@ -51,7 +51,7 @@ const CreateUserDialog = ({ open, onClose, onSave, user }) => {
     phone: "",
     address: "",
     password: "",
-    role: "",
+    role: "customer",
     avatar: null,
   });
 
@@ -71,7 +71,7 @@ const CreateUserDialog = ({ open, onClose, onSave, user }) => {
         phone: "",
         address: "",
         password: "",
-        role: "",
+        role: "customer",
         avatar: null,
       });
       setUploadedAvatar(null);
@@ -108,15 +108,15 @@ const CreateUserDialog = ({ open, onClose, onSave, user }) => {
     if (!formData.fullName) newErrors.fullName = "Full Name is required";
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
-    if (!formData.phone) newErrors.phone = "Phone number is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSave = () => {
+	  console.log("handleSave formData without validation=", formData)
     if (validateForm()) {
-      console.log(formData)
+	    console.log("handleSave formData=", formData)
       onSave(formData);
       onClose();
     }
