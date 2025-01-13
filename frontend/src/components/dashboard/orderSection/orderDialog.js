@@ -19,7 +19,8 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  CircularProgress
+  CircularProgress,
+  Checkbox,
 } from '@mui/material';
 import { Search as SearchIcon, AccountCircle } from '@mui/icons-material';
 import { api, uploadImages } from '../../../utils/api';
@@ -115,25 +116,6 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
               <Typography variant="body2" color="textSecondary" gutterBottom>
                 Enter the user details manually or search for an existing user.
               </Typography>
-              <TextField
-                fullWidth
-                id="input-with-icon-textfield"
-                label="Search User"
-                value={searchUser}
-                onChange={(e) => setSearchUser(e.target.value)}
-                sx={{ mb: 2, mt: 3 }}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-                variant="standard"
-              />
-
               {/* User Search Bar */}
               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
                 <TextField
@@ -160,18 +142,42 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
               {/* Loading Indicator */}
               {loading && <CircularProgress />}
 
-              {/* User List */}
-              <List>
+              {/* User Results */}
+              <List
+                sx={{
+                  maxHeight: 180,
+                  overflowY: 'auto',
+                  border: userResults.length ? '1px solid #ccc' : 'none',
+                  borderRadius: 2,
+                  p: 0,
+                  mt: 1,
+                }}
+              >
                 {userResults.map((user) => (
-                  <ListItem key={user._id} button onClick={() => handleUserSelect(user._id)}>
+                  <ListItem
+                    key={user._id}
+                    button
+                    onClick={() => handleUserSelect(user._id)}
+                    sx={{
+                      backgroundColor: selectedUserId === user._id ? 'rgba(25, 118, 210, 0.1)' : 'transparent',
+                      '&:hover': {
+                        backgroundColor: 'rgba(25, 118, 210, 0.05)',
+                      },
+                    }}
+                  >
                     <ListItemAvatar>
                       <Avatar src={`${API_BASE_URL}${user.avatar}`} alt={user.fullName} />
                     </ListItemAvatar>
                     <ListItemText primary={user.fullName} />
                     <ListItemText primary={user.email} />
+                    <Checkbox
+                      checked={selectedUserId === user._id}
+                      onChange={() => handleUserSelect(user._id)}
+                      sx={{ color: selectedUserId === user._id ? 'primary.main' : undefined }}
+                    />
                   </ListItem>
                 ))}
-              </List> 
+              </List>
 
               <Divider sx={{ my: 2 }}>OR</Divider>
               <TextField
