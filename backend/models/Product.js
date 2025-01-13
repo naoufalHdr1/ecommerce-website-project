@@ -11,13 +11,7 @@ const ProductSchema = new mongoose.Schema(
     stock: { type: Number, min: 0, default: 0 },
     images: { type: [String], default: ['/uploads/product-placeholder.png'] },
     sizes: [{ type: String }],
-    colors: [
-      {
-        name: { type: String },
-        value: { type: String },
-        _id: false,
-      },
-    ],
+    colors: [{ type: String }],
     subcategory_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Subcategory',

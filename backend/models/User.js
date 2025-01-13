@@ -6,10 +6,25 @@ import bcrypt from 'bcryptjs';
 // Defining the User Schema
 const userSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true },
+    fullName: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['customer', 'admin'], default: 'customer' },
+    address: { type: String },
+    phone: { type: String },
+    role: { type: String, default: 'customer' },
+    orders: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order',
+      },
+    ],
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Review',
+      },
+    ],
+    avatar: { type: String },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
   },

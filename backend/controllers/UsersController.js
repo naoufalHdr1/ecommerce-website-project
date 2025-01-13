@@ -9,12 +9,8 @@ class UsersController {
 
   /* Creates a new user. */
   static async createUser(req, res) {
-    const { name, email, password, role} = req.body;
-
-    // Validate input in the controller
-    if (!name) return res.status(400).json({ error: 'Missing name' });
-    if (!email) return res.status(400).json({ error: 'Missing email' });
-    if (!password) return res.status(400).json({ error: 'Missing password' });
+    console.log("req.body=", req.body)
+    const { email, password, ...userData } = req.body;
 
     try {
       // Check if the user already exists
@@ -22,14 +18,34 @@ class UsersController {
       if (existingUser) return res.status(400).json({ error: 'User already exists' });
 
       // Create and save a new user
+      console.log('password=', password)
       const hashedPassword = await User().hashPassword(password);
-      const newUser = new User({ name, email, password: hashedPassword, role });
+      console.log('hashed password=', hashedPassword)
+      console.log('userData=', userData);
+      const newUser = new User({ ...userData, email, password: hashedPassword });
       await newUser.save();
 
-      res.status(201).json({ id: newUser._id, email: newUser.email });
+      // Convert user to plain object and remove the password
+      const userWithoutPassword = newUser.toObject();
+      delete userWithoutPassword.password;
+
+      res.status(201).json(userWithoutPassword);
     } catch (err) {
+      console.log(err);
       res.status(400).json({ error: err.message });
     }
+  }
+
+  /* Finds all users */
+  static async findAllUser(req, res) {
+    try {
+      const users = await User.find();
+      
+      res.status(200).json(users);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+
   }
 
   /* Finds a user by their ID. */

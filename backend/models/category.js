@@ -3,9 +3,9 @@ import mongoose from 'mongoose';
 const categorySchema = mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
-    description: { type: String, required: true },
-    image: [{ type: String }],
-    banner: [{ type: String }],
+    description: { type: String },
+    images: [{ type: String }],
+    banners: [{ type: String }],
     subcategories : [
       {
         type: mongoose.Schema.Types.ObjectId,

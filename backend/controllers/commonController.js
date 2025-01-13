@@ -11,13 +11,17 @@ import { __dirname } from '../server.js';
 export const createItem = (childModel, parentModel = null) => async (req, res) => {
   // Determine if a parent relationship exists
   const isParentRequired = parentModel !== null;
+  console.log('isParentRequired=', isParentRequired);
   const parentKey = isParentRequired
     ? childModel.modelName === 'Product'
       ? 'subcategory_id'
       : 'category_id'
     : null;
+  console.log('parentKey=', parentKey);
 
+  console.log('req body=', req.body);
   const { [parentKey]: parentId, ...itemData } = req.body;
+  console.log('parent id=', parentId);
 
   try {
     // Create the new item
@@ -25,6 +29,7 @@ export const createItem = (childModel, parentModel = null) => async (req, res) =
       ...itemData,
       ...(isParentRequired && { [parentKey]: parentId || null }),
     });
+    console.log("new item=", newItem)
 
     // Handle subItem (subcategory or category) updates if needed
     if (isParentRequired && parentId) {
@@ -42,6 +47,7 @@ export const createItem = (childModel, parentModel = null) => async (req, res) =
 
     res.status(201).json(newItem);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -243,7 +249,9 @@ export const deleteBySub = (model, subModel) => async (req, res) => {
 };
 
 // Delete an item (Generalized)
-export const deleteProductById = (childModel, parentModel = null) => async (req, res) => {
+export const deleteItemById = (childModel, parentModel = null) => async (req, res) => {
+  console.log("delete req body=", req.body)
+  console.log("delete req params=", req.params)
   // Determine if a parent relationship exists
   const isParentRequired = parentModel !== null;
   const parentKey = isParentRequired
@@ -252,11 +260,13 @@ export const deleteProductById = (childModel, parentModel = null) => async (req,
       : 'category_id'
     : null;
 
-  const { _id, [parentKey]: parent_id } = req.body;
+  const { id } = req.params;
+  const { [parentKey]: parent_id } = req.body;
 
   try {
     // Find the item to delete
-    const item = await childModel.findById(_id);
+    const item = await childModel.findById(id);
+    console.log("Item found=", item)
     if (!item) {
       return res.status(404).json({ error: `${childModel.modelName} not found` });
     }
@@ -265,7 +275,9 @@ export const deleteProductById = (childModel, parentModel = null) => async (req,
     if (parentModel && parent_id) {
       const parent = await parentModel.findById(parent_id);
       if (!parent) {
-        return res.status(400).json({ error: `Invalid ${parentModel.modelName} ID` });
+        console.warn(`Parent document with ID ${parent_id} not found. Cleaning up child reference...`);
+       // await childModel.findByIdAndUpdate(id, { $unset: { [parentKey]: '' } });
+        //return res.status(200).json({ message: 'Parent not found. Reference removed from child.' });
       }
 
       // Check for parent-child mismatch
@@ -278,7 +290,7 @@ export const deleteProductById = (childModel, parentModel = null) => async (req,
       // Remove reference from parent
       const parentField = parentModel.modelName === 'Subcategory' ? 'products' : 'subcategories';
       await parentModel.findByIdAndUpdate(parent_id, {
-        $pull: { [parentField]: _id },
+        $pull: { [parentField]: id },
       });
     }
 
