@@ -12,8 +12,8 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import BaseTable from './baseTable';
-import { api, uploadImages } from '../../../utils/api';
-import { API_BASE_URL } from '../../../utils/config';
+import { api, uploadImages } from '../../utils/api';
+import { API_BASE_URL } from '../../utils/config';
 
 export default function ModelSection({ modelConfig }) {
   const {
