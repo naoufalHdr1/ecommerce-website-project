@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { api } from '../../../utils/api';
 import UserSearchBar from './userSearchBar';
+import ProductSearchBar from './productSearchBar';
 import { API_BASE_URL } from '../../../utils/config';
 
 const steps = ['User Information', 'Product Information', 'Shipping Address'];
@@ -176,6 +177,8 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
             </Box>
           )}
           {activeStep === 1 && (
+            <>
+            <ProductSearchBar />
             <Box sx={{ mt: 3 }}>
               <Typography variant="h6">Product Information</Typography>
               <Typography variant="body2" color="textSecondary" gutterBottom>
@@ -201,6 +204,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                 Total Amount: ${totalAmount}
               </Typography>
             </Box>
+            </>
           )}
           {activeStep === 2 && (
             <Box sx={{ mt: 3 }}>
