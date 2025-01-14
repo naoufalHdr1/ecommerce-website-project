@@ -12,9 +12,11 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  Avatar,
 } from '@mui/material';
 import { api } from '../../../utils/api';
 import UserSearchBar from './userSearchBar';
+import { API_BASE_URL } from '../../../utils/config';
 
 const steps = ['User Information', 'Product Information', 'Shipping Address'];
 
@@ -108,7 +110,32 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
 
               <UserSearchBar onSelectUser={handleUserSelect} />
 
-                  <Divider sx={{ my: 2 }}>OR</Divider>
+              <Divider sx={{ my: 2 }}>OR</Divider>
+              
+              <Box display="flex" alignItems="center" sx={{ mb: 3 }}>
+                {user?._id && (
+                  <Box
+                    sx={{
+                      width: '40%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      height: '100%',
+                      pr: 2,
+                    }}
+                  >
+                    <Avatar
+                      src={`${API_BASE_URL}${user.avatar}`}
+                      alt={user.fullName}
+                      sx={{
+                        width: '160px',
+                        height: '160px',
+                      }}
+                    />
+                  </Box>
+                )}
+                <Box sx={{ width: user && user._id ? '60%' : '100%' }}>
                   <TextField
                     fullWidth
                     label="Full Name"
@@ -138,6 +165,14 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     value={user ? user.phone : ''}
                     onChange={(e) => setUser({ ...user, phone: e.target.value })}
                   />
+                </Box>
+              </Box>
+              {user?._id && (
+                <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
+                  User selected ID: {user._id}
+                </Typography>
+              )}
+
             </Box>
           )}
           {activeStep === 1 && (

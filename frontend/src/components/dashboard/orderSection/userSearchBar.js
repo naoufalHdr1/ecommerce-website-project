@@ -51,12 +51,8 @@ const UserSearchBar = ({ onSelectUser }) => {
       setSelectedUser(null);
       onSelectUser(null);
     } else {
-      const keysToKeep = ['fullName', 'email', 'phone'];
-      const filteredUser = Object.fromEntries(
-        Object.entries(user).filter(([key]) => keysToKeep.includes(key))
-      );
       setSelectedUser(user);
-      onSelectUser(filteredUser);
+      onSelectUser(user);
     }
   };
 
