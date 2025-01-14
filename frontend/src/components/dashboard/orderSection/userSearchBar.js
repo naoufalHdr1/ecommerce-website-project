@@ -20,7 +20,7 @@ const UserSearchBar = ({ onSelectUser }) => {
   const [searchUser, setSearchUser] = useState('');
   const [userResults, setUserResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
 
   const handleSearch = async () => {
@@ -42,13 +42,22 @@ const UserSearchBar = ({ onSelectUser }) => {
     setHasSearched(false);
     setUserResults([]);
     setSearchUser('');
-    setSelectedUserId(null);
+    setSelectedUser(null);
     onSelectUser(null);
   };
 
-  const handleUserSelect = (userId) => {
-    setSelectedUserId(userId);
-    onSelectUser(userId);
+  const handleUserSelect = (user) => {
+    if (selectedUser && selectedUser._id === user._id) {
+      setSelectedUser(null);
+      onSelectUser(null);
+    } else {
+      const keysToKeep = ['fullName', 'email', 'phone'];
+      const filteredUser = Object.fromEntries(
+        Object.entries(user).filter(([key]) => keysToKeep.includes(key))
+      );
+      setSelectedUser(user);
+      onSelectUser(filteredUser);
+    }
   };
 
   return (
@@ -105,9 +114,9 @@ const UserSearchBar = ({ onSelectUser }) => {
             <ListItem
               key={user._id}
               button
-              onClick={() => handleUserSelect(user._id)}
+              onClick={() => handleUserSelect(user)}
               sx={{
-                backgroundColor: selectedUserId === user._id ? 'rgba(25, 118, 210, 0.1)' : 'transparent',
+                backgroundColor: selectedUser && selectedUser._id === user._id ? 'rgba(25, 118, 210, 0.1)' : 'transparent',
                 '&:hover': {
                   backgroundColor: 'rgba(25, 118, 210, 0.05)',
                 },
@@ -119,9 +128,9 @@ const UserSearchBar = ({ onSelectUser }) => {
               <ListItemText primary={user.fullName} />
               <ListItemText primary={user.email} />
               <Checkbox
-                checked={selectedUserId === user._id}
-                onChange={() => handleUserSelect(user._id)}
-                sx={{ color: selectedUserId === user._id ? 'primary.main' : undefined }}
+                checked={selectedUser && selectedUser._id === user._id}
+                onChange={() => handleUserSelect(user)}
+                sx={{ color: selectedUser && selectedUser._id === user._id ? 'primary.main' : undefined }}
               />
             </ListItem>
           ))
@@ -132,4 +141,3 @@ const UserSearchBar = ({ onSelectUser }) => {
 };
 
 export default UserSearchBar;
-

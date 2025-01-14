@@ -20,7 +20,7 @@ const steps = ['User Information', 'Product Information', 'Shipping Address'];
 
 export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   const [activeStep, setActiveStep] = useState(0);
-  const [user, setUser] = useState({ fullName: '', email: '', phone: '' });
+  const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
   const [shippingAddress, setShippingAddress] = useState({
     street: '',
@@ -32,16 +32,34 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   const [searchProduct, setSearchProduct] = useState('');
   const [totalAmount, setTotalAmount] = useState(0);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [errors, setErrors] = useState({ fullName: '', email: '' });
 
   const token = localStorage.getItem('token');
 
-  const handleUserSelect = (userId) => {
-    setSelectedUserId(userId);
-    console.log('Selected User ID:', userId);
+  const handleUserSelect = (user) => {
+    console.log('Selected User:', user);
+    user ? setUser(user) : setUser(null) ;
   };
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+   const handleNext = () => {
+    // Validation before going to the next step
+    const newErrors = { fullName: '', email: '' };
+    let formValid = true;
+
+    if (!user?.fullName) {
+      newErrors.fullName = 'Full Name is required';
+      formValid = false;
+    }
+    if (!user?.email) {
+      newErrors.email = 'Email is required';
+      formValid = false;
+    }
+
+    setErrors(newErrors);
+
+    if (formValid) {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
   };
 
   const handleBack = () => {
@@ -90,38 +108,36 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
 
               <UserSearchBar onSelectUser={handleUserSelect} />
 
-              {selectedUserId ? (
-                <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
-                  User selected ID: {selectedUserId}
-                </Typography>
-              ) : (
-                <>
-                <Divider sx={{ my: 2 }}>OR</Divider>
-                <TextField
-                  fullWidth
-                  label="Full Name"
-                  variant="standard"
-                  value={user.fullName}
-                  onChange={(e) => setUser({ ...user, fullName: e.target.value })}
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  fullWidth
-                  label="Email"
-                  variant="standard"
-                  value={user.email}
-                  onChange={(e) => setUser({ ...user, email: e.target.value })}
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  fullWidth
-                  label="Phone Number"
-                  variant="standard"
-                  value={user.phone}
-                  onChange={(e) => setUser({ ...user, phone: e.target.value })}
-                />
-                </>
-              )}
+                  <Divider sx={{ my: 2 }}>OR</Divider>
+                  <TextField
+                    fullWidth
+                    label="Full Name"
+                    variant="standard"
+                    value={user ? user.fullName : ''}
+                    onChange={(e) => setUser({ ...user, fullName: e.target.value })}
+                    sx={{ mb: 2 }}
+                    required
+                    error={errors.fullName}
+                    helperText={errors.fullName}
+                  />
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    variant="standard"
+                    value={user ? user.email : ''}
+                    onChange={(e) => setUser({ ...user, email: e.target.value })}
+                    sx={{ mb: 2 }}
+                    required
+                    error={errors.email}
+                    helperText={errors.email}
+                  />
+                  <TextField
+                    fullWidth
+                    label="Phone Number"
+                    variant="standard"
+                    value={user ? user.phone : ''}
+                    onChange={(e) => setUser({ ...user, phone: e.target.value })}
+                  />
             </Box>
           )}
           {activeStep === 1 && (
