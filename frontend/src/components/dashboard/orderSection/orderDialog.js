@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -12,19 +12,9 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
-  InputAdornment,
-  IconButton,
-  Avatar,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  CircularProgress,
-  Checkbox,
 } from '@mui/material';
-import { Search as SearchIcon, AccountCircle } from '@mui/icons-material';
-import { api, uploadImages } from '../../../utils/api';
-import { API_BASE_URL } from '../../../utils/config';
+import { api } from '../../../utils/api';
+import UserSearchBar from './userSearchBar';
 
 const steps = ['User Information', 'Product Information', 'Shipping Address'];
 
@@ -39,30 +29,11 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
     zip: '',
     country: '',
   });
-  const [searchUser, setSearchUser] = useState('');
   const [searchProduct, setSearchProduct] = useState('');
   const [totalAmount, setTotalAmount] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [userResults, setUserResults] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
   const token = localStorage.getItem('token');
-
-  // Search User
-  const handleSearch = async () => {
-    if (!searchUser) return;
-
-    setLoading(true);
-    try {
-      const res = await api(`/users?fullName=${searchUser}`);
-      console.log("res=", res.data)
-      setUserResults(res.data || []);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleUserSelect = (userId) => {
     setSelectedUserId(userId);
@@ -116,93 +87,41 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
               <Typography variant="body2" color="textSecondary" gutterBottom>
                 Enter the user details manually or search for an existing user.
               </Typography>
-              {/* User Search Bar */}
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+
+              <UserSearchBar onSelectUser={handleUserSelect} />
+
+              {selectedUserId ? (
+                <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
+                  User selected ID: {selectedUserId}
+                </Typography>
+              ) : (
+                <>
+                <Divider sx={{ my: 2 }}>OR</Divider>
                 <TextField
                   fullWidth
-                  id="input-with-icon-textfield"
-                  label="Search User"
-                  value={searchUser}
-                  onChange={(e) => setSearchUser(e.target.value)}
-                  sx={{ mb: 2, mt: 3 }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle />
-                      </InputAdornment>
-                    ),
-                  }}
+                  label="Full Name"
                   variant="standard"
+                  value={user.fullName}
+                  onChange={(e) => setUser({ ...user, fullName: e.target.value })}
+                  sx={{ mb: 2 }}
                 />
-                <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearch}>
-                  <SearchIcon />
-                </IconButton>
-              </div>
-              
-              {/* Loading Indicator */}
-              {loading && <CircularProgress />}
-
-              {/* User Results */}
-              <List
-                sx={{
-                  maxHeight: 180,
-                  overflowY: 'auto',
-                  border: userResults.length ? '1px solid #ccc' : 'none',
-                  borderRadius: 2,
-                  p: 0,
-                  mt: 1,
-                }}
-              >
-                {userResults.map((user) => (
-                  <ListItem
-                    key={user._id}
-                    button
-                    onClick={() => handleUserSelect(user._id)}
-                    sx={{
-                      backgroundColor: selectedUserId === user._id ? 'rgba(25, 118, 210, 0.1)' : 'transparent',
-                      '&:hover': {
-                        backgroundColor: 'rgba(25, 118, 210, 0.05)',
-                      },
-                    }}
-                  >
-                    <ListItemAvatar>
-                      <Avatar src={`${API_BASE_URL}${user.avatar}`} alt={user.fullName} />
-                    </ListItemAvatar>
-                    <ListItemText primary={user.fullName} />
-                    <ListItemText primary={user.email} />
-                    <Checkbox
-                      checked={selectedUserId === user._id}
-                      onChange={() => handleUserSelect(user._id)}
-                      sx={{ color: selectedUserId === user._id ? 'primary.main' : undefined }}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-
-              <Divider sx={{ my: 2 }}>OR</Divider>
-              <TextField
-                fullWidth
-                label="Full Name"
-                variant="standard"
-                value={user.fullName}
-                onChange={(e) => setUser({ ...user, fullName: e.target.value })}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                fullWidth
-                label="Email"
-                variant="standard"
-                value={user.email}
-                onChange={(e) => setUser({ ...user, email: e.target.value })}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                fullWidth
-                label="Phone Number"
-                variant="standard"
-                value={user.phone}
-                onChange={(e) => setUser({ ...user, phone: e.target.value })}
-              />
+                <TextField
+                  fullWidth
+                  label="Email"
+                  variant="standard"
+                  value={user.email}
+                  onChange={(e) => setUser({ ...user, email: e.target.value })}
+                  sx={{ mb: 2 }}
+                />
+                <TextField
+                  fullWidth
+                  label="Phone Number"
+                  variant="standard"
+                  value={user.phone}
+                  onChange={(e) => setUser({ ...user, phone: e.target.value })}
+                />
+                </>
+              )}
             </Box>
           )}
           {activeStep === 1 && (
