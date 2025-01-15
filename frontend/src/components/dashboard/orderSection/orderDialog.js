@@ -22,6 +22,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Alert,
 } from '@mui/material';
 import CloseIcon from "@mui/icons-material/Close";
 import { api } from '../../../utils/api';
@@ -46,15 +47,19 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   const [searchProduct, setSearchProduct] = useState('');
   const [totalAmount, setTotalAmount] = useState(0);
   const [selectedUserId, setSelectedUserId] = useState(null);
-  const [errors, setErrors] = useState({ fullName: '', email: '' });
+  const [errors, setErrors] = useState({});
+  //const [errors, setErrors] = useState({ fullName: '', email: '' });
   const [status, setStatus] = useState("Pending");
 
   const token = localStorage.getItem('token');
 
+  useEffect(() => {
+    console.log("errors=", errors);
+  }, [errors]);
+
   // Update totalAmount whenever items change
   useEffect(() => {
     const newTotal = products.reduce((acc, item) => acc + parseFloat(item.totalPrice), 0);
-    console.log("new total=", newTotal);
     setTotalAmount(newTotal);
   }, [products]);
 
@@ -63,23 +68,26 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
     user ? setUser(user) : setUser(null) ;
   };
 
-   const handleNext = () => {
+  const handleNext = () => {
     // Validation before going to the next step
-    const newErrors = { fullName: '', email: '' };
     let formValid = true;
+    const newErrors = {};
 
-    if (!user?.fullName) {
-      newErrors.fullName = 'Full Name is required';
-      formValid = false;
-    }
-    if (!user?.email) {
-      newErrors.email = 'Email is required';
-      formValid = false;
+    if (activeStep === 0) { 
+      if (!user?.fullName) newErrors.fullName = 'Full Name is required';
+      if (!user?.email) newErrors.email = 'Email is required';
     }
 
-    setErrors(newErrors);
+    if (activeStep === 1 && products.length === 0)
+        newErrors.products = 'Products List empty';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      formValid = false;
+    }
 
     if (formValid) {
+      setErrors({});
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
   };
@@ -197,6 +205,17 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
               <Typography variant="body2" color="textSecondary" gutterBottom>
                 Search for products and add them to the order with quantities.
               </Typography>
+
+              {/* Display Alert if there are errors */}
+              {errors.products && (
+                <Alert
+                  severity="error"
+                  onClose={() => setErrors({})}
+                  sx={{ marginBottom: 2 }}
+                >
+                  {errors.products}
+                </Alert>
+              )}
 
               <ProductSearchBar onAddProduct={handleAddProduct} />
               <Divider sx={{ my: 2 }}></Divider>
