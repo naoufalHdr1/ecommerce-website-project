@@ -18,6 +18,10 @@ import {
   Card,
   CardContent,
   Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import CloseIcon from "@mui/icons-material/Close";
 import { api } from '../../../utils/api';
@@ -25,7 +29,8 @@ import UserSearchBar from './userSearchBar';
 import ProductSearchBar from './productSearchBar';
 import { API_BASE_URL } from '../../../utils/config';
 
-const steps = ['User Information', 'Product Information', 'Shipping Address'];
+const steps = ['User Information', 'Order Information', 'Shipping Address'];
+const statusOptions = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
 export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   const [activeStep, setActiveStep] = useState(0);
@@ -42,6 +47,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   const [totalAmount, setTotalAmount] = useState(0);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [errors, setErrors] = useState({ fullName: '', email: '' });
+  const [status, setStatus] = useState("Pending");
 
   const token = localStorage.getItem('token');
 
@@ -187,7 +193,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
           )}
           {activeStep === 1 && (
             <Box sx={{ mt: 3 }}>
-              <Typography variant="h6">Product Information</Typography>
+              <Typography variant="h6">Order Information</Typography>
               <Typography variant="body2" color="textSecondary" gutterBottom>
                 Search for products and add them to the order with quantities.
               </Typography>
@@ -208,18 +214,41 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                   boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
                 }}
               >
-                <Typography
-                  variant="h6"
-                  sx={{
-                    textAlign: "left",
-                    marginTop: 3,
-                    marginBottom: 3,
-                    fontWeight: "bold",
-                    color: "#333",
-                  }}
-                >
-                  Your Items:
-                </Typography>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={6}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      textAlign: "left",
+                      marginTop: 3,
+                      marginBottom: 3,
+                      fontWeight: "bold",
+                      color: "#333",
+                    }}
+                  >
+                    {`Your Items(${products.length}):`}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <Typography variant="h6" sx={{ marginRight: 2 }}>Order Status:</Typography>
+                    <FormControl variant="standard">
+                      <Select
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                        label="Age"
+                      >
+  
+                        {statusOptions.map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                </Grid>
+              </Grid>
 
                 <Stack spacing={3}>
                   {products.map((item) => (
@@ -305,12 +334,14 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                 </Stack>
               </Box>
 
-      {/* Total Price */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-          Total: ${totalAmount.toFixed(2)}
-        </Typography>
-      </Box>
+              <Divider variant="inset" component="p" sx={{ marginTop: 2 }} />
+
+              {/* Total Price */}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  Total: ${totalAmount.toFixed(2)}
+                </Typography>
+              </Box>
 
             </Box>
           )}
@@ -329,6 +360,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                   setShippingAddress({ ...shippingAddress, street: e.target.value })
                 }
                 sx={{ mb: 2 }}
+                required
               />
               <TextField
                 fullWidth
@@ -339,6 +371,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                   setShippingAddress({ ...shippingAddress, city: e.target.value })
                 }
                 sx={{ mb: 2 }}
+                required
               />
               <TextField
                 fullWidth
@@ -349,6 +382,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                   setShippingAddress({ ...shippingAddress, state: e.target.value })
                 }
                 sx={{ mb: 2 }}
+                required
               />
               <TextField
                 fullWidth
@@ -359,6 +393,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                   setShippingAddress({ ...shippingAddress, zip: e.target.value })
                 }
                 sx={{ mb: 2 }}
+                required
               />
               <TextField
                 fullWidth
@@ -368,6 +403,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                 onChange={(e) =>
                   setShippingAddress({ ...shippingAddress, country: e.target.value })
                 }
+                required
               />
             </Box>
           )}
