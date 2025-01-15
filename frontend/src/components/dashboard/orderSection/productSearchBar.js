@@ -17,6 +17,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Chip,
 } from '@mui/material';
 import { Search as SearchIcon, AccountCircle, Close as CloseIcon } from '@mui/icons-material';
 import { api } from '../../../utils/api';
@@ -24,9 +25,10 @@ import { API_BASE_URL } from '../../../utils/config';
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 
-const ProductSearchBar = () => {
+const ProductSearchBar = ({ addProduct }) => {
   const [searchProduct, setSearchProduct] = useState('');
   const [productResults, setProductResults] = useState([]);
+  const [productStates, setProductStates] = React.useState({});
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -35,9 +37,36 @@ const ProductSearchBar = () => {
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
 
-  const handleQuantityChangee = (change) => {
-    setQuantity((prevQuantity) => Math.max(1, prevQuantity + change));
+  const handleProductStateChange = (productId, field, value) => {
+    setProductStates((prev) => ({
+      ...prev,
+      [productId]: {
+        ...prev[productId],
+        [field]: value,
+      },
+    }));
   };
+
+  const totalPrice = (price, quantity = 1) => {
+    return (price * quantity).toFixed(2)
+  }
+
+  const handleQuantityChangee = (productId, change) => {
+    handleProductStateChange(productId, "quantity", Math.max(1, (productStates[productId]?.quantity || 1) + change));
+  };
+
+  const handleAddProduct = (productId, price) => {
+    console.log(productStates)
+    const product = { ...productStates[productId] };
+
+    product._id = productId;
+    product.totalPrice = totalPrice(price, product?.quantity)
+
+    setSelectedProducts((prev) => [...prev, productId]);
+    console.log("product=", product);
+    console.log("selectedProducts=", selectedProducts);
+    return product;
+  }
 
   // Fetch products based on search query
   const handleSearch = async () => {
@@ -96,15 +125,9 @@ const ProductSearchBar = () => {
           sx={{ mb: 2, mt: 3 }}
           variant="standard"
         />
-        {productResults.length ? (
-          <IconButton type="button" sx={{ p: '10px' }} aria-label="clear" onClick={resetSearch}>
-            <CloseIcon />
-          </IconButton>
-        ) : (
-          <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearch}>
-            <SearchIcon />
-          </IconButton>
-        )}
+        <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSearch}>
+          <SearchIcon />
+        </IconButton>
       </div>
 
       {/* Loading Indicator */}
@@ -139,7 +162,7 @@ const ProductSearchBar = () => {
               {/* Product Image */}
               <CardMedia
                 component="img"
-                image={`${API_BASE_URL}${product.images[0]}`}
+                image={product.images?.[0] ? `${API_BASE_URL}${product.images[0]}` : '/image'}
                 alt={product.name}
                 sx={{
                   width: "35%",
@@ -158,14 +181,33 @@ const ProductSearchBar = () => {
                   justifyContent: "space-between",
                 }}
               >
-                {/* Subcategory Name */}
-                <Typography
-                  variant="subtitle2"
-                  color="text.secondary"
-                  sx={{ fontWeight: "bold" }}
-                >
-                  {product.subcategory_id}
-                </Typography>
+
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  {/* Subcategory Name */}
+                  <Typography
+                    variant="subtitle2"
+                    color="text.secondary"
+                    sx={{ fontWeight: "bold" }}
+                  >
+                    {product.subcategory_id || "No Subcategory"}
+                  </Typography>
+
+                  {/* Chip */}
+                  {selectedProducts.filter((item) => item === product._id).length > 0 && (
+                    <Chip
+                      label={`x${selectedProducts.filter((item) => item === product._id).length}`}
+                      color="success"
+                      size="small"
+                      sx={{
+                        fontSize: "0.8rem",
+                        height: "auto",
+                        "& .MuiChip-label": {
+                          padding: "0 8px",
+                        },
+                      }}
+                    />
+                  )}
+                </Box>
 
                 {/* Product Name */}
                 <Typography variant="h6" sx={{ fontWeight: "bold" }}>
@@ -174,7 +216,8 @@ const ProductSearchBar = () => {
 
                 {/* Product Price */}
                 <Typography variant="body1" color="primary" sx={{ fontWeight: "bold" }}>
-                  ${(product.price * quantity).toFixed(2)}
+                  ${totalPrice(product.price, productStates[product._id]?.quantity)}
+
                 </Typography>
 
                 {/* Product variant */}
@@ -186,9 +229,8 @@ const ProductSearchBar = () => {
                   {product.sizes && product.sizes.length > 0 ? (
                     <RadioGroup
                       row
-                      value={selectedSize}
-                      onChange={(e) => setSelectedSize(e.target.value)}
-                      sx={{ gap: 1 }}
+                      value={productStates[product._id]?.size || ""}
+                      onChange={(e) => handleProductStateChange(product._id, "size", e.target.value)}
                     >
                       {product.sizes.map((size) => (
                         <FormControlLabel
@@ -219,15 +261,16 @@ const ProductSearchBar = () => {
                           sx={{
                             width: 24,
                             height: 24,
+                            padding: '1px',
                             backgroundColor: color,
                             borderRadius: "50%",
                             border:
-                              selectedColor === color
+                              productStates[product._id]?.color === color
                                 ? "2px solid #000"
                                 : "1px solid #ccc",
                             cursor: "pointer",
                           }}
-                          onClick={() => setSelectedColor(color)}
+                          onClick={() => handleProductStateChange(product._id, "color", color)}
                         />
                       ))}
                     </Box>
@@ -252,19 +295,19 @@ const ProductSearchBar = () => {
                     </Typography>
                     <IconButton
                       size="small"
-                      onClick={() => handleQuantityChangee(-1)}
-                      disabled={quantity === 1}
+                      onClick={() => handleQuantityChangee(product._id, -1)}
+                      disabled={(productStates[product._id]?.quantity || 1) === 1}
                     >
                       <RemoveIcon />
                     </IconButton>
                     <TextField
-                      value={quantity}
+                      value={productStates[product._id]?.quantity || 1}
                       variant="standard"
                       size="small"
                       sx={{ width: 40, textAlign: "center" }}
-                      inputProps={{ readOnly: true, style: { textAlign: "center" } }}
+                      inputProps={{ style: { textAlign: "center" } }}
                     />
-                    <IconButton size="small" onClick={() => handleQuantityChangee(1)}>
+                    <IconButton size="small" onClick={() => handleQuantityChangee(product._id, 1)}>
                       <AddIcon />
                     </IconButton>
                   </Box>
@@ -274,7 +317,7 @@ const ProductSearchBar = () => {
                     variant="outlined"
                     size="small"
                     color="primary"
-                    onClick={() => console.log("test")}
+                    onClick={() => handleAddProduct(product._id, product.price)}
                   >
                     Add Product
                   </Button>
@@ -285,7 +328,7 @@ const ProductSearchBar = () => {
 	)}
       </Box>
 
-      {/* Selected Products */}
+      {/* Selected Products
       <List sx={{ mt: 2 }}>
         {selectedProducts.map((product) => (
           <ListItem key={product._id} sx={{ display: 'flex', alignItems: 'center' }}>
@@ -302,6 +345,7 @@ const ProductSearchBar = () => {
           </ListItem>
         ))}
       </List>
+      */}
 
       {/* Divider */}
       <Divider sx={{ my: 2 }} />
