@@ -13,7 +13,13 @@ import {
   DialogTitle,
   Divider,
   Avatar,
+  IconButton,
+  Stack,
+  Card,
+  CardContent,
+  Grid,
 } from '@mui/material';
+import CloseIcon from "@mui/icons-material/Close";
 import { api } from '../../../utils/api';
 import UserSearchBar from './userSearchBar';
 import ProductSearchBar from './productSearchBar';
@@ -38,6 +44,13 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   const [errors, setErrors] = useState({ fullName: '', email: '' });
 
   const token = localStorage.getItem('token');
+
+  // Update totalAmount whenever items change
+  useEffect(() => {
+    const newTotal = products.reduce((acc, item) => acc + parseFloat(item.totalPrice), 0);
+    console.log("new total=", newTotal);
+    setTotalAmount(newTotal);
+  }, [products]);
 
   const handleUserSelect = (user) => {
     console.log('Selected User:', user);
@@ -73,16 +86,12 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
     setActiveStep(0);
   };
 
-  const addProduct = (product) => {
-    setProducts((prev) => {
-      const updatedProducts = [...prev, product];
-      const newTotal = updatedProducts.reduce(
-        (sum, p) => sum + p.quantity * p.price,
-        0
-      );
-      setTotalAmount(newTotal);
-      return updatedProducts;
-    });
+  const handleAddProduct = (product) => {
+    setProducts((prev) => [...prev, product]);
+  };
+
+  const handleRemove = (id) => {
+    setProducts(products.filter((item) => item._id !== id));
   };
 
   const handleSave = () => {
@@ -177,34 +186,133 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
             </Box>
           )}
           {activeStep === 1 && (
-            <>
-            <ProductSearchBar />
             <Box sx={{ mt: 3 }}>
               <Typography variant="h6">Product Information</Typography>
               <Typography variant="body2" color="textSecondary" gutterBottom>
                 Search for products and add them to the order with quantities.
               </Typography>
-              <TextField
-                fullWidth
-                label="Search Product"
-                variant="standard"
-                value={searchProduct}
-                onChange={(e) => setSearchProduct(e.target.value)}
-                sx={{ mb: 2 }}
-              />
-              <Button
-                variant="outlined"
-                onClick={() =>
-                  addProduct({ name: 'Sample Product', quantity: 1, price: 100 })
-                }
+
+              <ProductSearchBar onAddProduct={handleAddProduct} />
+              <Divider sx={{ my: 2 }}></Divider>
+
+              {/* Producs List */}
+              <Box
+                sx={{
+                  maxWidth: 600,
+                  margin: "auto",
+                  padding: 2,
+                  maxHeight: 500,
+                  overflowY: "auto",
+                  borderRadius: 3,
+                  backgroundColor: "#f5f5f5",
+                  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+                }}
               >
-                Add Product
-              </Button>
-              <Typography variant="body1" sx={{ mt: 2 }}>
-                Total Amount: ${totalAmount}
-              </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    textAlign: "left",
+                    marginTop: 3,
+                    marginBottom: 3,
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  Your Items:
+                </Typography>
+
+                <Stack spacing={3}>
+                  {products.map((item) => (
+                    <Card
+                      key={item._id}
+                      sx={{
+                        padding: 2,
+                        paddingBottom: 0,
+                        borderRadius: 3,
+                        backgroundColor: "#ffffff",
+                        boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.2)",
+                      }}
+                    >
+                      <Grid container alignItems="center" spacing={2}>
+                        {/* Item Details */}
+                        <Grid item xs={9}>
+                          <CardContent
+                            sx={{
+                              padding: 0,
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 0.5,
+                            }}
+                          >
+                            <Typography
+                              variant="h6"
+                              sx={{ fontWeight: "bold", color: "#333" }}
+                            >
+                              {item.name}
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              sx={{ color: "gray", fontSize: "0.9rem" }}
+                            >
+                              Size: {item.size} | Color:{" "}
+                              <Box
+                                component="span"
+                                sx={{
+                                  display: "inline-block",
+                                  width: 12,
+                                  height: 12,
+                                  backgroundColor: item.color,
+                                  borderRadius: "50%",
+                                  marginLeft: 1,
+                                  border: "1px solid #ddd",
+                                }}
+                              />
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontSize: "0.9rem", color: "#555" }}
+                            >
+                              Quantity: {item.quantity}
+                            </Typography>
+                            <Typography
+                              variant="h6"
+                              sx={{ color: "#007aff", fontWeight: "bold" }}
+                            >
+                              Total: ${item.totalPrice}
+                            </Typography>
+                          </CardContent>
+                        </Grid>
+
+                        {/* Close Button */}
+                        <Grid item xs={3} sx={{ textAlign: "right" }}>
+                          <IconButton
+                            onClick={() => handleRemove(item._id)}
+                            sx={{
+                              color: "#ff4d4d",
+                              backgroundColor: "#fff",
+                              border: "1px solid #ddd",
+                              "&:hover": {
+                                backgroundColor: "#ffe6e6",
+                              },
+                            }}
+                          >
+                            <CloseIcon />
+                          </IconButton>
+                        </Grid>
+                      </Grid>
+                    </Card>
+                  ))}
+                </Stack>
+              </Box>
+
+      {/* Total Price */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+          Total: ${totalAmount.toFixed(2)}
+        </Typography>
+      </Box>
+
             </Box>
-            </>
           )}
           {activeStep === 2 && (
             <Box sx={{ mt: 3 }}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -6,10 +6,6 @@ import {
   CardContent,
   Typography,
   TextField,
-  Divider,
-  List,
-  ListItem,
-  Avatar,
   Button,
   CircularProgress,
   IconButton,
@@ -20,23 +16,19 @@ import {
   Chip,
   Alert,
 } from '@mui/material';
-import { Search as SearchIcon, AccountCircle, Close as CloseIcon } from '@mui/icons-material';
+import { Search as SearchIcon } from '@mui/icons-material';
 import { api } from '../../../utils/api';
 import { API_BASE_URL } from '../../../utils/config';
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 
-const ProductSearchBar = ({ addProduct }) => {
+const ProductSearchBar = ({ onAddProduct }) => {
   const [searchProduct, setSearchProduct] = useState('');
   const [productResults, setProductResults] = useState([]);
   const [productStates, setProductStates] = React.useState({});
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
-  const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedColor, setSelectedColor] = useState(null);
   const [errors, setErrors] = React.useState([]);
 
   const handleProductStateChange = (productId, field, value) => {
@@ -53,7 +45,7 @@ const ProductSearchBar = ({ addProduct }) => {
     return (price * quantity).toFixed(2)
   }
 
-  const handleQuantityChangee = (productId, change) => {
+  const handleQuantityChange = (productId, change) => {
     handleProductStateChange(productId, "quantity", Math.max(1, (productStates[productId]?.quantity || 1) + change));
   };
 
@@ -84,12 +76,14 @@ const ProductSearchBar = ({ addProduct }) => {
     const addProduct = { ...productStates[product._id] };
 
     addProduct._id = product._id;
+    addProduct.name = product.name;
     addProduct.totalPrice = totalPrice(product.price, addProduct.quantity)
+    console.log("type of total=", typeof(addProduct.totalPrice))
 
     setSelectedProducts((prev) => [...prev, product._id]);
     console.log("added product=", addProduct);
     console.log("selectedProducts=", selectedProducts);
-    return product;
+    onAddProduct(addProduct);
   }
 
   // Fetch products based on search query
@@ -106,33 +100,6 @@ const ProductSearchBar = ({ addProduct }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const resetSearch = () => {
-    setHasSearched(false);
-    setProductResults([]);
-    setSearchProduct('');
-  };
-
-
-  const handleProductSelect = (product) => {
-    if (!selectedProducts.find((item) => item._id === product._id)) {
-      setSelectedProducts([...selectedProducts, { ...product, quantity: 1 }]);
-    }
-  };
-
-  const handleQuantityChange = (productId, quantity) => {
-    setSelectedProducts((prev) =>
-      prev.map((item) =>
-        item._id === productId
-          ? { ...item, quantity: Math.max(1, Number(quantity)) }
-          : item
-      )
-    );
-  };
-
-  const calculateTotalPrice = () => {
-    return selectedProducts.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
   return (
@@ -330,7 +297,7 @@ const ProductSearchBar = ({ addProduct }) => {
                     </Typography>
                     <IconButton
                       size="small"
-                      onClick={() => handleQuantityChangee(product._id, -1)}
+                      onClick={() => handleQuantityChange(product._id, -1)}
                       disabled={(productStates[product._id]?.quantity || 1) === 1}
                     >
                       <RemoveIcon />
@@ -342,7 +309,7 @@ const ProductSearchBar = ({ addProduct }) => {
                       sx={{ width: 40, textAlign: "center" }}
                       inputProps={{ style: { textAlign: "center" } }}
                     />
-                    <IconButton size="small" onClick={() => handleQuantityChangee(product._id, 1)}>
+                    <IconButton size="small" onClick={() => handleQuantityChange(product._id, 1)}>
                       <AddIcon />
                     </IconButton>
                   </Box>
@@ -362,14 +329,6 @@ const ProductSearchBar = ({ addProduct }) => {
           ))
 	)}
       </Box>
-
-      {/* Total Price
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-          Total: ${calculateTotalPrice().toFixed(2)}
-        </Typography>
-      </Box>
-      */}
     </Box>
   );
 };
