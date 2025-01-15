@@ -18,6 +18,7 @@ import {
   FormControlLabel,
   Radio,
   Chip,
+  Alert,
 } from '@mui/material';
 import { Search as SearchIcon, AccountCircle, Close as CloseIcon } from '@mui/icons-material';
 import { api } from '../../../utils/api';
@@ -36,6 +37,7 @@ const ProductSearchBar = ({ addProduct }) => {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
+  const [errors, setErrors] = React.useState([]);
 
   const handleProductStateChange = (productId, field, value) => {
     setProductStates((prev) => ({
@@ -55,15 +57,37 @@ const ProductSearchBar = ({ addProduct }) => {
     handleProductStateChange(productId, "quantity", Math.max(1, (productStates[productId]?.quantity || 1) + change));
   };
 
-  const handleAddProduct = (productId, price) => {
-    console.log(productStates)
-    const product = { ...productStates[productId] };
+  const productValidation = (product) => {
+    const productState = productStates[product._id] || {};
+    const newErrors = [];
 
-    product._id = productId;
-    product.totalPrice = totalPrice(price, product?.quantity)
+    // Validate sizes
+    if (product.sizes?.length > 0 && !productState.size) {
+      newErrors.push("Please select a size.");
+    }
 
-    setSelectedProducts((prev) => [...prev, productId]);
-    console.log("product=", product);
+    // Validate colors
+    if (product.colors?.length > 0 && !productState.color) {
+      newErrors.push("Please select a color.");
+    }
+
+    if (newErrors.length > 0) {
+      setErrors(newErrors);
+      return true;
+    }
+
+    setErrors([]);
+  }
+
+  const handleAddProduct = (product) => {
+    if (productValidation(product)) return;
+    const addProduct = { ...productStates[product._id] };
+
+    addProduct._id = product._id;
+    addProduct.totalPrice = totalPrice(product.price, addProduct.quantity)
+
+    setSelectedProducts((prev) => [...prev, product._id]);
+    console.log("added product=", addProduct);
     console.log("selectedProducts=", selectedProducts);
     return product;
   }
@@ -132,6 +156,17 @@ const ProductSearchBar = ({ addProduct }) => {
 
       {/* Loading Indicator */}
       {loading && <CircularProgress />}
+
+      {/* Display Alert if there are errors */}
+      {errors.length > 0 && (
+        <Alert
+          severity="error"
+          onClose={() => setErrors([])}
+          sx={{ marginBottom: 2 }}
+        >
+          {errors.join(" / ")}
+        </Alert>
+      )}
 
       {/* Product Results */}
       <Box
@@ -267,7 +302,7 @@ const ProductSearchBar = ({ addProduct }) => {
                             border:
                               productStates[product._id]?.color === color
                                 ? "2px solid #000"
-                                : "1px solid #ccc",
+                                : "2px solid #ccc",
                             cursor: "pointer",
                           }}
                           onClick={() => handleProductStateChange(product._id, "color", color)}
@@ -317,7 +352,7 @@ const ProductSearchBar = ({ addProduct }) => {
                     variant="outlined"
                     size="small"
                     color="primary"
-                    onClick={() => handleAddProduct(product._id, product.price)}
+                    onClick={() => handleAddProduct(product)}
                   >
                     Add Product
                   </Button>
@@ -328,34 +363,13 @@ const ProductSearchBar = ({ addProduct }) => {
 	)}
       </Box>
 
-      {/* Selected Products
-      <List sx={{ mt: 2 }}>
-        {selectedProducts.map((product) => (
-          <ListItem key={product._id} sx={{ display: 'flex', alignItems: 'center' }}>
-            <img src={`${API_BASE_URL}${product.images[0]}`} alt={product.name} sx={{ mr: 2 }} />
-            <Typography sx={{ flex: 1 }}>{product.name}</Typography>
-            <TextField
-              type="number"
-              value={product.quantity}
-              onChange={(e) => handleQuantityChange(product._id, e.target.value)}
-              sx={{ width: '50px', mr: 2 }}
-              inputProps={{ min: 1 }}
-            />
-            <Typography>${(product.price * product.quantity).toFixed(2)}</Typography>
-          </ListItem>
-        ))}
-      </List>
-      */}
-
-      {/* Divider */}
-      <Divider sx={{ my: 2 }} />
-
-      {/* Total Price */}
+      {/* Total Price
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
           Total: ${calculateTotalPrice().toFixed(2)}
         </Typography>
       </Box>
+      */}
     </Box>
   );
 };
