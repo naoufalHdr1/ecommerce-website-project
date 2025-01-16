@@ -84,6 +84,16 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
     if (activeStep === 1 && products.length === 0)
         newErrors.products = 'Products List empty';
 
+    if (activeStep === 2) { 
+      if (!shippingAddress?.firstName) newErrors.firstName = 'First Name is required';
+      if (!shippingAddress?.lastName) newErrors.lastName = 'Last Name is required';
+      if (!shippingAddress?.addressLine1) newErrors.addressLine1 = 'Address is required';
+      if (!shippingAddress?.city) newErrors.city = 'City is required';
+      if (!shippingAddress?.state) newErrors.state = 'State is required';
+      if (!shippingAddress?.zip) newErrors.zip = 'Zip code is required';
+      if (!shippingAddress?.country) newErrors.country = 'Country is required';
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       formValid = false;
@@ -111,7 +121,32 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
     setProducts(products.filter((item) => item._id !== id));
   };
 
+
+  const validateShippingAddress = (shippingAddress) => {
+    const requiredFields = [
+      { field: 'firstName', message: 'First Name is required' },
+      { field: 'lastName', message: 'Last Name is required' },
+      { field: 'addressLine1', message: 'Address is required' },
+      { field: 'city', message: 'City is required' },
+      { field: 'state', message: 'State is required' },
+      { field: 'zip', message: 'Zip code is required' },
+      { field: 'country', message: 'Country is required' },
+    ];
+
+    return requiredFields.reduce((errors, { field, message }) => {
+      if (!shippingAddress?.[field]) errors[field] = message;
+      return errors;
+    }, {});
+  };
+
   const handleSave = () => {
+    const newErrors = validateShippingAddress(shippingAddress);
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     const orderData = { user, products, shippingAddress, totalAmount };
     onSave(orderData);
   };
@@ -391,6 +426,8 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                       setShippingAddress({ ...shippingAddress, firstName: e.target.value })
                     }
                     required
+                    error={errors.firstName}
+                    helperText={errors.firstName}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -403,6 +440,8 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                       setShippingAddress({ ...shippingAddress, lastName: e.target.value })
                     }
                     required
+                    error={errors.lastName}
+                    helperText={errors.lastName}
                   />
                 </Grid>
               </Grid>
@@ -417,6 +456,8 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                 }
                 required
                 sx={{ mb: 2 }}
+                error={errors.addressLine1}
+                helperText={errors.addressLine1}
               />
               <TextField
                 fullWidth
@@ -426,7 +467,6 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                 onChange={(e) =>
                   setShippingAddress({ ...shippingAddress, addressLine2: e.target.value })
                 }
-                required
                 sx={{ mb: 2 }}
               />
 
@@ -441,6 +481,8 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                       setShippingAddress({ ...shippingAddress, city: e.target.value })
                     }
                     required
+                    error={errors.city}
+                    helperText={errors.city}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -453,6 +495,8 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                       setShippingAddress({ ...shippingAddress, state: e.target.value })
                     }
                     required
+                    error={errors.state}
+                    helperText={errors.state}
                   />
                 </Grid>
               </Grid>
@@ -467,8 +511,9 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     onChange={(e) =>
                       setShippingAddress({ ...shippingAddress, zip: e.target.value })
                     }
-                    sx={{ mb: 2 }}
                     required
+                    error={errors.zip}
+                    helperText={errors.zip}
                   />
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -481,11 +526,14 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                       setShippingAddress({ ...shippingAddress, country: e.target.value })
                     }
                     required
+                    error={errors.country}
+                    helperText={errors.country}
                   />
                 </Grid>
               </Grid>
             </Box>
           )}
+
           {activeStep === steps.length && (
             <Typography sx={{ mt: 3 }}>
               All steps completed - review and save your order.
