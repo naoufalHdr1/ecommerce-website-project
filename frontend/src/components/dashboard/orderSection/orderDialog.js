@@ -84,16 +84,6 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
     if (activeStep === 1 && products.length === 0)
         newErrors.products = 'Products List empty';
 
-    if (activeStep === 2) { 
-      if (!shippingAddress?.firstName) newErrors.firstName = 'First Name is required';
-      if (!shippingAddress?.lastName) newErrors.lastName = 'Last Name is required';
-      if (!shippingAddress?.addressLine1) newErrors.addressLine1 = 'Address is required';
-      if (!shippingAddress?.city) newErrors.city = 'City is required';
-      if (!shippingAddress?.state) newErrors.state = 'State is required';
-      if (!shippingAddress?.zip) newErrors.zip = 'Zip code is required';
-      if (!shippingAddress?.country) newErrors.country = 'Country is required';
-    }
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       formValid = false;
@@ -121,7 +111,21 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
     setProducts(products.filter((item) => item._id !== id));
   };
 
+  // Handle input changes
+  const handleChange = (field) => (e) => {
+    setShippingAddress((prevAddress) => ({
+      ...prevAddress,
+      [field]: e.target.value,
+    }));
+    if (errors && errors[field]) {
+      setErrors((prevErrors) => {
+        const { [field]: _, ...remainingErrors } = prevErrors;
+        return remainingErrors;
+      });
+    }
+  };
 
+  // Performs validation for required fields.
   const validateShippingAddress = (shippingAddress) => {
     const requiredFields = [
       { field: 'firstName', message: 'First Name is required' },
@@ -147,8 +151,8 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
       return;
     }
 
-    const orderData = { user, products, shippingAddress, totalAmount };
-    onSave(orderData);
+    console.log("saved")
+
   };
 
   return (
@@ -422,9 +426,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     label="First name"
                     variant="standard"
                     value={shippingAddress.firstName}
-                    onChange={(e) => 
-                      setShippingAddress({ ...shippingAddress, firstName: e.target.value })
-                    }
+                    onChange={handleChange('firstName')}
                     required
                     error={errors.firstName}
                     helperText={errors.firstName}
@@ -436,9 +438,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     label="Last name"
                     variant="standard"
                     value={shippingAddress.lastName}
-                    onChange={(e) => 
-                      setShippingAddress({ ...shippingAddress, lastName: e.target.value })
-                    }
+                    onChange={handleChange('lastName')}
                     required
                     error={errors.lastName}
                     helperText={errors.lastName}
@@ -451,9 +451,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                 label="Address line 1"
                 variant="standard"
                 value={shippingAddress.addressLine1}
-                onChange={(e) =>
-                  setShippingAddress({ ...shippingAddress, addressLine1: e.target.value })
-                }
+                onChange={handleChange('addressLine1')}
                 required
                 sx={{ mb: 2 }}
                 error={errors.addressLine1}
@@ -477,9 +475,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     label="City"
                     variant="standard"
                     value={shippingAddress.city}
-                    onChange={(e) =>
-                      setShippingAddress({ ...shippingAddress, city: e.target.value })
-                    }
+                    onChange={handleChange('city')}
                     required
                     error={errors.city}
                     helperText={errors.city}
@@ -491,9 +487,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     label="State"
                     variant="standard"
                     value={shippingAddress.state}
-                    onChange={(e) =>
-                      setShippingAddress({ ...shippingAddress, state: e.target.value })
-                    }
+                    onChange={handleChange('state')}
                     required
                     error={errors.state}
                     helperText={errors.state}
@@ -508,9 +502,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     label="Zip / Postal code"
                     variant="standard"
                     value={shippingAddress.zip}
-                    onChange={(e) =>
-                      setShippingAddress({ ...shippingAddress, zip: e.target.value })
-                    }
+                    onChange={handleChange('zip')}
                     required
                     error={errors.zip}
                     helperText={errors.zip}
@@ -522,9 +514,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     label="Country"
                     variant="standard"
                     value={shippingAddress.country}
-                    onChange={(e) =>
-                      setShippingAddress({ ...shippingAddress, country: e.target.value })
-                    }
+                    onChange={handleChange('country')}
                     required
                     error={errors.country}
                     helperText={errors.country}
