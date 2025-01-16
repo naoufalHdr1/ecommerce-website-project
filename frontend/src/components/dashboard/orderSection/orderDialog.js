@@ -38,6 +38,10 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
   const [shippingAddress, setShippingAddress] = useState({
+    firstName: '',
+    lastName: '',
+    addressLine1: '',
+    addressLine2: '',
     street: '',
     city: '',
     state: '',
@@ -48,7 +52,6 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   const [totalAmount, setTotalAmount] = useState(0);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [errors, setErrors] = useState({});
-  //const [errors, setErrors] = useState({ fullName: '', email: '' });
   const [status, setStatus] = useState("Pending");
 
   const token = localStorage.getItem('token');
@@ -125,6 +128,8 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
               </Step>
             ))}
           </Stepper>
+
+          {/* User Information Stepper */}
           {activeStep === 0 && (
             <Box sx={{ mt: 3 }}>
               <Typography variant="h6">User Information</Typography>
@@ -199,6 +204,8 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
 
             </Box>
           )}
+
+          {/* Order Information Stepper */}
           {activeStep === 1 && (
             <Box sx={{ mt: 3 }}>
               <Typography variant="h6">Order Information</Typography>
@@ -364,66 +371,119 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
 
             </Box>
           )}
+
+          {/* Shipping Information Stepper */}
           {activeStep === 2 && (
             <Box sx={{ mt: 3 }}>
               <Typography variant="h6">Shipping Address</Typography>
               <Typography variant="body2" color="textSecondary" gutterBottom>
                 Enter the shipping address details for the order.
               </Typography>
+
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="First name"
+                    variant="standard"
+                    value={shippingAddress.firstName}
+                    onChange={(e) => 
+                      setShippingAddress({ ...shippingAddress, firstName: e.target.value })
+                    }
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Last name"
+                    variant="standard"
+                    value={shippingAddress.lastName}
+                    onChange={(e) => 
+                      setShippingAddress({ ...shippingAddress, lastName: e.target.value })
+                    }
+                    required
+                  />
+                </Grid>
+              </Grid>
+
               <TextField
                 fullWidth
-                label="Street"
+                label="Address line 1"
                 variant="standard"
-                value={shippingAddress.street}
+                value={shippingAddress.addressLine1}
                 onChange={(e) =>
-                  setShippingAddress({ ...shippingAddress, street: e.target.value })
+                  setShippingAddress({ ...shippingAddress, addressLine1: e.target.value })
                 }
+                required
                 sx={{ mb: 2 }}
-                required
               />
               <TextField
                 fullWidth
-                label="City"
+                label="Address line 2"
                 variant="standard"
-                value={shippingAddress.city}
+                value={shippingAddress.addressLine2}
                 onChange={(e) =>
-                  setShippingAddress({ ...shippingAddress, city: e.target.value })
+                  setShippingAddress({ ...shippingAddress, addressLine2: e.target.value })
                 }
+                required
                 sx={{ mb: 2 }}
-                required
               />
-              <TextField
-                fullWidth
-                label="State"
-                variant="standard"
-                value={shippingAddress.state}
-                onChange={(e) =>
-                  setShippingAddress({ ...shippingAddress, state: e.target.value })
-                }
-                sx={{ mb: 2 }}
-                required
-              />
-              <TextField
-                fullWidth
-                label="Zip Code"
-                variant="standard"
-                value={shippingAddress.zip}
-                onChange={(e) =>
-                  setShippingAddress({ ...shippingAddress, zip: e.target.value })
-                }
-                sx={{ mb: 2 }}
-                required
-              />
-              <TextField
-                fullWidth
-                label="Country"
-                variant="standard"
-                value={shippingAddress.country}
-                onChange={(e) =>
-                  setShippingAddress({ ...shippingAddress, country: e.target.value })
-                }
-                required
-              />
+
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="City"
+                    variant="standard"
+                    value={shippingAddress.city}
+                    onChange={(e) =>
+                      setShippingAddress({ ...shippingAddress, city: e.target.value })
+                    }
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="State"
+                    variant="standard"
+                    value={shippingAddress.state}
+                    onChange={(e) =>
+                      setShippingAddress({ ...shippingAddress, state: e.target.value })
+                    }
+                    required
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Zip / Postal code"
+                    variant="standard"
+                    value={shippingAddress.zip}
+                    onChange={(e) =>
+                      setShippingAddress({ ...shippingAddress, zip: e.target.value })
+                    }
+                    sx={{ mb: 2 }}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Country"
+                    variant="standard"
+                    value={shippingAddress.country}
+                    onChange={(e) =>
+                      setShippingAddress({ ...shippingAddress, country: e.target.value })
+                    }
+                    required
+                  />
+                </Grid>
+              </Grid>
             </Box>
           )}
           {activeStep === steps.length && (
