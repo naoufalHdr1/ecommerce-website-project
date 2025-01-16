@@ -62,6 +62,21 @@ class UsersController {
     }
   }
 
+  /* finds a user by their name. */
+  static async findUserByName(req, res) {
+    const query = req.query;
+    console.log("query=", query)
+
+    try {
+      const user = await User.find(query);
+      res.status(200).json(user);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+
   /* Updates a user's data. */
   static async updateUser(req, res) {
     const { id } = req.params;

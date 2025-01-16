@@ -84,6 +84,7 @@ export const getById = (model) => async (req, res) => {
 // Retrieve items by query parameters
 export const getByQuery = (model) => async (req, res) => {
   const query = req.query;
+	console.log("query=", query)
 
   try {
     const data = await model.find(query);
