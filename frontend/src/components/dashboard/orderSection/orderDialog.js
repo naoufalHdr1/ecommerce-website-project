@@ -19,13 +19,11 @@ import {
   CardContent,
   Grid,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   Alert,
 } from '@mui/material';
 import CloseIcon from "@mui/icons-material/Close";
-import { api } from '../../../utils/api';
 import UserSearchBar from './userSearchBar';
 import ProductSearchBar from './productSearchBar';
 import { API_BASE_URL } from '../../../utils/config';
@@ -42,28 +40,21 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
     lastName: '',
     addressLine1: '',
     addressLine2: '',
-    street: '',
     city: '',
     state: '',
     zip: '',
     country: '',
   });
-  const [searchProduct, setSearchProduct] = useState('');
   const [totalAmount, setTotalAmount] = useState(0);
-  const [selectedUserId, setSelectedUserId] = useState(null);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("Pending");
   const [isDisabled, setIsDisabled] = useState(false);
 
-  const token = localStorage.getItem('token');
-
-  useEffect(() => {
-    console.log("user=", user);
-  }, [user]);
-
   // Update totalAmount whenever items change
   useEffect(() => {
-    const newTotal = products.reduce((acc, item) => acc + parseFloat(item.totalPrice), 0);
+    const newTotal = products.reduce((acc, item) => acc + item.totalPrice, 0);
+    console.log("newTotal=", newTotal);
+    console.log("type of newTotal=", typeof(newTotal));
     setTotalAmount(newTotal);
   }, [products]);
 
@@ -100,16 +91,12 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
   const handleAddProduct = (product) => {
     setProducts((prev) => [...prev, product]);
   };
 
-  const handleRemove = (id) => {
-    setProducts(products.filter((item) => item._id !== id));
+  const handleRemove = (item) => {
+    setProducts(products.filter((product) => product !== item));
   };
 
   // Handle input changes
@@ -151,6 +138,33 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
       setErrors(newErrors);
       return;
     }
+
+    // Transform the data
+    const transformedItems = products.map(item => ({
+      product: item.product._id,
+      size: item.size,
+      color: item.color,
+      quantity: item.quantity || 1,
+      totalPrice: item.totalPrice,
+    }));
+
+    const orderData = {
+      user,
+      items: [...transformedItems],
+      totalAmount,
+      shippingAddress: { ...shippingAddress },
+      status,
+    };
+
+    /*
+    console.log("user=", user);
+    console.log("products=", products);
+    console.log("shippingAddress=", shippingAddress);
+    console.log("status=", status);
+    console.log("totalAmount=", totalAmount);
+    */
+
+    onSave(orderData);
   };
 
   return (
@@ -355,7 +369,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                               variant="h6"
                               sx={{ fontWeight: "bold", color: "#333" }}
                             >
-                              {item.name}
+                              {item.product.name}
                             </Typography>
                             <Typography
                               variant="body2"
@@ -393,7 +407,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                         {/* Close Button */}
                         <Grid item xs={3} sx={{ textAlign: "right" }}>
                           <IconButton
-                            onClick={() => handleRemove(item._id)}
+                            onClick={() => handleRemove(item)}
                             sx={{
                               color: "#ff4d4d",
                               backgroundColor: "#fff",

@@ -22,7 +22,6 @@ const UserSearchBar = ({ onSelectUser }) => {
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(false);
 
   const handleSearch = async () => {
     setHasSearched(true);
@@ -45,17 +44,14 @@ const UserSearchBar = ({ onSelectUser }) => {
     setSearchUser('');
     setSelectedUser(null);
     onSelectUser(null);
-    setIsDisabled(false);
   };
 
   const handleUserSelect = (user) => {
     if (selectedUser && selectedUser._id === user._id) {
       setSelectedUser(null);
-      setIsDisabled(false);
       onSelectUser(null, false);
     } else {
       setSelectedUser(user);
-      setIsDisabled(true);
       onSelectUser(user, true);
     }
   };

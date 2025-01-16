@@ -42,7 +42,7 @@ const ProductSearchBar = ({ onAddProduct }) => {
   };
 
   const totalPrice = (price, quantity = 1) => {
-    return (price * quantity).toFixed(2)
+    return parseFloat((price * quantity).toFixed(2));
   }
 
   const handleQuantityChange = (productId, change) => {
@@ -75,14 +75,10 @@ const ProductSearchBar = ({ onAddProduct }) => {
     if (productValidation(product)) return;
     const addProduct = { ...productStates[product._id] };
 
-    addProduct._id = product._id;
-    addProduct.name = product.name;
+    addProduct.product = product;
     addProduct.totalPrice = totalPrice(product.price, addProduct.quantity)
-    console.log("type of total=", typeof(addProduct.totalPrice))
 
     setSelectedProducts((prev) => [...prev, product._id]);
-    console.log("added product=", addProduct);
-    console.log("selectedProducts=", selectedProducts);
     onAddProduct(addProduct);
   }
 

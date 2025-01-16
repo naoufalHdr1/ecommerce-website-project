@@ -56,11 +56,15 @@ export default function ModelSection({ modelConfig }) {
 
   const handleAddSave = async (newItem) => {
     try {
+      console.log("newItem=", newItem);
+      console.log("model config=", modelConfig)
+      console.log("api endpoint=", apiEndpoint)
       const res = await api.post(apiEndpoint, newItem, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log("res data=", res.data);
       setData((prev) => [...prev, res.data]);
       setIsAddOpen(false);
     } catch (err) {
