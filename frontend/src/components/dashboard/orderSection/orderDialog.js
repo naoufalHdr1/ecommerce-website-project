@@ -35,25 +35,37 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   const [activeStep, setActiveStep] = useState(0);
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
-  const [shippingAddress, setShippingAddress] = useState({
-    firstName: '',
-    lastName: '',
-    addressLine1: '',
-    addressLine2: '',
-    city: '',
-    state: '',
-    zip: '',
-    country: '',
-  });
+  const [shippingAddress, setShippingAddress] = useState({});
   const [totalAmount, setTotalAmount] = useState(0);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("Pending");
   const [isDisabled, setIsDisabled] = useState(false);
 
+  useEffect(() => {
+    console.log("item=", item);
+    if (item) {
+      if (item.user) {
+        setUser(item.user);
+        setIsDisabled(true);
+      }
+      setProducts(item.items);
+      setShippingAddress(item.shippingAddress);
+      setStatus(item.status);
+      setTotalAmount(item.totalAmount);
+    } else {
+      setUser(null);
+      setIsDisabled(false);
+      setProducts([]);
+      setShippingAddress({});
+      setStatus("Pending");
+      setTotalAmount(0);
+    }
+  }, [item])
+
   // Update totalAmount whenever items change
   useEffect(() => {
     const newTotal = products.reduce((acc, item) => acc + item.totalPrice, 0);
-    setTotalAmount(newTotal);
+    setTotalAmount(parseFloat(newTotal.toFixed(2)));
   }, [products]);
 
   const handleUserSelect = (user, state) => {
@@ -442,7 +454,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     fullWidth
                     label="First name"
                     variant="standard"
-                    value={shippingAddress.firstName}
+                    value={shippingAddress.firstName || ''}
                     onChange={handleChange('firstName')}
                     required
                     error={errors.firstName}
@@ -454,7 +466,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     fullWidth
                     label="Last name"
                     variant="standard"
-                    value={shippingAddress.lastName}
+                    value={shippingAddress.lastName || ''}
                     onChange={handleChange('lastName')}
                     required
                     error={errors.lastName}
@@ -467,7 +479,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                 fullWidth
                 label="Address line 1"
                 variant="standard"
-                value={shippingAddress.addressLine1}
+                value={shippingAddress.addressLine1 || ''}
                 onChange={handleChange('addressLine1')}
                 required
                 sx={{ mb: 2 }}
@@ -478,7 +490,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                 fullWidth
                 label="Address line 2"
                 variant="standard"
-                value={shippingAddress.addressLine2}
+                value={shippingAddress.addressLine2 || ''}
                 onChange={(e) =>
                   setShippingAddress({ ...shippingAddress, addressLine2: e.target.value })
                 }
@@ -491,7 +503,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     fullWidth
                     label="City"
                     variant="standard"
-                    value={shippingAddress.city}
+                    value={shippingAddress.city || ''}
                     onChange={handleChange('city')}
                     required
                     error={errors.city}
@@ -503,7 +515,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     fullWidth
                     label="State"
                     variant="standard"
-                    value={shippingAddress.state}
+                    value={shippingAddress.state || ''}
                     onChange={handleChange('state')}
                     required
                     error={errors.state}
@@ -518,7 +530,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     fullWidth
                     label="Zip / Postal code"
                     variant="standard"
-                    value={shippingAddress.zip}
+                    value={shippingAddress.zip || ''}
                     onChange={handleChange('zip')}
                     required
                     error={errors.zip}
@@ -530,7 +542,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     fullWidth
                     label="Country"
                     variant="standard"
-                    value={shippingAddress.country}
+                    value={shippingAddress.country || ''}
                     onChange={handleChange('country')}
                     required
                     error={errors.country}
