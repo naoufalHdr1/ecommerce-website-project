@@ -7,6 +7,7 @@ import authRoutes from './routes/authRoutes.js'
 import productRoutes from './routes/productRoutes.js'
 import categoryRoutes from './routes/categoryRoutes.js'
 import subcategoryRoutes from './routes/subcategoryRoutes.js'
+import orderRoutes from './routes/orderRoutes.js'
 import uploadRoutes from './routes/uploadRoutes.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -33,6 +34,7 @@ app.use('/', uploadRoutes);
 app.use('/products', productRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/subcategories', subcategoryRoutes);
+app.use('/orders', orderRoutes);
 
 // Handel graceful shutdown
 process.on('SIGINT', async () => {
