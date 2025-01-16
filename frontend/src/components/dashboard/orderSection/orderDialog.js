@@ -58,6 +58,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
+    console.log("user=", user);
   }, [user]);
 
   // Update totalAmount whenever items change
@@ -236,9 +237,21 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                 </Box>
               </Box>
               {user?._id && (
-                <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
-                  User selected ID: {user._id}
-                </Typography>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
+                    User selected ID: {user._id}
+                  </Typography>
+                  <Button variant="outlined" size="small" onClick={() => {
+                    setUser(null);
+                    setIsDisabled(false);
+                  }}>
+                    Reset User
+                  </Button>
+                </Box>
               )}
 
             </Box>
