@@ -7,7 +7,8 @@ import { verifyToken, checkAdmin } from '../middleware/auth.js';
 const router = express.Router();
 
 // Private Routes
-router.get('/', verifyToken, checkAdmin, OrderController.createOrder);
+router.get('/', verifyToken, checkAdmin, OrderController.fetchAllOrders);
+router.post('/', verifyToken, checkAdmin, OrderController.createOrder);
 
 export default router;
 

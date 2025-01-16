@@ -10,6 +10,8 @@ export default class OrderContorller {
 
   /* Creates a new order. */
   static async createOrder(req, res) {
+    console.log("order creation:");
+    console.log("req.body=", req.body);
     const { user, items, totalAmount, shippingAddress, status } = req.body;
 
     try {
@@ -19,6 +21,7 @@ export default class OrderContorller {
       if (!userId) {
         // Check if the email already exists
         const existingUser = await User.findOne({ email: user.email });
+        console.log("existingUser=", existingUser);
         if (existingUser) {
           return res.status(400).json({ error: "User email already exists" });
         }
@@ -33,6 +36,7 @@ export default class OrderContorller {
         });
 
         await newUser.save();
+        console.log("new User created=", newUser);
         userId = newUser._id; // Update the userId for the order
       }
 
@@ -46,6 +50,7 @@ export default class OrderContorller {
       });
 
       await order.save();
+      console.log("new Order craeted=", order);
 
       // Update the user's orders list
       await User.findByIdAndUpdate(userId, {
@@ -53,6 +58,21 @@ export default class OrderContorller {
       });
 
       res.status(201).json(order);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  /* Finds All orders */
+  static async fetchAllOrders(req, res) {
+    try {
+      const orders = await Order.find()
+        .populate('user')
+        .populate('items.product')
+        .exec();
+
+      res.status(200).json(orders);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message });
