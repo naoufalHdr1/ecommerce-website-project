@@ -53,12 +53,12 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("Pending");
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    console.log("errors=", errors);
-  }, [errors]);
+  }, [user]);
 
   // Update totalAmount whenever items change
   useEffect(() => {
@@ -66,9 +66,9 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
     setTotalAmount(newTotal);
   }, [products]);
 
-  const handleUserSelect = (user) => {
-    console.log('Selected User:', user);
+  const handleUserSelect = (user, state) => {
     user ? setUser(user) : setUser(null) ;
+    setIsDisabled(state);
   };
 
   const handleNext = () => {
@@ -150,9 +150,6 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
       setErrors(newErrors);
       return;
     }
-
-    console.log("saved")
-
   };
 
   return (
@@ -214,6 +211,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     required
                     error={errors.fullName}
                     helperText={errors.fullName}
+                    disabled={isDisabled}
                   />
                   <TextField
                     fullWidth
@@ -225,6 +223,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     required
                     error={errors.email}
                     helperText={errors.email}
+                    disabled={isDisabled}
                   />
                   <TextField
                     fullWidth
@@ -232,6 +231,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                     variant="standard"
                     value={user ? user.phone : ''}
                     onChange={(e) => setUser({ ...user, phone: e.target.value })}
+                    disabled={isDisabled}
                   />
                 </Box>
               </Box>
