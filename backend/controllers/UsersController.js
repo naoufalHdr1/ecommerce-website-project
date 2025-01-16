@@ -9,7 +9,6 @@ class UsersController {
 
   /* Creates a new user. */
   static async createUser(req, res) {
-    console.log("req.body=", req.body)
     const { email, password, ...userData } = req.body;
 
     try {
@@ -18,10 +17,7 @@ class UsersController {
       if (existingUser) return res.status(400).json({ error: 'User already exists' });
 
       // Create and save a new user
-      console.log('password=', password)
       const hashedPassword = await User().hashPassword(password);
-      console.log('hashed password=', hashedPassword)
-      console.log('userData=', userData);
       const newUser = new User({ ...userData, email, password: hashedPassword });
       await newUser.save();
 
@@ -31,7 +27,6 @@ class UsersController {
 
       res.status(201).json(userWithoutPassword);
     } catch (err) {
-      console.log(err);
       res.status(400).json({ error: err.message });
     }
   }
@@ -65,13 +60,11 @@ class UsersController {
   /* finds a user by their name. */
   static async findUserByName(req, res) {
     const query = req.query;
-    console.log("query=", query)
 
     try {
       const user = await User.find(query);
       res.status(200).json(user);
     } catch (err) {
-      console.log(err);
       res.status(500).json({ error: err.message });
     }
   }
