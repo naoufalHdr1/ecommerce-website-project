@@ -53,8 +53,6 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   // Update totalAmount whenever items change
   useEffect(() => {
     const newTotal = products.reduce((acc, item) => acc + item.totalPrice, 0);
-    console.log("newTotal=", newTotal);
-    console.log("type of newTotal=", typeof(newTotal));
     setTotalAmount(newTotal);
   }, [products]);
 
@@ -155,14 +153,6 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
       shippingAddress: { ...shippingAddress },
       status,
     };
-
-    /*
-    console.log("user=", user);
-    console.log("products=", products);
-    console.log("shippingAddress=", shippingAddress);
-    console.log("status=", status);
-    console.log("totalAmount=", totalAmount);
-    */
 
     onSave(orderData);
   };

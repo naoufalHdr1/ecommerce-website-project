@@ -6,9 +6,13 @@ export default function OrderOverview() {
     modelName: 'Order',
     apiEndpoint: '/orders',
     columns: [
-      { field: 'orderId', headerName: 'Order ID', width: 200 },
+      { field: '_id', headerName: 'Order ID', width: 200 },
+      { field: 'user.name', headerName: 'Customer', width: 150},
+      { field: 'totalAmount', headerName: 'Total', width: 100 },
+      { field: 'products', headerName: 'Products', width: 100,
+        renderCell: (params) => (params.row.items?.length || 0)
+       },
       { field: 'status', headerName: 'Status', width: 150 },
-      { field: 'total', headerName: 'Total', width: 150 },
     ],
     dialogComponent: OrderDialog,
   }
