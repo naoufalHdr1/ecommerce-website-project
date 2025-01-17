@@ -9,6 +9,7 @@ const router = express.Router();
 // Private Routes
 router.get('/', verifyToken, checkAdmin, OrderController.fetchAllOrders);
 router.post('/', verifyToken, checkAdmin, OrderController.createOrder);
+router.put('/:id', verifyToken, checkAdmin, OrderController.updateOrder);
 
 export default router;
 
