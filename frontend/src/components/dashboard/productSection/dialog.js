@@ -27,6 +27,8 @@ import { Close } from '@mui/icons-material';
 import { useStateContext } from './stateContext';
 import { uploadImages } from '../../../utils/api';
 import { API_BASE_URL } from '../../../utils/config';
+import BookmarkAddOutlinedIcon from '@mui/icons-material/BookmarkAddOutlined';
+import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded';
 
 export default function CustomDialog({ type, open, onClose, onSave, item, categoryMap, subcategoryMap }) {
   const { state } = useStateContext();
@@ -42,6 +44,7 @@ export default function CustomDialog({ type, open, onClose, onSave, item, catego
     description: '',
     images: [],
     banners: [],
+    isFeatured: false,
   });
   const sizesOptions = ['S', 'M', 'L', 'XL'];
   const colorsOptions = ['Red', 'Blue', 'Green', 'Yellow'];
@@ -85,6 +88,7 @@ export default function CustomDialog({ type, open, onClose, onSave, item, catego
         description: '',
         images: [],
         banners: [],
+        isFeatured: false,
       });
       setUploadedImages([]);
       setUploadedBanners([]);
@@ -170,6 +174,7 @@ export default function CustomDialog({ type, open, onClose, onSave, item, catego
         subcategory_id: formData.subcategory_id,
         description: formData.description,
         images: uploadedImageUrls,
+        isFeatured: formData.isFeatured,
       };
     } else if (type === 'subcategories') {
       itemData = {
@@ -204,6 +209,7 @@ export default function CustomDialog({ type, open, onClose, onSave, item, catego
       description: '',
       images: [],
       banners: [],
+      isFeatured: false,
     });
   };
 
@@ -220,11 +226,26 @@ export default function CustomDialog({ type, open, onClose, onSave, item, catego
             ))}
           </Stepper>
 
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6">{steps[activeStep].title}</Typography>
-            <Typography variant="body2" sx={{ mb: 3 }}>
-              {steps[activeStep].description}
-            </Typography>
+          <Box sx={{ mt: 3}}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+              <Box>
+                <Typography variant="h6">{steps[activeStep].title}</Typography>
+                <Typography variant="body2" sx={{ mb: 3 }}>
+                  {steps[activeStep].description}
+                </Typography>
+              </Box>
+              {type === 'products' && (
+                <Box display="flex" alignItems="center">
+                  <Button
+                    variant={formData.isFeatured ? "contained" : "outlined"}
+                    onClick={() => setFormData((prev) => ({...prev, isFeatured: !prev.isFeatured}))}
+                    startIcon={formData.isFeatured ? <BookmarkAddedIcon /> : <BookmarkAddOutlinedIcon />}
+                  >
+                    Featured
+                  </Button>
+                </Box>
+              )}
+            </Box>
 
             {activeStep === 0 && (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>

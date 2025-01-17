@@ -43,7 +43,6 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
   const [isDisabled, setIsDisabled] = useState(false);
 
   useEffect(() => {
-    console.log("item=", item);
     if (item) {
       if (item.user) {
         setUser(item.user);
@@ -54,7 +53,6 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
       setStatus(item.status);
       setTotalAmount(item.totalAmount);
     } else {
-      console.log("add")
       setUser(null);
       setIsDisabled(false);
       setProducts([]);
@@ -160,7 +158,6 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
       deepEqual(item.shippingAddress, shippingAddress) &&
       item.status === status
     ) {
-      console.log("Nothing Changed");
       onClose();
       setTimeout(() => {
         setActiveStep(0);
@@ -185,7 +182,6 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
       status,
     };
 
-    console.log("orderData=", orderData)
     onSave(orderData);
     onClose();
     setTimeout(() => {

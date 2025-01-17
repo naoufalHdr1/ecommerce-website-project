@@ -3,10 +3,12 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Box, Button, Tooltip, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import Checkbox from '@mui/material/Checkbox';
 
 const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId, onBulkDelete }) => {
   const [rowSelectionModel, setRowSelectionModel] = useState([]);
-
   const enhancedColumns = [
     ...columns,
     ...(onEdit || onDelete
@@ -17,12 +19,17 @@ const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId, onBulkDelete }) 
             width: 150,
             sortable: false,
             filterable: false,
-            align: 'right',
             headerAlign: 'right',
             renderCell: (params) => (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, width: '100%' }}>
+              <Box sx={{ display: 'flex', justifyContent: "flex-end", alignItems: "center", gap: 1 }}>
+                
+                {/* Bookmark Indicator */}
+                <Tooltip title={params.row.isFeatured ? "Bookmarked" : "Not Bookmarked"} sx={{ paddingRight: 0, paddingLeft: 0 }}>
+                  {params.row.isFeatured ? <BookmarkIcon color="primary"/> : <BookmarkBorderIcon color="primary"/>}
+                </Tooltip>
+
                 {/* Edit Button */}
-                <Tooltip title="Edit">
+                <Tooltip title="Edit" sx={{ paddingRight: 0, paddingLeft: 0 }}>
                   <IconButton
                     color="disabled"
                     fontSize="small"
@@ -31,8 +38,9 @@ const BaseTable = ({ rows, columns, onEdit, onDelete, getRowId, onBulkDelete }) 
                     <EditIcon />
                   </IconButton>
                 </Tooltip>
+
                 {/* Delete Button */}
-                <Tooltip title="Delete">
+                <Tooltip title="Delete" sx={{ paddingRight: 0, paddingLeft: 0 }}>
                   <IconButton
                     color="disabled"
                     fontSize="small"
