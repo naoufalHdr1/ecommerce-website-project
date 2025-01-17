@@ -42,7 +42,6 @@ export default function ModelSection({ modelConfig }) {
             Authorization: `Bearer ${token}`,
           },
         });
-	      console.log("res data=", res.data)
         setData(res.data);
       } catch (err) {
         console.error(`Error fetching ${modelName}:`, err);
@@ -62,7 +61,6 @@ export default function ModelSection({ modelConfig }) {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("res after adding product=", res.data)
       setData((prev) => [...prev, res.data]);
       setIsAddOpen(false);
     } catch (err) {

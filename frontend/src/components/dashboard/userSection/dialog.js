@@ -92,7 +92,6 @@ const CreateUserDialog = ({ open, onClose, onSave, user }) => {
   const handleAvatarUpload = (e) => {
     const file = e.target.files[0];
     const preview = URL.createObjectURL(file);
-	  console.log("file=", file)
     if (file) {
       setUploadedAvatar(preview);
       setFormData((prev) => ({ ...prev, avatar: file }));
@@ -114,9 +113,7 @@ const CreateUserDialog = ({ open, onClose, onSave, user }) => {
   };
 
   const handleSave = () => {
-	  console.log("handleSave formData without validation=", formData)
     if (validateForm()) {
-	    console.log("handleSave formData=", formData)
       onSave(formData);
       onClose();
     }

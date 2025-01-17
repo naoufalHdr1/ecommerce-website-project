@@ -27,6 +27,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import UserSearchBar from './userSearchBar';
 import ProductSearchBar from './productSearchBar';
 import { API_BASE_URL } from '../../../utils/config';
+import deepEqual from 'fast-deep-equal';
 
 const steps = ['User Information', 'Order Information', 'Shipping Address'];
 const statusOptions = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
@@ -53,6 +54,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
       setStatus(item.status);
       setTotalAmount(item.totalAmount);
     } else {
+      console.log("add")
       setUser(null);
       setIsDisabled(false);
       setProducts([]);
@@ -149,6 +151,23 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
       return;
     }
 
+    // Compare Data when editing order
+    if (
+      item &&
+      deepEqual(item.user, user) &&
+      deepEqual(item.items, products) &&
+      item.totalAmount === totalAmount &&
+      deepEqual(item.shippingAddress, shippingAddress) &&
+      item.status === status
+    ) {
+      console.log("Nothing Changed");
+      onClose();
+      setTimeout(() => {
+        setActiveStep(0);
+      }, 1000);
+      return;
+    }
+
     // Transform the data
     const transformedItems = products.map(item => ({
       product: item.product._id,
@@ -166,8 +185,30 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
       status,
     };
 
+    console.log("orderData=", orderData)
     onSave(orderData);
+    onClose();
+    setTimeout(() => {
+      setActiveStep(0);
+    }, 1000);
   };
+
+  const handleClose = () => {
+    onClose();
+    setTimeout(() => {
+      setActiveStep(0);
+    }, 1000);
+  }
+
+  const handleReset = () => {
+    setUser(null);
+    setIsDisabled(false);
+    setProducts([]);
+    setShippingAddress({});
+    setStatus("Pending");
+    setTotalAmount(0);
+    setActiveStep(0);
+  }
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -577,7 +618,10 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
             Save
           </Button>
         )}
-        <Button onClick={onClose} color="secondary">
+        <Button onClick={handleReset} color="secondary">
+          Reset
+        </Button>
+        <Button onClick={handleClose} color="error">
           Cancel
         </Button>
       </DialogActions>
