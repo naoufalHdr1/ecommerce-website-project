@@ -10,6 +10,7 @@ const router = express.Router();
 router.get('/', verifyToken, checkAdmin, OrderController.fetchAllOrders);
 router.post('/', verifyToken, checkAdmin, OrderController.createOrder);
 router.put('/:id', verifyToken, checkAdmin, OrderController.updateOrder);
+router.delete('/:id', verifyToken, checkAdmin, OrderController.deleteOrder);
 
 export default router;
 

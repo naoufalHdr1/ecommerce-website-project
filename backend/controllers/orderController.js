@@ -82,9 +82,7 @@ export default class OrderContorller {
 
   /* Update an Item by Id */
   static async updateOrder(req, res) {
-    console.log('req.body=', req.body)
     const { id } = req.params
-    console.log('id=', id);
     const { user, items, totalAmount, shippingAddress, status } = req.body;
 
     try {
@@ -119,7 +117,6 @@ export default class OrderContorller {
 
       // Handle user update
       if (userId && userId !== String(previousUserId)) {
-        console.log("user update:");
         const newUser = await User.findById(userId);
         if (!newUser) {
           return res.status(400).json({ error: 'Invalid new user ID' });
@@ -134,7 +131,6 @@ export default class OrderContorller {
 
       // Handle items update
       if (items && JSON.stringify(items) !== JSON.stringify(order.items)) {
-        console.log("items update:");
         for (const item of items) {
           const productExists = await Product.findById(item.product);
           if (!productExists) {
@@ -149,19 +145,16 @@ export default class OrderContorller {
         shippingAddress &&
         JSON.stringify(shippingAddress) !== JSON.stringify(order.shippingAddress)
       ) {
-        console.log('shippingAddress update:')
         updateFields.shippingAddress = { ...order.shippingAddress, ...shippingAddress };
       }
 
       // Handle totalAmount update
       if (totalAmount && totalAmount !== order.totalAmount) {
-        console.log('totalAmount update:')
         updateFields.totalAmount = totalAmount;
       }
 
       // Handle status update
       if (status && status !== order.status) {
-        console.log('status update:')
         updateFields.status = status;
       }
 
@@ -181,6 +174,30 @@ export default class OrderContorller {
 
       res.status(200).json(updatedOrder);
 
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  /* Delete Order by it's Id */
+  static async deleteOrder(req, res) {
+    const { id } = req.params;
+
+    try {
+      const order = await Order.findById(id);
+      if (!order) return res.status(404).json({ error: "Order not found" });
+
+      const userId = order.user;
+      const user = await User.findById(userId);
+      if (!user) return res.status(400).json({ error: 'Invalid user ID' });
+
+      // Handle user-order relationship delete
+      await User.findByIdAndUpdate(userId, { $pull: { orders: order._id } });
+
+      await order.deleteOne();
+
+      res.status(200).json({ message: "Order deleted successfully"});
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message });
