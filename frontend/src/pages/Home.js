@@ -58,7 +58,16 @@ const Home = () => {
         title={titles[1].title}
         description={titles[1].description}
       />
-      <CollectionSection categories={categories} />
+      {state.categories ? (
+        <CollectionSection categories={state.categories} />
+      ) : (
+        <p className="text-secondary fst-italic d-flex justify-content-center">
+          <div className="border rounded-5 p-2">
+            <i class="bi bi-info-circle me-1"></i> No featured categories found
+          </div>
+        </p>
+      )}
+
       <Title
         title={titles[2].title}
         description={titles[2].description}

@@ -1,16 +1,17 @@
 import CategoryCard from "./categoryCard.js";
+import {API_BASE_URL} from '../../../utils/config';
 
 const CategoriesSection = ({ categories }) => {
   return (
     <div className="categories-section container py-5">
       {/* Category Cards */}
       <div className="row g-4">
-        {categories.map((category, index) => (
-          <div className="col-md-4" key={index}>
+        {categories.map((category) => (
+          <div className="col-md-4" key={category._id}>
             <CategoryCard
-              title={category.title}
+              title={category.name}
               season={category.season}
-              image={category.image}
+              image={category.images && `${API_BASE_URL}${category.images[0]}`}
             />
           </div>
         ))}
