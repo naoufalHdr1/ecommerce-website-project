@@ -9,10 +9,12 @@ import Category from "./pages/categories/category";
 import CategoryProductsPage from "./components/categories/categoryProductsPage/categoryProductsPage";
 import Dashboard from "./pages/dashboard/dashboard";
 import ProtectedRoute from "./components/protectedRoute.js";
+import { StateProvider } from './components/dashboard/productSection/stateContext';
 
 function App() {
   return (
     <NotificationProvider>
+		                  <StateProvider>
       <Router>
         <Routes>
           {/* Dashboard route without Layout */}
@@ -43,6 +45,7 @@ function App() {
           />
         </Routes>
       </Router>
+		                  </StateProvider>
     </NotificationProvider>
   );
 }

@@ -4,6 +4,7 @@ import Product from '../components/Home/Products/product.jsx';
 import CollectionSection from '../components/Home/Collections/Collection.js';
 import BenefitsSection from '../components/Home/services/benefitsSection.js';
 import Title from "../components/Home/title/title.jsx";
+import { useStateContext } from '../components/dashboard/productSection/stateContext';
 
 const titles = [
   { 
@@ -26,14 +27,10 @@ const categories = [
   { title: "Kids", season: "Winter 2024", image: "kid.png" },
 ];
 
-const featuredProducts = [
-  { id: 1, name: "Nike Free RN 2019 iD", category: "Shoes", price: 120, image: "/product1.jpg", rating: 4 },
-  { id: 2, name: "Leather Handbag", category: "Bags", price: 200, image: "/product2.jpg", rating: 5 },
-  { id: 3, name: "Summer Hat", category: "Accessories", price: 50, image: "/product3.jpg", rating: 3 },
-  { id: 4, name: "Adidas Running Shoes", category: "Shoes", price: 140, image: "/product4.jpg", rating: 5 },
-];
-
 const Home = () => {
+  const { state } = useStateContext();
+  const featuredProducts = state.products.filter(product => product.isFeatured).slice(0, 4);
+
   return (
     <>
       <HomeBanner />
@@ -42,11 +39,19 @@ const Home = () => {
         description={titles[0].description}
       />
       <section className="container my-5">
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-2 g-md-4">
-          {featuredProducts.map((product) => (
-            <Product product={product}/>
-          ))}
-        </div>
+        {featuredProducts ? (
+          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-2 g-md-4">
+            {featuredProducts.map((product) => (
+              <Product product={product}/>
+            ))}
+          </div>
+        ) : (
+          <p className="text-secondary fst-italic d-flex justify-content-center">
+            <div className="border rounded-5 p-2">
+              <i class="bi bi-info-circle me-1"></i> No featured products found
+            </div>
+          </p>
+        )}
      </section>
 
       <Title
