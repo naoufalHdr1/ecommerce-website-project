@@ -12,15 +12,14 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { addNotification } = useNotifications();
-  const { login, isLoggedIn, loading } = useAuth();
+  const { login, isLoggedIn } = useAuth();
 
   // Redirect user to home page if already loggedIn
   useEffect(() => {
     if (isLoggedIn) {
-      addNotification('Already Logged In!', 'info');
       navigate('/');
     }
-  }, [isLoggedIn, navigate, loading]);
+  }, [isLoggedIn, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();

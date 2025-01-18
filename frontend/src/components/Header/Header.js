@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from '../../contexts/authContext';
+import LoginIcon from '@mui/icons-material/Login';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const { isLoggedIn } = useAuth();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  console.log('isLoggedIn==', isLoggedIn)
 
   return (
     <header>
@@ -12,8 +17,20 @@ const Header = () => {
       <div className="bg-dark text-white py-2 px-5 d-md-flex justify-content-between align-items-center">
         <p className="top-bar-left mb-0 fw-bold">Free shipping, 30-day return or refund guarantee.</p>
         <div className="top-bar-links">
-          <a href="/login" className="text-white text-decoration-none me-3">SIGN IN</a>
-          <a href="/faqs" className="text-white text-decoration-none me-3">FAQs</a>
+          {isLoggedIn ? (
+            <a href="/logout" className="text-white text-decoration-none me-3">
+              <LogoutIcon fontSize="small" /> LOG OUT
+            </a>
+          ) : (
+            <>
+              <a href="/login" className="text-white text-decoration-none me-3">
+                <LoginIcon fontSize="small"/> SIGN IN
+              </a>
+              <a href="/register" className="text-white text-decoration-none me-3">
+                <PersonAddIcon fontSize="small"/> SIGN UP
+              </a>
+            </>
+          )}
           <select className="form-select form-select-sm d-inline-block w-auto bg-dark text-white border">
             <option value="usd">USD</option>
             <option value="eur">EUR</option>
