@@ -1,23 +1,33 @@
-import { useState } from "react";
-import { ToastContainer, toast } from 'react-toastify';
+import { useState, useEffect } from "react";
+import { ToastContainer } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import InputField from '../components/InputField/InputField.js';
 import BannerSection from '../components/Banner/Banner.js';
 import { loginUser } from '../utils/api.js';
 import { useNotifications } from '../utils/notificationContext';
+import { useAuth } from '../contexts/authContext';
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { addNotification } = useNotifications();
+  const { login, isLoggedIn, loading } = useAuth();
+
+  // Redirect user to home page if already loggedIn
+  useEffect(() => {
+    if (isLoggedIn) {
+      addNotification('Already Logged In!', 'info');
+      navigate('/');
+    }
+  }, [isLoggedIn, navigate, loading]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const data = await loginUser(email, password);
-      if (data?.token) {
-        localStorage.setItem('token', data.token);
+      if (data?.token && data?.user) {
+        login(data);
         addNotification('Login successful!', 'success');
         navigate('/');
       }

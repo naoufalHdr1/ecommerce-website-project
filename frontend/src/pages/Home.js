@@ -21,12 +21,6 @@ const titles = [
   }
 ]
 
-const categories = [
-  { title: "Men", season: "Summer 2023", image: "man.png" },
-  { title: "Women", season: "Spring 2018", image: "women.png" },
-  { title: "Kids", season: "Winter 2024", image: "kid.png" },
-];
-
 const Home = () => {
   const { state } = useStateContext();
   const featuredProducts = state.products.filter(product => product.isFeatured).slice(0, 4);
