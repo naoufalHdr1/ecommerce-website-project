@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/authContext';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
+import UserMenu from './userMenu';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -76,6 +77,9 @@ const Header = () => {
             {["search", "heart", "bag"].map((icon) => (
               <i key={icon} className={`bi bi-${icon} me-4 fs-5 icon-hover`}></i>
             ))}
+	  	      {isLoggedIn && (
+              <UserMenu />
+            )}
           </div>
         </div>
       </div>

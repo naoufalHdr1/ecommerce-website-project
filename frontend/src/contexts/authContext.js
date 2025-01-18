@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { API_BASE_URL } from '../utils/config';
 
 // Create the Authentication Context
 const AuthContext = createContext();
@@ -11,7 +12,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', userData.token);
     localStorage.setItem('user', JSON.stringify(userData.user));
     setIsLoggedIn(true);
-    setUser(userData);
+    setUser(userData?.user);
   };
 
   const logout = () => {
@@ -22,7 +23,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, login, logout, API_BASE_URL }}>
       {children}
     </AuthContext.Provider>
   );
