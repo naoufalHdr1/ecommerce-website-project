@@ -10,6 +10,8 @@ import {
   Box,
   Divider,
   IconButton,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -24,18 +26,24 @@ import Favorite from '@mui/icons-material/Favorite';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import TrackingIcon from '@mui/icons-material/MyLocation';
+import PublicIcon from '@mui/icons-material/Public';
+import ShieldIcon from '@mui/icons-material/Shield';
+import { Facebook, Twitter, Pinterest } from '@mui/icons-material';
 
 const product = {
   _id: '678ab56339afb00686d4cfb3',
   name: "Men's Ribbed Cashmere",
-  description: '',
+  description: "Men's Ribbed Cashmere Description",
   price: 54.99,
   stock: 100,
   images: [
     '/uploads/3954832144c86a56c776f07b383ac21c',
     '/uploads/085f6e5ba6308b6ffa31bce46a9039ca',
     '/uploads/1a7694ca5de10e8208b6fddf03a534ee',
-    '/uploads/3954832144c86a56c776f07b383ac21c',
   ],
   sizes: [ 'S', 'M', 'L' ],
   colors: [ 'White', 'Red', 'Blue', 'Green' ],
@@ -54,6 +62,11 @@ const SingleProductPage = () => {
   const [currentImage, setCurrentImage] = useState(product.images[0]);
   const [startIndex, setStartIndex] = useState(0);
   const thumbnailsToShow = 5;
+  const [activeTab, setActiveTab] = useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
 
   const handleThumbnailClick = (image) => {
     setCurrentImage(image);
@@ -144,7 +157,6 @@ const SingleProductPage = () => {
                       margin: '8px',
                       border: currentImage === img ? '2px solid #dc143c' : '2px solid transparent',
                       borderRadius: 8,
-                      width: '60px',
                       height: '60px',
                     }}
                     onClick={() => handleThumbnailClick(img)}
@@ -335,16 +347,16 @@ const SingleProductPage = () => {
                 fullWidth
                 variant="outlined"
                 sx={{
-                  color: '#dc143c', // Crimson text
-                  borderColor: '#dc143c', // Crimson border
+                  color: '#dc143c', 
+                  borderColor: '#dc143c',
                   textTransform: 'uppercase',
                   fontWeight: 'bold',
                   '&:hover': {
-                    backgroundColor: '#ffe6e6', // Light crimson hover effect
+                    backgroundColor: '#ffe6e6',
                     borderColor: '#dc143c',
                   },
                 }}
-                startIcon={<AddShoppingCartIcon sx={{ color: '#dc143c' }} />}
+                startIcon={<MonetizationOnOutlinedIcon sx={{ color: '#dc143c' }} />}
               >
                 Buy Now
               </Button>
@@ -356,12 +368,12 @@ const SingleProductPage = () => {
                 fullWidth
                 variant="contained"
                 sx={{
-                  backgroundColor: '#000', // Black background
-                  color: '#fff', // White text
+                  backgroundColor: '#000',
+                  color: '#fff',
                   textTransform: 'uppercase',
                   fontWeight: 'bold',
                   '&:hover': {
-                    backgroundColor: '#333', // Darker black on hover
+                    backgroundColor: '#333',
                   },
                 }}
                 startIcon={<AddShoppingCartIcon />}
@@ -398,14 +410,181 @@ const SingleProductPage = () => {
           <hr />
 
           {/* Share Buttons */}
-          <Box display="flex" justifyContent="space-between" mt={4}>
-            <Typography variant="body2" color="textSecondary">
-              Share this:
-            </Typography>
-            <Box>
-              <Button size="small">Facebook</Button>
-              <Button size="small">Twitter</Button>
-              <Button size="small">Pinterest</Button>
+<Box display="flex" justifyContent="flex-end" alignItems="center" mt={4}>
+  <Typography variant="body2" color="textSecondary" sx={{ marginRight: 2, fontWeight: 'bold' }}>
+    Share this:
+  </Typography>
+  <Box display="flex" gap={1.5}>
+    {/* Facebook */}
+    <Button
+      sx={{
+        minWidth: 'auto',
+        width: 30,
+        height: 30,
+        borderRadius: '50%',
+        backgroundColor: '#3b5998',
+        color: '#fff',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        transition: 'transform 0.3s ease, background-color 0.3s ease',
+        '&:hover': {
+          backgroundColor: '#2d4373',
+          transform: 'scale(1.1)',
+        },
+      }}
+    >
+      <Facebook fontSize="small" />
+    </Button>
+    {/* Twitter */}
+    <Button
+      sx={{
+        minWidth: 'auto',
+        width: 30,
+        height: 30,
+        borderRadius: '50%',
+        backgroundColor: '#1da1f2',
+        color: '#fff',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        transition: 'transform 0.3s ease, background-color 0.3s ease',
+        '&:hover': {
+          backgroundColor: '#148cc7',
+          transform: 'scale(1.1)',
+        },
+      }}
+    >
+      <Twitter fontSize="small" />
+    </Button>
+    {/* Pinterest */}
+    <Button
+      sx={{
+        minWidth: 'auto',
+        width: 30,
+        height: 30,
+        borderRadius: '50%',
+        backgroundColor: '#bd081c',
+        color: '#fff',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        transition: 'transform 0.3s ease, background-color 0.3s ease',
+        '&:hover': {
+          backgroundColor: '#8c0617',
+          transform: 'scale(1.1)',
+        },
+      }}
+    >
+      <Pinterest fontSize="small" />
+    </Button>
+  </Box>
+</Box>
+
+          {/* */}
+          <Box sx={{ marginTop: 4 }}>
+            {/* Tabs */}
+            <Tabs
+              value={activeTab}
+              onChange={handleTabChange}
+              sx={{
+                '& .MuiTabs-indicator': {
+                  backgroundColor: '#dc143c',
+                },
+                '& .MuiTab-root': {
+                  color: '#444',
+                  fontWeight: 'bold',
+                  '&.Mui-selected': {
+                    color: '#dc143c',
+                  },
+                },
+              }}
+              aria-label="product tabs"
+              fontWeight='bold'
+            >
+              <Tab label="Description" fontWeight="bold"/>
+              <Tab label="Additional Info" fontWeight="bold"/>
+              <Tab label="Shipping" fontWeight="bold"/>
+            </Tabs>
+
+            {/* Tab Panels */}
+            <Box
+              sx={{
+                padding: 3,
+                background: 'linear-gradient(145deg, #f9f9f9, #ffffff)',
+                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.06)',
+                border: '1px solid #e0e0e0',
+                borderRadius: 3,
+                marginTop: 3,
+              }}
+            >
+              {activeTab === 0 && (
+                <Typography variant="body1">{product.description || 'No description available.'}</Typography>
+              )}
+              {activeTab === 1 && (
+                <Typography variant="body1" color="textSecondary">
+                  Additional information will be added here.
+                </Typography>
+              )}
+              {activeTab === 2 && (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                    <LocalShippingIcon sx={{ color: '#dc143c', fontSize: 30 }} />
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#333' }}>
+                        Free Shipping
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#6e6e6e' }}>
+                        Enjoy free standard shipping on orders over $50 (3-5 business days).
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                    <AccessTimeIcon sx={{ color: '#dc143c', fontSize: 30 }} />
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#333' }}>
+                        Expedited Shipping
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#6e6e6e' }}>
+                        Available for faster delivery (1-2 business days) with additional charges.
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                    <TrackingIcon sx={{ color: '#dc143c', fontSize: 30 }} />
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#333' }}>
+                        Order Tracking
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#6e6e6e' }}>
+                        Receive tracking details as soon as your order ships.
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                    <PublicIcon sx={{ color: '#dc143c', fontSize: 30 }} />
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#333' }}>
+                        International Shipping
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#6e6e6e' }}>
+                        Delivery times and costs vary by destination.
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                    <ShieldIcon sx={{ color: '#dc143c', fontSize: 30 }} />
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#333' }}>
+                        Reliability
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#6e6e6e' }}>
+                        We partner with trusted couriers to ensure safe and timely delivery.
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              )}
             </Box>
           </Box>
         </Grid>
