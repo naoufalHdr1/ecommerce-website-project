@@ -22,6 +22,8 @@ import Checkbox from '@mui/material/Checkbox';
 import FavoriteBorder from '@mui/icons-material/FavoriteBorder';
 import Favorite from '@mui/icons-material/Favorite';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const product = {
   _id: '678ab56339afb00686d4cfb3',
@@ -29,9 +31,12 @@ const product = {
   description: '',
   price: 54.99,
   stock: 100,
-  images: [ '/uploads/3954832144c86a56c776f07b383ac21c',
-    '/uploads/3954832144c86a56c776f07b383ac21c' ],
-  images: [ '/uploads/3954832144c86a56c776f07b383ac21c' ],
+  images: [
+    '/uploads/3954832144c86a56c776f07b383ac21c',
+    '/uploads/085f6e5ba6308b6ffa31bce46a9039ca',
+    '/uploads/1a7694ca5de10e8208b6fddf03a534ee',
+    '/uploads/3954832144c86a56c776f07b383ac21c',
+  ],
   sizes: [ 'S', 'M', 'L' ],
   colors: [ 'White', 'Red', 'Blue', 'Green' ],
   subcategory_id: '678ab4a739afb00686d4cfaa',
@@ -46,19 +51,40 @@ const SingleProductPage = () => {
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isWishlist, setIsWishlist] = useState(false);
+  const [currentImage, setCurrentImage] = useState(product.images[0]);
+  const [startIndex, setStartIndex] = useState(0);
+  const thumbnailsToShow = 5;
+
+  const handleThumbnailClick = (image) => {
+    setCurrentImage(image);
+  };
+
+  const handleNext = () => {
+    if (startIndex + thumbnailsToShow < product.images.length) {
+      setStartIndex(startIndex + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (startIndex > 0) {
+      setStartIndex(startIndex - 1);
+    }
+  };
 
   return (
     <Container
       sx={{
-        padding: 4,
+        padding: 2,
         backgroundColor: '#f9f9f9',
       }}
     >
       <Grid container spacing={4}>
+
         {/* Product Image and Thumbnails */}
         <Grid item xs={12} md={6}>
+          {/* Main Image */}
           <img
-            src={`${API_BASE_URL}${product.images[0]}`}
+            src={`${API_BASE_URL}${currentImage}`}
             alt={product.name}
             style={{
               width: '100%',
@@ -66,24 +92,83 @@ const SingleProductPage = () => {
               borderRadius: 8,
             }}
           />
-          <Box display="flex" justifyContent="center" mt={2}>
-            {product.images.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`Thumbnail ${index}`}
-                style={{
-                  cursor: 'pointer',
-                  margin: '8px',
-                  border: '2px solid transparent',
-                  borderRadius: 8,
-                  width: '60px',
-                  height: '60px',
+
+          {/* Thumbnails with Arrows */}
+          <Box
+            display="flex"
+            alignItems="center"
+            mt={2}
+            sx={{
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Left Arrow */}
+            {startIndex > 0 && (
+              <IconButton
+                onClick={handlePrevious}
+                sx={{
+                  position: 'absolute',
+                  left: 0,
+                  zIndex: 2,
+                  backgroundColor: '#fff',
+                  '&:hover': {
+                    backgroundColor: '#f5f5f5',
+                  },
                 }}
-                onMouseOver={(e) => (e.target.style.borderColor = '#dc143c')}
-                onMouseOut={(e) => (e.target.style.borderColor = 'transparent')}
-              />
-            ))}
+              >
+                <ArrowBackIosIcon />
+              </IconButton>
+            )}
+
+            {/* Thumbnails */}
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              sx={{
+                overflow: 'hidden',
+                width: '100%',
+                margin: '0 32px', // Space for arrows
+              }}
+            >
+              {product.images
+                .slice(startIndex, startIndex + thumbnailsToShow)
+                .map((img, index) => (
+                  <img
+                    key={index}
+                    src={`${API_BASE_URL}${img}`}
+                    alt={`Thumbnail ${index}`}
+                    style={{
+                      cursor: 'pointer',
+                      margin: '8px',
+                      border: currentImage === img ? '2px solid #dc143c' : '2px solid transparent',
+                      borderRadius: 8,
+                      width: '60px',
+                      height: '60px',
+                    }}
+                    onClick={() => handleThumbnailClick(img)}
+                  />
+                ))}
+            </Box>
+
+            {/* Right Arrow */}
+            {startIndex + thumbnailsToShow < product.images.length && (
+              <IconButton
+                onClick={handleNext}
+                sx={{
+                  position: 'absolute',
+                  right: 0,
+                  zIndex: 2,
+                  backgroundColor: '#fff',
+                  '&:hover': {
+                    backgroundColor: '#f5f5f5',
+                  },
+                }}
+              >
+                <ArrowForwardIosIcon />
+              </IconButton>
+            )}
           </Box>
         </Grid>
 
@@ -242,6 +327,7 @@ const SingleProductPage = () => {
           </Box>
 
           {/* Buttons Section */}
+          <hr />
           <Grid container spacing={2} alignItems="center" sx={{ marginBottom: 4 }}>
             {/* Buy Now Button */}
             <Grid item xs={12} md={5}>
@@ -309,6 +395,7 @@ const SingleProductPage = () => {
               </Button>
             </Grid>
           </Grid>
+          <hr />
 
           {/* Share Buttons */}
           <Box display="flex" justifyContent="space-between" mt={4}>
