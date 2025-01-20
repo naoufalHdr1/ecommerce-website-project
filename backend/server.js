@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import dbClient from './config/db.js';
 import usersRoutes from './routes/usersRoutes.js'
 import authRoutes from './routes/authRoutes.js'
@@ -23,6 +24,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 dbClient.connect(process.env.MONGO_URI);
