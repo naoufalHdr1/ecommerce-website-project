@@ -17,6 +17,7 @@ const ProductSchema = new mongoose.Schema(
       ref: 'Subcategory',
       default: null,
     },
+    isFeatured: { type: Boolean, default: false },
   },
   {
     timestamps: true,
