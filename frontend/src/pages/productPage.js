@@ -89,6 +89,7 @@ const SingleProductPage = () => {
       sx={{
         padding: 2,
         backgroundColor: '#f9f9f9',
+        marginTop: 4,
       }}
     >
       <Grid container spacing={4}>
