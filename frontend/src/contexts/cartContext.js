@@ -1,10 +1,10 @@
-import React, { createContext, useReducer, useEffect } from 'react';
+import React, { createContext, useReducer, useEffect, useContext } from 'react';
 import { api } from '../utils/api.js';
 
 // Initial state
 const initialState = {
   items: [],
-  totalPrice: 0,
+  totalAmount: 0,
 };
 
 // Reducer function
@@ -12,18 +12,28 @@ function cartReducer(state, action) {
   switch (action.type) {
     case 'SET_CART':
       return { ...state, ...action.payload };
+
     case 'ADD_ITEM':
       return {
         ...state,
         items: action.payload.items,
-        totalPrice: action.payload.totalPrice,
+        totalAmount: action.payload.totalAmount,
       };
+
+      /*
+    case 'DELETE_ITEM':
+      return {
+        ...state,
+        items: state.items.filter((item) => item.product._id === action.payload.itemId),
+        totalAmount: action.payload.totalAmount,
+      };
+      */
     default:
       return state;
   }
 }
 
-export const CartContext = createContext();
+const CartContext = createContext();
 
 // Context Provider Component
 export function CartProvider({ children }) {
@@ -48,3 +58,6 @@ export function CartProvider({ children }) {
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
+
+// Custom Hook for using Auth Context
+export const useCart = () => useContext(CartContext);

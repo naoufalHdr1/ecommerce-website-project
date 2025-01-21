@@ -12,12 +12,14 @@ import Dashboard from "./pages/dashboard/dashboard";
 import ProtectedRoute from "./components/protectedRoute.js";
 import { StateProvider } from './components/dashboard/productSection/stateContext';
 import { AuthProvider } from './contexts/authContext';
+import { CartProvider } from './contexts/cartContext';
 
 function App() {
   return (
     <NotificationProvider>
     <StateProvider>
     <AuthProvider>
+    <CartProvider>
       <Router>
         <Routes>
           {/* Dashboard route without Layout */}
@@ -49,6 +51,7 @@ function App() {
           />
         </Routes>
       </Router>
+    </CartProvider>
     </AuthProvider>
 		</StateProvider>
     </NotificationProvider>

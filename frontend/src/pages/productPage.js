@@ -20,6 +20,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { API_BASE_URL } from '../utils/config';
+import { api } from '../utils/api';
 import Checkbox from '@mui/material/Checkbox';
 import FavoriteBorder from '@mui/icons-material/FavoriteBorder';
 import Favorite from '@mui/icons-material/Favorite';
@@ -33,6 +34,8 @@ import TrackingIcon from '@mui/icons-material/MyLocation';
 import PublicIcon from '@mui/icons-material/Public';
 import ShieldIcon from '@mui/icons-material/Shield';
 import { Facebook, Twitter, Pinterest } from '@mui/icons-material';
+import { useCart } from '../contexts/cartContext';
+import { useAuth } from '../contexts/authContext';
 
 const product = {
   _id: '678ab56339afb00686d4cfb3',
@@ -55,6 +58,8 @@ const product = {
 }
 
 const SingleProductPage = () => {
+  const { state, dispatch } = useCart();
+  const { user } = useAuth();
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
@@ -63,6 +68,7 @@ const SingleProductPage = () => {
   const [startIndex, setStartIndex] = useState(0);
   const thumbnailsToShow = 5;
   const [activeTab, setActiveTab] = useState(0);
+  console.log('st=', state)
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -81,6 +87,30 @@ const SingleProductPage = () => {
   const handlePrevious = () => {
     if (startIndex > 0) {
       setStartIndex(startIndex - 1);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      const totalPrice = parseFloat((selectedQuantity * product.price).toFixed(2));
+      const item = {
+        user : user ? user._id : null,
+        items: {
+          product: product._id,
+          size: selectedSize,
+          color: selectedColor,
+          quantity: selectedQuantity,
+          totalPrice,
+        },
+        totalAmount: parseFloat(((state?.totalAmount || 0) + totalPrice).toFixed(2)),
+      };
+      const res = await api.post('/cart', item);
+      console.log('res.data=', res.data);
+      if (res.data)
+        dispatch({ type: `ADD_ITEM`, payload: { items: res.data.items, totalAmount: res.data.totalAmount  } });
+      console.log('state=', state);
+    } catch (err) {
+      console.log('Failed to add item to cart', err);
     }
   };
 
@@ -211,10 +241,6 @@ const SingleProductPage = () => {
             }}
           >
             ${product.price.toFixed(2)}
-          </Typography>
-
-          <Typography variant="body1" paragraph>
-            {product.description}
           </Typography>
 
           {/* Color and Size Selectors */}
@@ -379,6 +405,7 @@ const SingleProductPage = () => {
                 }}
                 startIcon={<AddShoppingCartIcon />}
                 disabled={product.stock === 0}
+	  	          onClick={handleAddToCart}
               >
                 Add to Cart
               </Button>
