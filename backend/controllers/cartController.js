@@ -12,13 +12,13 @@ export default class CartController {
   static async addToCart(req, res) {
     try {
       const sessionId = req.cookies?.sessionId;
-      const { userId, items, totalAmount } = req.body;
+      const { user, items, totalAmount } = req.body;
       let cart;
 
-      if (userId) {
-        const user = await User.findOne({ _id: userId });
-        if (!user) return res.status(400).json({ error: 'User Id not valid' });
-        cart = await Cart.findOne({ user: userId });
+      if (user) {
+        const existingUser = await User.findOne({ _id: user });
+        if (!existingUser) return res.status(400).json({ error: 'User Id not valid' });
+        cart = await Cart.findOne({ user: user });
       } else {
         cart = await Cart.findOne({ sessionId });
       }
@@ -26,19 +26,22 @@ export default class CartController {
       if (!cart) {
         // Create a new cart
         cart = new Cart({
-          user: userId || null,
-          sessionId: userId ? null : sessionId,
-          items,
-          totlaAmount,
+          user: user || null,
+          sessionId: user ? null : sessionId,
+          items: [ items ],
+          totalAmount,
         });
       } else {
         // Update existing cart
-        const existingItem = cart.items.find(item => item.product === items.product);
+        const existingItem = cart.items.find(item =>
+          item.product.toString() === items.product &&
+          item.size === items.size &&
+          item.color === items.color
+        );
 
-        if (existingItem &&
-          (existingItem.size === items.size && existingItem.color === items.color)) {
+        if (existingItem) {
           existingItem.quantity += items.quantity;
-          existing.totalPrice += items.totalPrice;
+          existingItem.totalPrice += items.totalPrice;
         } else {
           cart.items.push(items);
         }
@@ -48,7 +51,8 @@ export default class CartController {
 
       await cart.save();
 
-      res.status(200).json(cart);
+      const populatedCart = await Cart.findById(cart._id).populate('items.product');
+      res.status(200).json(populatedCart);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message });
