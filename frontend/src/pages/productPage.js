@@ -68,7 +68,6 @@ const SingleProductPage = () => {
   const [startIndex, setStartIndex] = useState(0);
   const thumbnailsToShow = 5;
   const [activeTab, setActiveTab] = useState(0);
-  console.log('st=', state)
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -105,12 +104,10 @@ const SingleProductPage = () => {
         totalAmount: parseFloat(((state?.totalAmount || 0) + totalPrice).toFixed(2)),
       };
       const res = await api.post('/cart', item);
-      console.log('res.data=', res.data);
       if (res.data)
         dispatch({ type: `ADD_ITEM`, payload: { items: res.data.items, totalAmount: res.data.totalAmount  } });
-      console.log('state=', state);
     } catch (err) {
-      console.log('Failed to add item to cart', err);
+      console.error('Failed to add item to cart', err);
     }
   };
 

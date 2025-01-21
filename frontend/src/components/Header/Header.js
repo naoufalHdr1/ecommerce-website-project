@@ -5,12 +5,54 @@ import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
 import UserMenu from './userMenu';
+import CartDrawer from './cart'
+
+const items = [
+  {
+    id: '678ef17b2f2f5d74c281ef46',
+    name: "Men's Ribbed Cashmere",
+    price: 54.99,
+    image: '/uploads/3954832144c86a56c776f07b383ac21c',
+    size: 'M',
+    color: 'Blue',
+    quantity: 5,
+    totalPrice: 109.98,
+    totalAmount: 109.98,
+  },
+  {
+    id: '678ef17b2f2f5d74c281ef46',
+    name: "Men's Ribbed Cashmere",
+    price: 54.99,
+    image: '/uploads/3954832144c86a56c776f07b383ac21c',
+    size: 'M',
+    color: 'Blue',
+    quantity: 5,
+    totalPrice: 109.98,
+    totalAmount: 109.98,
+  },
+  {
+    id: '678ef17b2f2f5d74c281ef46',
+    name: "Men's Ribbed Cashmere",
+    price: 54.99,
+    image: '/uploads/3954832144c86a56c776f07b383ac21c',
+    size: 'M',
+    color: 'Blue',
+    quantity: 5,
+    totalPrice: 109.98,
+    totalAmount: 109.98,
+  }
+];
+
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoggedIn } = useAuth();
+  const [cartOpen, setCartOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  console.log('isLoggedIn==', isLoggedIn)
+
+  const toggleCartDrawer = (newOpen) => () => {
+    setCartOpen(newOpen);
+  };
 
   return (
     <header>
@@ -74,15 +116,27 @@ const Header = () => {
 
           {/* Icons (large screens) */}
           <div className="d-none d-md-flex align-items-center">
-            {["search", "heart", "bag"].map((icon) => (
-              <i key={icon} className={`bi bi-${icon} me-4 fs-5 icon-hover`}></i>
-            ))}
-	  	      {isLoggedIn && (
+            <i key='search' className={`bi bi-search me-4 fs-5 icon-hover`}></i>
+            <i key='heart' className={`bi bi-heart me-4 fs-5 icon-hover`}></i>
+            <i
+              key='bag'
+              className={`bi bi-bag me-4 fs-5 icon-hover`}
+              onClick={toggleCartDrawer(true)}
+            >
+            </i>
+            {isLoggedIn && (
               <UserMenu />
             )}
           </div>
         </div>
       </div>
+
+      {/* Cart Drawer */}
+      <CartDrawer
+        cartItems={items}
+        open={cartOpen}
+        onClose={toggleCartDrawer(false)}
+      />
 
       {/* Side Menu */}
       <div className={`side-menu ${isMenuOpen ? "open" : ""}`}>
