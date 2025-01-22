@@ -1,5 +1,7 @@
 import React, { createContext, useReducer, useEffect, useContext } from 'react';
 import { api } from '../utils/api.js';
+import { useAuth } from '../contexts/authContext';
+import axios from 'axios';
 
 // Initial state
 const initialState = {
@@ -38,13 +40,15 @@ const CartContext = createContext();
 // Context Provider Component
 export function CartProvider({ children }) {
   const [state, dispatch] = useReducer(cartReducer, initialState);
+  const { user } = useAuth();
 
   // Fetch cart data on load
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const res = await api('/cart');
-        dispatch({ type: 'SET_CART', payload: res.data });
+        const res = await api.get(`/cart?userId=${user?._id}`);
+        if (res.data) 
+          dispatch({ type: 'SET_CART', payload: { items: res.data.items, totalAmount: res.data.totalAmount } });
       } catch (error) {
         console.error('Failed to fetch cart:', error);
       }

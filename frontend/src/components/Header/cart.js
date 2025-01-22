@@ -15,12 +15,18 @@ import { Close, Delete, Add, Remove, ShoppingCart } from '@mui/icons-material';
 import { API_BASE_URL } from '../../utils/config';
 import PaymentOutlinedIcon from '@mui/icons-material/PaymentOutlined';
 import ShoppingCartCheckoutOutlinedIcon from '@mui/icons-material/ShoppingCartCheckoutOutlined';
+import { useCart } from '../../contexts/cartContext';
 
-const CartDrawer = ({ cartItems, open, onClose }) => {
-  const [items, setItems] = useState(cartItems);
+const CartDrawer = ({ open, onClose }) => {
+  const { state, dispatch } = useCart();
+  const [items, setItems] = useState(state.items);
+  const [totalAmount, totalAmoun] = useState(state.totalAmount);
+
+  console.log('items=', items);
+  console.log('state=', state.items);
 
   const handleRemove = (id) => {
-    setItems(items.filter((item) => item.id !== id));
+    setItems(items.filter((item) => item._id !== id));
   };
 
   const handleQuantityChange = (id, type) => {
@@ -38,8 +44,13 @@ const CartDrawer = ({ cartItems, open, onClose }) => {
 
   const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
+  const handleClose = () => {
+    console.log('cart drawer closer')
+    onClose();
+  };
+
   return (
-    <Drawer anchor="right" open={open} onClose={onClose}>
+    <Drawer anchor="right" open={open} onClose={handleClose}>
       <Box
         sx={{
           width: 400,
@@ -81,7 +92,7 @@ const CartDrawer = ({ cartItems, open, onClose }) => {
             Your Cart ({items.length})
           </Typography>
           <IconButton
-            onClick={onClose}
+            onClick={handleClose}
           >
             <Close fontSize="small" />
           </IconButton>
@@ -108,10 +119,10 @@ const CartDrawer = ({ cartItems, open, onClose }) => {
                 }}
               >
                 <Typography variant="body1" fontWeight="bold">
-                  {item.name}
+                  {item.product.name}
                 </Typography>
                 <IconButton
-                  onClick={() => handleRemove(item.id)}
+                  onClick={() => handleRemove(item._id)}
                   sx={{ color: '#dc143c' }}
                   size="small"
                 >
@@ -128,8 +139,8 @@ const CartDrawer = ({ cartItems, open, onClose }) => {
                 {/* Image */}
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <img
-                    src={`${API_BASE_URL}${item.image}`}
-                    alt={item.name}
+                    src={`${API_BASE_URL}${item.product.images && item.product.images[0]}`}
+                    alt={item.product.name}
                     style={{
                       width: 80,
                       height: 90,
@@ -144,7 +155,7 @@ const CartDrawer = ({ cartItems, open, onClose }) => {
                   {/* Price */}
                   <Box>
                     <Typography variant="body1" sx={{ fontWeight: "bold", color: "#dc143c", marginBottom: 1 }}>
-                      Price: ${item.price}
+                      Price: ${item.product.price}
                     </Typography>
                   </Box>
 
@@ -160,7 +171,7 @@ const CartDrawer = ({ cartItems, open, onClose }) => {
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         <IconButton
                           size="small"
-                          onClick={() => handleQuantityChange(item.id, 'decrease')}
+                          onClick={() => handleQuantityChange(item._id, 'decrease')}
                           disabled={(item.quantity || 1) === 1}
                         >
                           <RemoveIcon />
@@ -173,7 +184,7 @@ const CartDrawer = ({ cartItems, open, onClose }) => {
                           inputProps={{ style: { textAlign: "center" } }}
                         />
                         <IconButton size="small"
-                            onClick={() => handleQuantityChange(item.id, 'increase')}>
+                            onClick={() => handleQuantityChange(item._id, 'increase')}>
                           <AddIcon />
                         </IconButton>
                       </Box>
