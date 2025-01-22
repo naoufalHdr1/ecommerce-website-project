@@ -51,7 +51,7 @@ export const userRole = async (req, res) => {
 
 /* Middleware to handle authentication and session management */
 export const handleAuthAndSession = (req, res, next) => {
-	const { v4: uuidv4 } = pkg;
+  const { v4: uuidv4 } = pkg;
   const token = req.cookies.token;
   const sessionId = req.cookies.sessionId;
 
@@ -65,7 +65,7 @@ export const handleAuthAndSession = (req, res, next) => {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
   } else if (sessionId) {
-    // If no toekn but sessionId exists (for guests)
+    // If no token but sessionId exists (for guests)
     req.sessionId = sessionId;
   } else {
     // If neither token nor sessionId exists, generate a new sessionId
@@ -74,7 +74,7 @@ export const handleAuthAndSession = (req, res, next) => {
       httpOnly: true,
       secure: false,
       sameSite: 'Lax',
-      maxAge: '1000 * 60 * 60 * 24 * 7',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
     });
     req.sessionId = newSessionId;
   }

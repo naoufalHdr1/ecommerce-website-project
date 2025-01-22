@@ -11,23 +11,17 @@ export default class CartController {
 
   static async addToCart(req, res) {
     try {
-      const sessionId = req.cookies.sessionId;
-      const { user, items, totalAmount } = req.body;
       let cart;
+      const filter = req.userId ? { userId: req.userId } : { sessionId: req.sessionId };
+      const { items, totalAmount } = req.body;
 
-      if (user) {
-        const existingUser = await User.findOne({ _id: user });
-        if (!existingUser) return res.status(400).json({ error: 'User Id not valid' });
-        cart = await Cart.findOne({ user: user });
-      } else {
-        cart = await Cart.findOne({ sessionId });
-      }
+      cart = await Cart.findOne(filter);
 
       if (!cart) {
         // Create a new cart
         cart = new Cart({
-          user: user || null,
-          sessionId: user ? null : sessionId,
+          user: filter.userId || null,
+          sessionId: filter.userId ? null : filter.sessionId,
           items: [ items ],
           totalAmount,
         });
@@ -61,24 +55,37 @@ export default class CartController {
 
   static async getCartItems(req, res) {
     try {
-      const sessionId = req.cookies.sessionId;
-      const { userId } = req.query;
-      let cart;
-      
-      if (userId && userId !== 'undefined') {
-        const existingUser = await User.findOne({ _id: userId });
-        if (!existingUser) return res.status(400).json({ error: 'User Id not valid' });
-        cart = await Cart.findOne({ user: userId })
-          .populate('items.product')
-          .exec();
-      } else {
-        cart = await Cart.findOne({ sessionId })
-          .populate('items.product')
-          .exec();
-      }
+      const filter = req.userId ? { userId: req.userId } : { sessionId: req.sessionId };
+
+      const cart = await Cart.findOne(filter)
+        .populate('items.product')
+        .exec();
 
       res.status(200).json(cart);
     } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  static async updateCart(req, res) {
+    try {
+      const filter = req.userId ? { userId: req.userId } : { sessionId: req.sessionId };
+      const { items, totalAmount } = req.body;
+      let cart;
+
+      cart = await Cart.findOne(filter);
+      if (!cart) return res.status(404).json({ error: 'Cart not found' });
+
+      cart.items = items;
+      cart.totalAmount = totalAmount;
+
+      await cart.save();
+
+      const populatedCart = await Cart.findById(cart._id).populate('items.product');
+
+      res.status(200).json(populatedCart);
+     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message });
     }
