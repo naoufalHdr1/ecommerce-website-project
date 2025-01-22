@@ -11,7 +11,7 @@ export default class CartController {
 
   static async addToCart(req, res) {
     try {
-      const sessionId = req.sessionId;
+      const sessionId = req.cookies.sessionId;
       const { user, items, totalAmount } = req.body;
       let cart;
 
@@ -61,16 +61,11 @@ export default class CartController {
 
   static async getCartItems(req, res) {
     try {
-      console.log(req.cookies)
       const sessionId = req.cookies.sessionId;
       const { userId } = req.query;
       let cart;
-      console.log("sessionId=", sessionId);
-      console.log('********************************');
-      console.log("userId=", userId)
-      console.log('********************************');
       
-      if (userId) {
+      if (userId && userId !== 'undefined') {
         const existingUser = await User.findOne({ _id: userId });
         if (!existingUser) return res.status(400).json({ error: 'User Id not valid' });
         cart = await Cart.findOne({ user: userId })

@@ -26,18 +26,12 @@ dotenv.config();
 const app = express();
 
 // Middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
 }));
-app.use(session({
-  secret: 'your-secret-key',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { httpOnly: true, secure: false, maxAge: 1000 * 60 * 60 * 24 * 7 }
-}));
-app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 dbClient.connect(process.env.MONGO_URI);
@@ -52,13 +46,14 @@ app.use('/subcategories', subcategoryRoutes);
 app.use('/orders', orderRoutes);
 app.use('/cart', cartRoutes);
 
-// Experimental route to set a cookie
 app.get('/cookies', (req, res) => {
-  if (!req.session.sessionId) {
-    req.session.sessionId = uuidv4(); // Assign a new session ID if not set
-    res.send({ sessionId: req.session.sessionId, message: 'New session created' });
-  } else {
-    res.send({ sessionId: req.session.sessionId, message: 'Session exists' });
+  try {
+    if (req.cookies.sessionId) {
+      return res.send('Session ID is: ' + req.cookies.sessionId);
+    }
+    return res.send('Session ID not found');
+  } catch (err) {
+    console.error(err);
   }
 });
 

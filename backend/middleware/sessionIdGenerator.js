@@ -3,7 +3,6 @@ import pkg from 'uuid';
 const { v4: uuidv4 } = pkg;
 export const generateSessionId = (req, res, next) => {
   if (!req.cookies.sessionId) {
-    console.log("abcs")
     const sessionId = uuidv4();
     res.cookie('sessionId', sessionId, {
       httpOnly: true,
@@ -13,4 +12,4 @@ export const generateSessionId = (req, res, next) => {
     req.cookies.sessionId = sessionId;
   }
   next();
-}
+};
