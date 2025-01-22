@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Drawer,
   Box,
@@ -14,25 +14,36 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import { Close, Delete, Add, Remove, ShoppingCart } from '@mui/icons-material';
 import { API_BASE_URL } from '../../utils/config';
 import PaymentOutlinedIcon from '@mui/icons-material/PaymentOutlined';
+import SaveIcon from '@mui/icons-material/Save';
+import UndoIcon from '@mui/icons-material/Undo';
 import ShoppingCartCheckoutOutlinedIcon from '@mui/icons-material/ShoppingCartCheckoutOutlined';
 import { useCart } from '../../contexts/cartContext';
+import { api } from '../../utils/api';
 
 const CartDrawer = ({ open, onClose }) => {
   const { state, dispatch } = useCart();
-  const [items, setItems] = useState(state.items);
-  const [totalAmount, totalAmoun] = useState(state.totalAmount);
+  const [items, setItems] = useState([]);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  console.log('items=', items);
-  console.log('state=', state.items);
+  useEffect(() => {
+    setItems(state.items);
+    setTotalAmount(state.totalAmount);
+  }, [state]);
+
+  useEffect(() => {
+    setTotalAmount(totalPrice);
+  }, [items])
 
   const handleRemove = (id) => {
     setItems(items.filter((item) => item._id !== id));
+    setHasChanges(true);
   };
 
   const handleQuantityChange = (id, type) => {
     setItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === id
+        item._id === id
           ? {
               ...item,
               quantity: type === 'increase' ? item.quantity + 1 : Math.max(1, item.quantity - 1),
@@ -40,9 +51,27 @@ const CartDrawer = ({ open, onClose }) => {
           : item
       )
     );
+    setHasChanges(true);
   };
 
-  const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0);
+  const handleSaveChanges = async () => {
+    try {
+      const res = await api.put('/cart', { items, totalAmount });
+      if (res.data)
+        dispatch({ type: 'ADD_CART', payload: { items: res.data.items, totalAmount: res.data.totalAmount } });
+      setHasChanges(false);
+    } catch (err) {
+      console.error('Error saving cart changes:', err);
+    }
+  }
+
+  const handleUndoChanges = () => {
+    setItems(state.items);
+    setTotalAmount(state.totalAmount);
+    setHasChanges(false);
+  }
+
+  const totalPrice = items.reduce((total, item) => total + item.product.price * item.quantity, 0);
 
   const handleClose = () => {
     console.log('cart drawer closer')
@@ -191,7 +220,7 @@ const CartDrawer = ({ open, onClose }) => {
                     </Grid>
                     <Grid item xs={6} sx={{ textAlign: 'right' }}>
                       <Typography fontWeight="bold" sx={{ marginRight: 1 }}>
-                        ${item.price * item.quantity}
+                        ${item.product.price * item.quantity}
                       </Typography>
                     </Grid>
                   </Grid>
@@ -211,7 +240,7 @@ const CartDrawer = ({ open, onClose }) => {
         >
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              Total: <span>${totalPrice.toFixed(2)}</span>
+              Total: <span>${totalAmount.toFixed(2)}</span>
             </Typography>
           </Box>
 
@@ -233,23 +262,55 @@ const CartDrawer = ({ open, onClose }) => {
           >
             Proceed to Checkout
           </Button>
+  
+          {/* Save and Undo Buttons (Conditionally Rendered) */}
+          {hasChanges && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                gap: 1,
+                marginTop: 2,
+              }}
+            >
+              {/* Save Button */}
+              <Button
+                variant="contained"
+                startIcon={<SaveIcon />}
+                sx={{
+                  backgroundColor: '#28a745',
+                  color: '#fff',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    backgroundColor: '#218838',
+                  },
+                }}
+                onClick={handleSaveChanges}
+                fullWidth
+              >
+                Save Changes
+              </Button>
 
-          <Button
-            fullWidth
-            variant="outlined"
-            sx={{
-              color: '#dc143c',
-              borderColor: '#dc143c',
-              marginTop: 1,
-              '&:hover': {
-                backgroundColor: '#dc143c',
-                color: '#fff',
-              },
-            }}
-            startIcon={<ShoppingCartCheckoutOutlinedIcon color='#dc143c'/>}
-          >
-            View Cart
-          </Button>
+              {/* Undo Button */}
+              <Button
+                variant="outlined"
+                startIcon={<UndoIcon />}
+                sx={{
+                  color: '#dc143c',
+                  borderColor: '#dc143c',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    backgroundColor: '#dc143c',
+                    color: '#fff',
+                  },
+                }}
+                onClick={handleUndoChanges}
+                fullWidth
+              >
+                Undo Changes
+              </Button>
+            </Box>
+          )}
         </Box>
       </Box>
     </Drawer>
