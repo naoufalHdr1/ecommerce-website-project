@@ -11,17 +11,13 @@ import { __dirname } from '../server.js';
 export const createItem = (childModel, parentModel = null) => async (req, res) => {
   // Determine if a parent relationship exists
   const isParentRequired = parentModel !== null;
-  console.log('isParentRequired=', isParentRequired);
   const parentKey = isParentRequired
     ? childModel.modelName === 'Product'
       ? 'subcategory_id'
       : 'category_id'
     : null;
-  console.log('parentKey=', parentKey);
 
-  console.log('req body=', req.body);
   const { [parentKey]: parentId, ...itemData } = req.body;
-  console.log('parent id=', parentId);
 
   try {
     // Create the new item
@@ -29,7 +25,6 @@ export const createItem = (childModel, parentModel = null) => async (req, res) =
       ...itemData,
       ...(isParentRequired && { [parentKey]: parentId || null }),
     });
-    console.log("new item=", newItem)
 
     // Handle subItem (subcategory or category) updates if needed
     if (isParentRequired && parentId) {
@@ -84,7 +79,6 @@ export const getById = (model) => async (req, res) => {
 // Retrieve items by query parameters
 export const getByQuery = (model) => async (req, res) => {
   const query = req.query;
-	console.log("query=", query)
 
   try {
     const data = await model.find(query);
@@ -251,8 +245,6 @@ export const deleteBySub = (model, subModel) => async (req, res) => {
 
 // Delete an item (Generalized)
 export const deleteItemById = (childModel, parentModel = null) => async (req, res) => {
-  console.log("delete req body=", req.body)
-  console.log("delete req params=", req.params)
   // Determine if a parent relationship exists
   const isParentRequired = parentModel !== null;
   const parentKey = isParentRequired
@@ -267,7 +259,6 @@ export const deleteItemById = (childModel, parentModel = null) => async (req, re
   try {
     // Find the item to delete
     const item = await childModel.findById(id);
-    console.log("Item found=", item)
     if (!item) {
       return res.status(404).json({ error: `${childModel.modelName} not found` });
     }

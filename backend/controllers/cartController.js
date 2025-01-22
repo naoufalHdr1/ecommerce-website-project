@@ -11,7 +11,7 @@ export default class CartController {
 
   static async addToCart(req, res) {
     try {
-      const sessionId = req.cookies?.sessionId;
+      const sessionId = req.sessionId;
       const { user, items, totalAmount } = req.body;
       let cart;
 
@@ -53,6 +53,36 @@ export default class CartController {
 
       const populatedCart = await Cart.findById(cart._id).populate('items.product');
       res.status(200).json(populatedCart);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  static async getCartItems(req, res) {
+    try {
+      console.log(req.cookies)
+      const sessionId = req.cookies.sessionId;
+      const { userId } = req.query;
+      let cart;
+      console.log("sessionId=", sessionId);
+      console.log('********************************');
+      console.log("userId=", userId)
+      console.log('********************************');
+      
+      if (userId) {
+        const existingUser = await User.findOne({ _id: userId });
+        if (!existingUser) return res.status(400).json({ error: 'User Id not valid' });
+        cart = await Cart.findOne({ user: userId })
+          .populate('items.product')
+          .exec();
+      } else {
+        cart = await Cart.findOne({ sessionId })
+          .populate('items.product')
+          .exec();
+      }
+
+      res.status(200).json(cart);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message });
