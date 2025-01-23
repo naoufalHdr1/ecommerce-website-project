@@ -1,7 +1,5 @@
 import React, { createContext, useReducer, useEffect, useContext } from 'react';
 import { api } from '../utils/api.js';
-import { useAuth } from '../contexts/authContext';
-import axios from 'axios';
 
 // Initial state
 const initialState = {
@@ -22,14 +20,6 @@ function cartReducer(state, action) {
         totalAmount: action.payload.totalAmount,
       };
 
-      /*
-    case 'DELETE_ITEM':
-      return {
-        ...state,
-        items: state.items.filter((item) => item.product._id === action.payload.itemId),
-        totalAmount: action.payload.totalAmount,
-      };
-      */
     default:
       return state;
   }
@@ -40,13 +30,12 @@ const CartContext = createContext();
 // Context Provider Component
 export function CartProvider({ children }) {
   const [state, dispatch] = useReducer(cartReducer, initialState);
-  const { user } = useAuth();
 
   // Fetch cart data on load
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const res = await api.get(`/cart?userId=${user?._id}`);
+        const res = await api.get('/cart');
         if (res.data) 
           dispatch({ type: 'SET_CART', payload: { items: res.data.items, totalAmount: res.data.totalAmount } });
       } catch (error) {

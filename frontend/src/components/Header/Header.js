@@ -7,43 +7,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import UserMenu from './userMenu';
 import CartDrawer from './cart'
 
-const items = [
-  {
-    id: '678ef17b2f2f5d74c281ef46',
-    name: "Men's Ribbed Cashmere",
-    price: 54.99,
-    image: '/uploads/3954832144c86a56c776f07b383ac21c',
-    size: 'M',
-    color: 'Blue',
-    quantity: 5,
-    totalPrice: 109.98,
-    totalAmount: 109.98,
-  },
-  {
-    id: '678ef17b2f2f5d74c281ef46',
-    name: "Men's Ribbed Cashmere",
-    price: 54.99,
-    image: '/uploads/3954832144c86a56c776f07b383ac21c',
-    size: 'M',
-    color: 'Blue',
-    quantity: 5,
-    totalPrice: 109.98,
-    totalAmount: 109.98,
-  },
-  {
-    id: '678ef17b2f2f5d74c281ef46',
-    name: "Men's Ribbed Cashmere",
-    price: 54.99,
-    image: '/uploads/3954832144c86a56c776f07b383ac21c',
-    size: 'M',
-    color: 'Blue',
-    quantity: 5,
-    totalPrice: 109.98,
-    totalAmount: 109.98,
-  }
-];
-
-
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoggedIn } = useAuth();
@@ -133,7 +96,6 @@ const Header = () => {
 
       {/* Cart Drawer */}
       <CartDrawer
-        cartItems={items}
         open={cartOpen}
         onClose={toggleCartDrawer(false)}
       />

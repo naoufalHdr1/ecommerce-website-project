@@ -23,6 +23,7 @@ const CartDrawer = ({ open, onClose }) => {
   const [items, setItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [hasChanges, setHasChanges] = useState(false);
+  const totalPrice = items.reduce((total, item) => total + item.product.price * item.quantity, 0);
 
   useEffect(() => {
     setItems(state.items);
@@ -32,7 +33,7 @@ const CartDrawer = ({ open, onClose }) => {
   useEffect(() => {
     setTotalAmount(totalPrice);
     setHasChanges(JSON.stringify(items) !== JSON.stringify(state.items))
-  }, [items])
+  }, [items, state.items, totalPrice])
 
   const handleRemove = (id) => {
     setItems(items.filter((item) => item._id !== id));
@@ -78,15 +79,8 @@ const CartDrawer = ({ open, onClose }) => {
     setHasChanges(false);
   }
 
-  const totalPrice = items.reduce((total, item) => total + item.product.price * item.quantity, 0);
-
-  const handleClose = () => {
-    console.log('cart drawer closer')
-    onClose();
-  };
-
   return (
-    <Drawer anchor="right" open={open} onClose={handleClose}>
+    <Drawer anchor="right" open={open} onClose={onClose}>
       <Box
         sx={{
           width: 400,
@@ -128,7 +122,7 @@ const CartDrawer = ({ open, onClose }) => {
             Your Cart ({items.length})
           </Typography>
           <IconButton
-            onClick={handleClose}
+            onClick={onClose}
           >
             <Close fontSize="small" />
           </IconButton>
