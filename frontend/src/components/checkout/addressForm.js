@@ -1,9 +1,8 @@
-import * as React from 'react';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Grid2';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import { styled } from '@mui/material/styles';
 
 const FormGrid = styled(Grid)(() => ({
@@ -11,117 +10,116 @@ const FormGrid = styled(Grid)(() => ({
   flexDirection: 'column',
 }));
 
-export default function AddressForm() {
+export default function AddressForm({ formData, handleChange, errors }) {
+
   return (
     <Grid container spacing={3}>
+      <FormGrid size={{ xs: 12 }}>
+      	<Typography variant="h6">Shipping Address</Typography>
+      	<Typography variant="body2" color="textSecondary" gutterBottom>
+          Enter the shipping address details for the order.
+        </Typography>
+      </FormGrid>
+
       <FormGrid size={{ xs: 12, md: 6 }}>
-        <FormLabel htmlFor="first-name" required>
-          First name
-        </FormLabel>
-        <OutlinedInput
-          id="first-name"
-          name="first-name"
-          type="name"
-          placeholder="John"
-          autoComplete="first name"
+        <TextField
+          label="First Name"
+          name="firstName"
+          value={formData.firstName}
+          onChange={handleChange('firstName')}
+          variant="standard"
           required
-          size="small"
+          fullWidth
+          error={!!errors.firstName}
+          helperText={errors.firstName}
         />
       </FormGrid>
       <FormGrid size={{ xs: 12, md: 6 }}>
-        <FormLabel htmlFor="last-name" required>
-          Last name
-        </FormLabel>
-        <OutlinedInput
-          id="last-name"
-          name="last-name"
-          type="last-name"
-          placeholder="Snow"
-          autoComplete="last name"
+        <TextField
+          label="Last Name"
+          name="lastName"
+          value={formData.lastName}
+          onChange={handleChange('lastName')}
+          variant="standard"
           required
-          size="small"
+          fullWidth
+          error={!!errors.lastName}
+          helperText={errors.lastName}
         />
       </FormGrid>
       <FormGrid size={{ xs: 12 }}>
-        <FormLabel htmlFor="address1" required>
-          Address line 1
-        </FormLabel>
-        <OutlinedInput
-          id="address1"
+        <TextField
+          label="Address Line 1"
           name="address1"
-          type="address1"
-          placeholder="Street name and number"
-          autoComplete="shipping address-line1"
+          value={formData.address1}
+          onChange={handleChange('address1')}
+          variant="standard"
           required
-          size="small"
+          fullWidth
+          error={!!errors.address1}
+          helperText={errors.address1}
         />
       </FormGrid>
       <FormGrid size={{ xs: 12 }}>
-        <FormLabel htmlFor="address2">Address line 2</FormLabel>
-        <OutlinedInput
-          id="address2"
+        <TextField
+          label="Address Line 2"
           name="address2"
-          type="address2"
-          placeholder="Apartment, suite, unit, etc. (optional)"
-          autoComplete="shipping address-line2"
-          required
-          size="small"
+          value={formData.address2}
+          onChange={handleChange('address2')}
+          variant="standard"
+          fullWidth
         />
       </FormGrid>
       <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="city" required>
-          City
-        </FormLabel>
-        <OutlinedInput
-          id="city"
+        <TextField
+          label="City"
           name="city"
-          type="city"
-          placeholder="New York"
-          autoComplete="City"
+          value={formData.city}
+          onChange={handleChange('city')}
+          variant="standard"
           required
-          size="small"
+          fullWidth
+          error={!!errors.city}
+          helperText={errors.city}
         />
       </FormGrid>
       <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="state" required>
-          State
-        </FormLabel>
-        <OutlinedInput
-          id="state"
+        <TextField
+          label="State"
           name="state"
-          type="state"
-          placeholder="NY"
-          autoComplete="State"
+          value={formData.state}
+          onChange={handleChange('state')}
+          variant="standard"
           required
-          size="small"
+          fullWidth
+          error={!!errors.state}
+          helperText={errors.state}
         />
       </FormGrid>
       <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="zip" required>
-          Zip / Postal code
-        </FormLabel>
-        <OutlinedInput
-          id="zip"
+        <TextField
+          label="Zip / Postal Code"
           name="zip"
-          type="zip"
-          placeholder="12345"
-          autoComplete="shipping postal-code"
+          value={formData.zip}
+          onChange={handleChange('zip')}
+          variant="standard"
           required
-          size="small"
+          fullWidth
+          error={!!errors.zip}
+          helperText={errors.zip}
         />
       </FormGrid>
       <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="country" required>
-          Country
-        </FormLabel>
-        <OutlinedInput
-          id="country"
+        <TextField
+          label="Country"
           name="country"
-          type="country"
-          placeholder="United States"
-          autoComplete="shipping country"
+          value={formData.country}
+          onChange={handleChange('country')}
+          variant="standard"
           required
-          size="small"
+          fullWidth
+          error={!!errors.country}
+          helperText={errors.country}
         />
       </FormGrid>
       <FormGrid size={{ xs: 12 }}>

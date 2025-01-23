@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -22,26 +22,88 @@ import AppTheme from '../../components/checkout/appTheme';
 import ColorModeIconDropdown from '../../components/checkout/colorModeIconDropdown';
 
 const steps = ['Shipping address', 'Payment details', 'Review your order'];
-function getStepContent(step) {
-  switch (step) {
-    case 0:
-      return <AddressForm />;
-    case 1:
-      return <PaymentForm />;
-    case 2:
-      return <Review />;
-    default:
-      throw new Error('Unknown step');
-  }
-}
+
 export default function Checkout(props) {
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = useState(0);
+  const [shippingAddress, setShippingAddress] = useState({
+    firstName: '',
+    lastName: '',
+    address1: '',
+    address2: '',
+    city: '',
+    state: '',
+    zip: '',
+    country: '',
+  });
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    console.log('shippingAddress:', shippingAddress)
+  }, [shippingAddress])
+
+  const getStepContent = (step) => {
+    switch (step) {
+      case 0:
+        return (
+          <AddressForm
+            formData={shippingAddress}
+            handleChange={handleChange}
+            errors={errors}
+          />
+        );
+      case 1:
+        return <PaymentForm />;
+      case 2:
+        return <Review />;
+      default:
+        throw new Error('Unknown step');
+    }
+  }
+
+  /* 
+   * Handle shipping address formData 
+   */
+  const handleChange = (field) => (event) => {
+    const { value } = event.target;
+    setShippingAddress((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
+
+    // Remove error as soon as user types something
+    if (errors[field]) {
+      setErrors((prevErrors) => {
+        const updatedErrors = { ...prevErrors };
+        delete updatedErrors[field];
+        return updatedErrors;
+      });
+    }
+  };
+
+  const validateShippingAddress = () => {
+    const newErrors = {};
+
+    ['firstName', 'lastName', 'address1', 'city', 'state', 'zip', 'country'].forEach((field) => {
+      if (!shippingAddress[field]) {
+        newErrors[field] = 'This field is required';
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  /* Stepper Buttons handler */
   const handleNext = () => {
+    if (activeStep === 0 && !validateShippingAddress()) return;
     setActiveStep(activeStep + 1);
   };
+
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
+
+
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
