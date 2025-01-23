@@ -1,62 +1,53 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
+import Badge from '@mui/material/Badge';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-
-const products = [
-  {
-    name: 'Professional plan',
-    desc: 'Monthly subscription',
-    price: '$15.00',
-  },
-  {
-    name: 'Dedicated support',
-    desc: 'Included in the Professional plan',
-    price: 'Free',
-  },
-  {
-    name: 'Hardware',
-    desc: 'Devices needed for development',
-    price: '$69.99',
-  },
-  {
-    name: 'Landing page template',
-    desc: 'License',
-    price: '$49.99',
-  },
-];
+import { useCart } from '../../contexts/cartContext';
 
 function Info({ totalPrice }) {
+  const { state } = useCart();
+  const { items, totalAmount } = state;
+
   return (
     <React.Fragment>
       <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
         Total
       </Typography>
       <Typography variant="h4" gutterBottom>
-        {totalPrice}
+        ${totalAmount}
       </Typography>
       <List disablePadding>
-        {products.map((product) => (
-          <ListItem key={product.name} sx={{ py: 1, px: 0 }}>
-            <ListItemText
-              sx={{ mr: 2 }}
-              primary={product.name}
-              secondary={product.desc}
-            />
-            <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-              {product.price}
-            </Typography>
-          </ListItem>
+        {items.map((item) => (
+          <Badge
+            badgeContent={`x${item.quantity}`}
+            color="primary"
+            key={item.product.name}
+            sx={{
+              '& .MuiBadge-badge': {
+                right: -3,
+                top: item.size || item.color ? 13 : 2,
+                border: (theme) => `2px solid ${theme.palette.background.paper}`,
+                padding: '0 4px',
+              },
+            }}
+          >
+            <ListItem sx={{ py: 1, px: 0 }}>
+              <ListItemText
+                sx={{ mr: 2 }}
+                primary={item.product.name}
+                secondary={`${item.size ? `Size: ${item.size}` : ''}${item.size && item.color ? ' | ' : ''}${item.color ? `Color: ${item.color}` : ''}`}
+              />
+              <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                ${item.totalPrice}
+              </Typography>
+            </ListItem>
+          </Badge>
         ))}
       </List>
     </React.Fragment>
   );
 }
-
-Info.propTypes = {
-  totalPrice: PropTypes.string.isRequired,
-};
 
 export default Info;

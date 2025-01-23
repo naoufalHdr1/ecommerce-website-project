@@ -134,7 +134,7 @@ export default function Checkout(props) {
             borderColor: { sm: 'none', md: 'divider' },
             alignItems: 'start',
             pt: 16,
-            px: 10,
+            px: 6,
             gap: 4,
           }}
         >
@@ -148,7 +148,7 @@ export default function Checkout(props) {
               maxWidth: 500,
             }}
           >
-            <Info totalPrice={activeStep >= 2 ? '$144.97' : '$134.98'} />
+            <Info />
           </Box>
         </Grid>
         <Grid
@@ -219,6 +219,7 @@ export default function Checkout(props) {
               <InfoMobile totalPrice={activeStep >= 2 ? '$144.97' : '$134.98'} />
             </CardContent>
           </Card>
+
           <Box
             sx={{
               display: 'flex',
