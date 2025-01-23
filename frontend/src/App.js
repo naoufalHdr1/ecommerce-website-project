@@ -7,6 +7,7 @@ import Logout from "./pages/Logout";
 import Register from "./pages/Register";
 import Category from "./pages/categories/category";
 import ProductPage from "./pages/product/productPage";
+import Checkout from "./pages/checkout/checkout";
 import CategoryProductsPage from "./components/categories/categoryProductsPage/categoryProductsPage";
 import Dashboard from "./pages/dashboard/dashboard";
 import ProtectedRoute from "./components/protectedRoute.js";
@@ -31,6 +32,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/checkout" element={<Checkout />} />
+
 
           {/* All other routes wrapped with Layout */}
           <Route
