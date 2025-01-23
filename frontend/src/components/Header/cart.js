@@ -4,19 +4,17 @@ import {
   Box,
   Typography,
   IconButton,
-  Divider,
   Button,
   Grid,
   TextField,
 } from '@mui/material';
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { Close, Delete, Add, Remove, ShoppingCart } from '@mui/icons-material';
+import { Close, Delete } from '@mui/icons-material';
 import { API_BASE_URL } from '../../utils/config';
 import PaymentOutlinedIcon from '@mui/icons-material/PaymentOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import UndoIcon from '@mui/icons-material/Undo';
-import ShoppingCartCheckoutOutlinedIcon from '@mui/icons-material/ShoppingCartCheckoutOutlined';
 import { useCart } from '../../contexts/cartContext';
 import { api } from '../../utils/api';
 
@@ -33,6 +31,7 @@ const CartDrawer = ({ open, onClose }) => {
 
   useEffect(() => {
     setTotalAmount(totalPrice);
+    setHasChanges(JSON.stringify(items) !== JSON.stringify(state.items))
   }, [items])
 
   const handleRemove = (id) => {
@@ -47,10 +46,18 @@ const CartDrawer = ({ open, onClose }) => {
           ? {
               ...item,
               quantity: type === 'increase' ? item.quantity + 1 : Math.max(1, item.quantity - 1),
+              totalPrice: (
+                parseFloat(
+                  type === 'increase'
+                  ? (item.totalPrice + item.product.price).toFixed(2)
+                  : (item.totalPrice - item.product.price).toFixed(2)
+                )
+              ),
             }
           : item
       )
     );
+    if (items === state.items) setHasChanges(false);
     setHasChanges(true);
   };
 
@@ -220,7 +227,7 @@ const CartDrawer = ({ open, onClose }) => {
                     </Grid>
                     <Grid item xs={6} sx={{ textAlign: 'right' }}>
                       <Typography fontWeight="bold" sx={{ marginRight: 1 }}>
-                        ${item.product.price * item.quantity}
+                        ${item.totalPrice.toFixed(2)}
                       </Typography>
                     </Grid>
                   </Grid>
