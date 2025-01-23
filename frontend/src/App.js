@@ -6,7 +6,7 @@ import Login from "./pages/Login";
 import Logout from "./pages/Logout";
 import Register from "./pages/Register";
 import Category from "./pages/categories/category";
-import ProductPage from "./pages/productPage";
+import ProductPage from "./pages/product/productPage";
 import CategoryProductsPage from "./components/categories/categoryProductsPage/categoryProductsPage";
 import Dashboard from "./pages/dashboard/dashboard";
 import ProtectedRoute from "./components/protectedRoute.js";
@@ -44,7 +44,7 @@ function App() {
                   <Route path="/register" element={<Register />} />
                   <Route path="/categories/:category" element={<Category />} />
                   <Route path="/a" element={<CategoryProductsPage />} />
-                  <Route path="/product" element={<ProductPage />} />
+                  <Route path="/product/:id" element={<ProductPage />} />
                 </Routes>
               </Layout>
             }

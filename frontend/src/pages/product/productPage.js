@@ -1,14 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   Container,
   Grid,
   Typography,
   Button,
-  MenuItem,
-  Select,
   TextField,
   Box,
-  Divider,
   IconButton,
   Tabs,
   Tab,
@@ -19,14 +17,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { API_BASE_URL } from '../utils/config';
-import { api } from '../utils/api';
-import Checkbox from '@mui/material/Checkbox';
-import FavoriteBorder from '@mui/icons-material/FavoriteBorder';
-import Favorite from '@mui/icons-material/Favorite';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { api } from '../../utils/api';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -34,59 +25,37 @@ import TrackingIcon from '@mui/icons-material/MyLocation';
 import PublicIcon from '@mui/icons-material/Public';
 import ShieldIcon from '@mui/icons-material/Shield';
 import { Facebook, Twitter, Pinterest } from '@mui/icons-material';
-import { useCart } from '../contexts/cartContext';
-import { useAuth } from '../contexts/authContext';
-
-const product = {
-  _id: '678ab56339afb00686d4cfb3',
-  name: "Men's Ribbed Cashmere",
-  description: "Men's Ribbed Cashmere Description",
-  price: 54.99,
-  stock: 100,
-  images: [
-    '/uploads/3954832144c86a56c776f07b383ac21c',
-    '/uploads/085f6e5ba6308b6ffa31bce46a9039ca',
-    '/uploads/1a7694ca5de10e8208b6fddf03a534ee',
-  ],
-  sizes: [ 'S', 'M', 'L' ],
-  colors: [ 'White', 'Red', 'Blue', 'Green' ],
-  subcategory_id: '678ab4a739afb00686d4cfaa',
-  isFeatured: true,
-  createdAt: '2025-01-17T19:54:11.123Z',
-  updatedAt: '2025-01-17T19:54:11.123Z',
-  __v: 0
-}
+import { useCart } from '../../contexts/cartContext';
+import { useAuth } from '../../contexts/authContext';
+import ProductImage from './productImage';
 
 const SingleProductPage = () => {
-  const { state, dispatch } = useCart();
+  const { id } = useParams();
   const { user } = useAuth();
+  const { dispatch } = useCart();
+  const [product, setProduct] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isWishlist, setIsWishlist] = useState(false);
-  const [currentImage, setCurrentImage] = useState(product.images[0]);
-  const [startIndex, setStartIndex] = useState(0);
-  const thumbnailsToShow = 5;
   const [activeTab, setActiveTab] = useState(0);
+
+  useEffect(() => {
+    // Fetch product by ID
+    const fetchProduct = async () => {
+      try {
+        const response = await api.get(`/products/${id}`);
+        setProduct(response.data);
+      } catch (err) {
+        console.error("Error fetching the product:", err);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
-  };
-
-  const handleThumbnailClick = (image) => {
-    setCurrentImage(image);
-  };
-
-  const handleNext = () => {
-    if (startIndex + thumbnailsToShow < product.images.length) {
-      setStartIndex(startIndex + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (startIndex > 0) {
-      setStartIndex(startIndex - 1);
-    }
   };
 
   const handleAddToCart = async () => {
@@ -101,7 +70,7 @@ const SingleProductPage = () => {
           quantity: selectedQuantity,
           totalPrice,
         },
-        totalAmount: parseFloat(((state?.totalAmount || 0) + totalPrice).toFixed(2)),
+        totalAmount: parseFloat(((product?.totalAmount || 0) + totalPrice).toFixed(2)),
       };
       const res = await api.post('/cart', item);
       if (res.data)
@@ -110,6 +79,11 @@ const SingleProductPage = () => {
       console.error('Failed to add item to cart', err);
     }
   };
+
+  // Ensure the product is loaded before rendering
+  if (!product) {
+    return;
+  }
 
   return (
     <Container
@@ -122,95 +96,7 @@ const SingleProductPage = () => {
       <Grid container spacing={4}>
 
         {/* Product Image and Thumbnails */}
-        <Grid item xs={12} md={6}>
-          {/* Main Image */}
-          <img
-            src={`${API_BASE_URL}${currentImage}`}
-            alt={product.name}
-            style={{
-              width: '100%',
-              height: 'auto',
-              borderRadius: 8,
-            }}
-          />
-
-          {/* Thumbnails with Arrows */}
-          <Box
-            display="flex"
-            alignItems="center"
-            mt={2}
-            sx={{
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            {/* Left Arrow */}
-            {startIndex > 0 && (
-              <IconButton
-                onClick={handlePrevious}
-                sx={{
-                  position: 'absolute',
-                  left: 0,
-                  zIndex: 2,
-                  backgroundColor: '#fff',
-                  '&:hover': {
-                    backgroundColor: '#f5f5f5',
-                  },
-                }}
-              >
-                <ArrowBackIosIcon />
-              </IconButton>
-            )}
-
-            {/* Thumbnails */}
-            <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              sx={{
-                overflow: 'hidden',
-                width: '100%',
-                margin: '0 32px', // Space for arrows
-              }}
-            >
-              {product.images
-                .slice(startIndex, startIndex + thumbnailsToShow)
-                .map((img, index) => (
-                  <img
-                    key={index}
-                    src={`${API_BASE_URL}${img}`}
-                    alt={`Thumbnail ${index}`}
-                    style={{
-                      cursor: 'pointer',
-                      margin: '8px',
-                      border: currentImage === img ? '2px solid #dc143c' : '2px solid transparent',
-                      borderRadius: 8,
-                      height: '60px',
-                    }}
-                    onClick={() => handleThumbnailClick(img)}
-                  />
-                ))}
-            </Box>
-
-            {/* Right Arrow */}
-            {startIndex + thumbnailsToShow < product.images.length && (
-              <IconButton
-                onClick={handleNext}
-                sx={{
-                  position: 'absolute',
-                  right: 0,
-                  zIndex: 2,
-                  backgroundColor: '#fff',
-                  '&:hover': {
-                    backgroundColor: '#f5f5f5',
-                  },
-                }}
-              >
-                <ArrowForwardIosIcon />
-              </IconButton>
-            )}
-          </Box>
-        </Grid>
+        <ProductImage images={product.images} name={product.name}/>
 
         {/* Product Details */}
         <Grid item xs={12} md={6}>
@@ -435,76 +321,76 @@ const SingleProductPage = () => {
           <hr />
 
           {/* Share Buttons */}
-<Box display="flex" justifyContent="flex-end" alignItems="center" mt={4}>
-  <Typography variant="body2" color="textSecondary" sx={{ marginRight: 2, fontWeight: 'bold' }}>
-    Share this:
-  </Typography>
-  <Box display="flex" gap={1.5}>
-    {/* Facebook */}
-    <Button
-      sx={{
-        minWidth: 'auto',
-        width: 30,
-        height: 30,
-        borderRadius: '50%',
-        backgroundColor: '#3b5998',
-        color: '#fff',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        transition: 'transform 0.3s ease, background-color 0.3s ease',
-        '&:hover': {
-          backgroundColor: '#2d4373',
-          transform: 'scale(1.1)',
-        },
-      }}
-    >
-      <Facebook fontSize="small" />
-    </Button>
-    {/* Twitter */}
-    <Button
-      sx={{
-        minWidth: 'auto',
-        width: 30,
-        height: 30,
-        borderRadius: '50%',
-        backgroundColor: '#1da1f2',
-        color: '#fff',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        transition: 'transform 0.3s ease, background-color 0.3s ease',
-        '&:hover': {
-          backgroundColor: '#148cc7',
-          transform: 'scale(1.1)',
-        },
-      }}
-    >
-      <Twitter fontSize="small" />
-    </Button>
-    {/* Pinterest */}
-    <Button
-      sx={{
-        minWidth: 'auto',
-        width: 30,
-        height: 30,
-        borderRadius: '50%',
-        backgroundColor: '#bd081c',
-        color: '#fff',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        transition: 'transform 0.3s ease, background-color 0.3s ease',
-        '&:hover': {
-          backgroundColor: '#8c0617',
-          transform: 'scale(1.1)',
-        },
-      }}
-    >
-      <Pinterest fontSize="small" />
-    </Button>
-  </Box>
-</Box>
+          <Box display="flex" justifyContent="flex-end" alignItems="center" mt={4}>
+            <Typography variant="body2" color="textSecondary" sx={{ marginRight: 2, fontWeight: 'bold' }}>
+              Share this:
+            </Typography>
+            <Box display="flex" gap={1.5}>
+              {/* Facebook */}
+              <Button
+                sx={{
+                  minWidth: 'auto',
+                  width: 30,
+                  height: 30,
+                  borderRadius: '50%',
+                  backgroundColor: '#3b5998',
+                  color: '#fff',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  transition: 'transform 0.3s ease, background-color 0.3s ease',
+                  '&:hover': {
+                    backgroundColor: '#2d4373',
+                    transform: 'scale(1.1)',
+                  },
+                }}
+              >
+                <Facebook fontSize="small" />
+              </Button>
+              {/* Twitter */}
+              <Button
+                sx={{
+                  minWidth: 'auto',
+                  width: 30,
+                  height: 30,
+                  borderRadius: '50%',
+                  backgroundColor: '#1da1f2',
+                  color: '#fff',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  transition: 'transform 0.3s ease, background-color 0.3s ease',
+                  '&:hover': {
+                    backgroundColor: '#148cc7',
+                    transform: 'scale(1.1)',
+                  },
+                }}
+              >
+                <Twitter fontSize="small" />
+              </Button>
+              {/* Pinterest */}
+              <Button
+                sx={{
+                  minWidth: 'auto',
+                  width: 30,
+                  height: 30,
+                  borderRadius: '50%',
+                  backgroundColor: '#bd081c',
+                  color: '#fff',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  transition: 'transform 0.3s ease, background-color 0.3s ease',
+                  '&:hover': {
+                    backgroundColor: '#8c0617',
+                    transform: 'scale(1.1)',
+                  },
+                }}
+              >
+                <Pinterest fontSize="small" />
+              </Button>
+            </Box>
+          </Box>
 
           {/* */}
           <Box sx={{ marginTop: 4 }}>
