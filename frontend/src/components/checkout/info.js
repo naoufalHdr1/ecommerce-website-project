@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Badge from '@mui/material/Badge';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { useCart } from '../../contexts/cartContext';
 
-function Info({ totalPrice }) {
-  const { state } = useCart();
-  const { items, totalAmount } = state;
+function Info({ items, totalAmount }) {
+
+  useEffect(() => {
+    console.log('items=', items)
+  }, [])
 
   return (
     <React.Fragment>

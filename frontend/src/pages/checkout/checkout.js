@@ -20,11 +20,14 @@ import Review from '../../components/checkout/review';
 import SitemarkIcon from '../../components/checkout/sitemarkIcon';
 import AppTheme from '../../components/checkout/appTheme';
 import ColorModeIconDropdown from '../../components/checkout/colorModeIconDropdown';
+import { useCart } from '../../contexts/cartContext';
 
 const steps = ['Shipping address', 'Payment details', 'Review your order'];
 
 export default function Checkout(props) {
   const [activeStep, setActiveStep] = useState(0);
+  const { state } = useCart();
+  const { items, totalAmount } = state;
   const [shippingAddress, setShippingAddress] = useState({
     firstName: '',
     lastName: '',
@@ -38,8 +41,8 @@ export default function Checkout(props) {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    console.log('shippingAddress:', shippingAddress)
-  }, [shippingAddress])
+    console.log('items=', items)
+  }, [])
 
   const getStepContent = (step) => {
     switch (step) {
@@ -138,7 +141,10 @@ export default function Checkout(props) {
             gap: 4,
           }}
         >
-          <SitemarkIcon />
+          <a href="/" className="header-logo">
+            <img src="/logo.png" alt="Male Fashion Logo" className="img-fluid" style={{ maxWidth: "150px" }} />
+          </a>
+
           <Box
             sx={{
               display: 'flex',
@@ -148,7 +154,7 @@ export default function Checkout(props) {
               maxWidth: 500,
             }}
           >
-            <Info />
+            <Info items={items} totalAmount={totalAmount} />
           </Box>
         </Grid>
         <Grid
@@ -209,14 +215,14 @@ export default function Checkout(props) {
               }}
             >
               <div>
-                <Typography variant="subtitle2" gutterBottom>
-                  Selected products
-                </Typography>
-                <Typography variant="body1">
-                  {activeStep >= 2 ? '$144.97' : '$134.98'}
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: "bold" }}
+                >
+                 Total: ${totalAmount}
                 </Typography>
               </div>
-              <InfoMobile totalPrice={activeStep >= 2 ? '$144.97' : '$134.98'} />
+              <InfoMobile items={items} totalAmount={totalAmount} />
             </CardContent>
           </Card>
 
