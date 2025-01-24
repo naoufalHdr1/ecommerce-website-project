@@ -7,10 +7,6 @@ import Typography from '@mui/material/Typography';
 
 function Info({ items, totalAmount }) {
 
-  useEffect(() => {
-    console.log('items=', items)
-  }, [])
-
   return (
     <React.Fragment>
       <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>

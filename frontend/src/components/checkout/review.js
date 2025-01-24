@@ -7,7 +7,6 @@ import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-const addresses = ['1 MUI Drive', 'Reactville', 'Anytown', '99999', 'USA'];
 const payments = [
   { name: 'Card type:', detail: 'Visa' },
   { name: 'Card holder:', detail: 'Mr. John Smith' },
@@ -15,22 +14,40 @@ const payments = [
   { name: 'Expiry date:', detail: '04/2024' },
 ];
 
-export default function Review() {
+export default function Review({ shippingAddress, items, totalAmount }) {
+  //const { firstName, lastName, address1, address2, city, state, zip, country } = shippingAddress;
+  const { firstName, lastName, ...addresses } = shippingAddress;
+  const taxes = 9.99;
+
+  const formatAddress = (address) => {
+    const {
+      address1,
+      address2,
+      city,
+      state,
+      zip,
+      country,
+    } = address;
+
+    return `${address1}${address2 ? `, ${address2}` : ""}, ${city}, ${state}, ${zip}, ${country}`;
+  };
+
   return (
     <Stack spacing={2}>
       <List disablePadding>
         <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText primary="Products" secondary="4 selected" />
-          <Typography variant="body2">$134.98</Typography>
+          <ListItemText primary="Products" secondary={`${items.length} selected`} />
+          <Typography variant="body2">${totalAmount}</Typography>
         </ListItem>
         <ListItem sx={{ py: 1, px: 0 }}>
           <ListItemText primary="Shipping" secondary="Plus taxes" />
-          <Typography variant="body2">$9.99</Typography>
+          <Typography variant="body2">+ ${taxes}</Typography>
         </ListItem>
+        <hr />
         <ListItem sx={{ py: 1, px: 0 }}>
           <ListItemText primary="Total" />
-          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            $144.97
+          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            ${parseFloat((totalAmount + taxes).toFixed(2))}
           </Typography>
         </ListItem>
       </List>
@@ -42,17 +59,17 @@ export default function Review() {
         sx={{ my: 2 }}
       >
         <div>
-          <Typography variant="subtitle2" gutterBottom>
-            Shipment details
+          <Typography variant="body2" fontWeight='bold' sx={{ pb: 1 }}>
+            Shipment details:
           </Typography>
-          <Typography gutterBottom>John Smith</Typography>
+          <Typography gutterBottom>{`${firstName} ${lastName}`}</Typography>
           <Typography gutterBottom sx={{ color: 'text.secondary' }}>
-            {addresses.join(', ')}
+            {formatAddress(addresses)}
           </Typography>
         </div>
         <div>
-          <Typography variant="subtitle2" gutterBottom>
-            Payment details
+          <Typography variant="body2" fontWeight='bold' sx={{ pb: 1 }}>
+            Payment details:
           </Typography>
           <Grid container>
             {payments.map((payment) => (

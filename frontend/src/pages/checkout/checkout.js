@@ -40,10 +40,6 @@ export default function Checkout(props) {
   });
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    console.log('items=', items)
-  }, [])
-
   const getStepContent = (step) => {
     switch (step) {
       case 0:
@@ -57,7 +53,13 @@ export default function Checkout(props) {
       case 1:
         return <PaymentForm />;
       case 2:
-        return <Review />;
+        return (
+          <Review
+            shippingAddress={shippingAddress}
+            items={items}
+            totalAmount={totalAmount}
+          />
+        );
       default:
         throw new Error('Unknown step');
     }
