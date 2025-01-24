@@ -21,6 +21,7 @@ import SitemarkIcon from '../../components/checkout/sitemarkIcon';
 import AppTheme from '../../components/checkout/appTheme';
 import ColorModeIconDropdown from '../../components/checkout/colorModeIconDropdown';
 import { useCart } from '../../contexts/cartContext';
+import { api } from '../../utils/api';
 
 const steps = ['Shipping address', 'Payment details', 'Review your order'];
 
@@ -108,6 +109,33 @@ export default function Checkout(props) {
     setActiveStep(activeStep - 1);
   };
 
+  const handlePlaceOrder = async () => {
+    // Transform the data
+    const transformedItems = items.map(item => ({
+      product: item.product._id,
+      size: item.size,
+      color: item.color,
+      quantity: item.quantity || 1,
+      totalPrice: item.totalPrice,
+    }));
+
+    const orderData = {
+      items: [...transformedItems],
+      shippingAddress,
+      totalAmount,
+    }
+
+    try {
+      console.log("orderData=", orderData)
+      const res = await api.post('/orders', orderData);
+      if (res.data) {
+        console.log("res.data=", res.data)
+        setActiveStep(activeStep + 1);
+      }
+    } catch (err) {
+      console.error('Error placing order:', err.message);
+    }
+  }
 
   return (
     <AppTheme {...props}>
@@ -322,7 +350,7 @@ export default function Checkout(props) {
                   <Button
                     variant="contained"
                     endIcon={<ChevronRightRoundedIcon />}
-                    onClick={handleNext}
+                    onClick={activeStep === steps.length - 1 ? handlePlaceOrder : handleNext}
                     sx={{ width: { xs: '100%', sm: 'fit-content' } }}
                   >
                     {activeStep === steps.length - 1 ? 'Place order' : 'Next'}

@@ -34,7 +34,6 @@ function App() {
           />
           <Route path="/checkout" element={<Checkout />} />
 
-
           {/* All other routes wrapped with Layout */}
           <Route
             path="/*"

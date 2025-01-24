@@ -128,7 +128,7 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
     const requiredFields = [
       { field: 'firstName', message: 'First Name is required' },
       { field: 'lastName', message: 'Last Name is required' },
-      { field: 'addressLine1', message: 'Address is required' },
+      { field: 'address1', message: 'Address is required' },
       { field: 'city', message: 'City is required' },
       { field: 'state', message: 'State is required' },
       { field: 'zip', message: 'Zip code is required' },
@@ -516,20 +516,20 @@ export default function OrderDialogStepper({ open, onClose, onSave, item }) {
                 fullWidth
                 label="Address line 1"
                 variant="standard"
-                value={shippingAddress.addressLine1 || ''}
-                onChange={handleChange('addressLine1')}
+                value={shippingAddress.address1 || ''}
+                onChange={handleChange('address1')}
                 required
                 sx={{ mb: 2 }}
-                error={errors.addressLine1}
-                helperText={errors.addressLine1}
+                error={errors.address1}
+                helperText={errors.address1}
               />
               <TextField
                 fullWidth
                 label="Address line 2"
                 variant="standard"
-                value={shippingAddress.addressLine2 || ''}
+                value={shippingAddress.address2 || ''}
                 onChange={(e) =>
-                  setShippingAddress({ ...shippingAddress, addressLine2: e.target.value })
+                  setShippingAddress({ ...shippingAddress, address2: e.target.value })
                 }
                 sx={{ mb: 2 }}
               />
