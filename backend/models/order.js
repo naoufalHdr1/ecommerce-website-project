@@ -5,7 +5,13 @@ const orderSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: false,
+    },
+    sessionId: {
+      type: String,
+      required: function () {
+        return !this.user;
+      },
     },
     items: [
       {
@@ -36,8 +42,8 @@ const orderSchema = new mongoose.Schema(
     shippingAddress: {
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
-      addressLine1: { type: String, required: true },
-      addressLine2: { type: String },
+      address1: { type: String, required: true },
+      address2: { type: String },
       city: { type: String, required: true },
       state: { type: String, required: true },
       zip: { type: String, required: true },

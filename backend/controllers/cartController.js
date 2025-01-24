@@ -70,6 +70,7 @@ export default class CartController {
 
   static async updateCart(req, res) {
     try {
+	    console.log('initiat upadating cart:');
       const filter = req.userId ? { userId: req.userId } : { sessionId: req.sessionId };
       const { items, totalAmount } = req.body;
       let cart;

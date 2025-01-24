@@ -11,9 +11,12 @@ export default class OrderContorller {
 
   /* Creates a new order. */
   static async createOrder(req, res) {
-    const { user, items, totalAmount, shippingAddress, status } = req.body;
+    const filter = req.userId ? { userId: req.userId } : { sessionId: req.sessionId };
+	  console.log("req.body=", req.body)
+    const { userId, items, totalAmount, shippingAddress, status } = req.body;
 
     try {
+      /*
       let userId = user._id;
 
       // Check if user is creating a new account
@@ -36,10 +39,13 @@ export default class OrderContorller {
         await newUser.save();
         userId = newUser._id; // Update the userId for the order
       }
+      */
+      const user = filter.userId ? filter.userId : userId;
 
       // Create the order
       const order = new Order({
-        user: userId,
+        user,
+        sessionId: user ? null : filter.sessionId, 
         items,
         totalAmount,
         shippingAddress,

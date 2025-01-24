@@ -15,13 +15,15 @@ import cartRoutes from './routes/cartRoutes.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pkg from 'uuid';
-
-const { v4: uuidv4 } = pkg;
-const __filename = fileURLToPath(import.meta.url);
-export const __dirname = path.dirname(__filename);
+import Stripe from 'stripe';
 
 // Load environment variables
 dotenv.config();
+
+const { v4: uuidv4 } = pkg;
+const __filename = fileURLToPath(import.meta.url);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+export const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -57,6 +59,23 @@ app.get('/cookies', (req, res) => {
   }
 });
 
+// Route that handles the payment intent.
+app.post('/create-payment-intent', async (req, res) => {
+  const { amount } = req.body;
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: 'usd',
+    });
+
+    res.send({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: error.message });
+  }
+});
+
 // Handel graceful shutdown
 process.on('SIGINT', async () => {
   await dbClient.disconnect();
@@ -65,7 +84,6 @@ process.on('SIGINT', async () => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
 });
 
 export default app;

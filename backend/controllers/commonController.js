@@ -72,6 +72,7 @@ export const getById = (model) => async (req, res) => {
     if (!data) return res.status(404).json({ error: 'Item not found' });
     res.status(200).json(data);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
