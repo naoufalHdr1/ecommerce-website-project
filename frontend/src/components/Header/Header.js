@@ -100,7 +100,7 @@ const Header = () => {
                                     <li key={subcat._id}>
                                       {/* Add hyperlink for subcategory */}
                                       <NavLink
-                                        to={`/shop/${cat.name}/${subcat.name}/${subcat._id}`}
+                                        to={`/shop/categories/${cat.name}/${subcat.name}/${subcat._id}`}
                                         className="subcategory-link"
                                       >
                                         - {subcat.name}

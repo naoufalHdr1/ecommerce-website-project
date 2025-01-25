@@ -6,7 +6,7 @@ import { useStateContext } from '../../dashboard/productSection/stateContext';
 import { useParams } from "react-router-dom";
 
 const CategoryProductsPage = () => {
-  const { id } = useParams();
+  const { categoryName, id } = useParams();
   const { state } = useStateContext();
   const { products, subcategories, categories} = state;
   const productsBySub = products.filter((p) => p.subcategory_id === id);
@@ -23,7 +23,7 @@ const CategoryProductsPage = () => {
   return (
     <div className="category-products-page d-md-flex">
       <div className="filter-sidebar-container">
-        <FilterSidebar subcategories={subcategories} />
+        <FilterSidebar subcategories={subcategories} categoryName={categoryName}/>
       </div>
 
       <section className="container my-5">

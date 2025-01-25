@@ -15,7 +15,7 @@ const CategoryCard = ({ type, categories, categoryName }) => {
                 <h2 className="text-dark fw-bold mb-0 fs-2">{category.name}</h2>
               </div>
               <div className="shop-now-container position-absolute bottom-0 start-0 p-3">
-                <a href={type === 'cat' ? `categories/${category.name}` : `${categoryName}/${category.name}/${category._id}`} className="btn btn-sm btn-dark shop-now d-none rounded-0">
+                <a href={type === 'cat' ? `/shop/categories/${category.name}` : `${categoryName}/${category.name}/${category._id}`} className="btn btn-sm btn-dark shop-now d-none rounded-0">
                   SHOP NOW
                 </a>
               </div>

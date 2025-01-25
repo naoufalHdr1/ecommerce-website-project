@@ -15,7 +15,7 @@ const DropdownSection = ({ title, sectionKey, isOpen, toggle, children }) => {
   );
 };
 
-const FilterSidebar = ({ subcategories }) => {
+const FilterSidebar = ({ subcategories, categoryName }) => {
   const [openDropdown, setOpenDropdown] = useState("categories");
   const [isFilterMenuOpen, setFilterMenuOpen] = useState(false);
   const filterSidebarRef = useRef(null); // Ref for the sidebar
@@ -120,7 +120,7 @@ const FilterSidebar = ({ subcategories }) => {
               subcategories.map((subcat) => (
                 <li key={subcat._id}>
                   <NavLink
-                    to={`/shop/subcategories/${subcat._id}`}
+                    to={`/shop/categories/${categoryName}/${subcat.name}/${subcat._id}`}
                     className="subcategory-link"
                     activeClassName="active"
                   >
