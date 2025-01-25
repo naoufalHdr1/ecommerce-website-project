@@ -64,8 +64,7 @@ const Categories = () => {
   const { state } = useStateContext(); 
   const { products, subcategories, categories } = state;
   const category = categories.find((cat) => cat.name.toLowerCase() === categoryName)
-  console.log("category=", category);
-  console.log("categoryName=", categoryName);
+  const subcategory = subcategories.filter((subcat) => subcat.category_id === category._id) 
   const featuredProducts = products.filter(product => product.isFeatured).slice(0, 4);
 
   // Handle invalid category
@@ -78,6 +77,7 @@ const Categories = () => {
       <HeroSection
         category={category}
       />
+      <CategoriesSection categories={subcategory} />
       <Title title="You might also like"/>
       <section className="container my-5">
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-2 g-md-4">
