@@ -37,7 +37,7 @@ const CategoryProductsPage = () => {
         ) : (
           <p className="text-secondary fst-italic d-flex justify-content-center">
             <div className="border rounded-5 p-2">
-              <i class="bi bi-info-circle me-1"></i> No featured products found
+              <i class="bi bi-info-circle me-1"></i> No products found
             </div>
           </p>
         )}

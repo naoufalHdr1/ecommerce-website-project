@@ -21,13 +21,18 @@ import AppTheme from '../../components/checkout/appTheme';
 import ColorModeIconDropdown from '../../components/checkout/colorModeIconDropdown';
 import { useCart } from '../../contexts/cartContext';
 import { api } from '../../utils/api';
+import { useLocation } from 'react-router-dom';
 
 const steps = ['Shipping address', 'Payment details', 'Review your order'];
 
 export default function Checkout(props) {
   const [activeStep, setActiveStep] = useState(0);
-  const { state } = useCart() ;
-  const { items, totalAmount } = state;
+
+  const cartState = useCart() ;
+  const location = useLocation();
+
+  const { items, totalAmount } = location.state || cartState.state || {};
+
   const [shippingAddress, setShippingAddress] = useState({
     firstName: '',
     lastName: '',
@@ -125,10 +130,8 @@ export default function Checkout(props) {
     }
 
     try {
-      console.log("orderData=", orderData)
       const res = await api.post('/orders', orderData);
       if (res.data) {
-        console.log("res.data=", res.data)
         setActiveStep(activeStep + 1);
       }
     } catch (err) {

@@ -28,6 +28,7 @@ import { Facebook, Twitter, Pinterest } from '@mui/icons-material';
 import { useCart } from '../../contexts/cartContext';
 import { useAuth } from '../../contexts/authContext';
 import ProductImage from './productImage';
+import { useNavigate } from "react-router-dom";
 
 const SingleProductPage = () => {
   const { id } = useParams();
@@ -39,6 +40,7 @@ const SingleProductPage = () => {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isWishlist, setIsWishlist] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch product by ID
@@ -79,6 +81,22 @@ const SingleProductPage = () => {
       console.error('Failed to add item to cart', err);
     }
   };
+
+  const handleBuyNow = () => {
+    const totalPrice = parseFloat((selectedQuantity * product.price).toFixed(2));
+    const items = [
+      {
+        product: product,
+        size: selectedSize,
+        color: selectedColor,
+        quantity: selectedQuantity,
+        totalPrice,
+      },
+    ]
+    const totalAmount = parseFloat(((product?.totalAmount || 0) + totalPrice).toFixed(2));
+
+    navigate('/checkout', { state: { items, totalAmount } });
+  }
 
   // Ensure the product is loaded before rendering
   if (!product) {
@@ -267,6 +285,7 @@ const SingleProductPage = () => {
                   },
                 }}
                 startIcon={<MonetizationOnOutlinedIcon sx={{ color: '#dc143c' }} />}
+                onClick={handleBuyNow}
               >
                 Buy Now
               </Button>
