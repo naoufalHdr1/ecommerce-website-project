@@ -1,18 +1,21 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from '../../contexts/authContext';
+import Badge from '@mui/material/Badge';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
 import UserMenu from './userMenu';
 import CartDrawer from './cart'
 import { useStateContext } from '../../components/dashboard/productSection/stateContext';
+import { useCart } from '../../contexts/cartContext'; 
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoggedIn } = useAuth();
   const [cartOpen, setCartOpen] = useState(false);
   const { state } = useStateContext(); 
+  const { state: cartItems } = useCart();
   const { categories, subcategories } = state; 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -123,14 +126,15 @@ const Header = () => {
 
           {/* Icons (large screens) */}
           <div className="d-none d-md-flex align-items-center">
-            <i key='search' className={`bi bi-search me-4 fs-5 icon-hover`}></i>
-            <i key='heart' className={`bi bi-heart me-4 fs-5 icon-hover`}></i>
-            <i
-              key='bag'
-              className={`bi bi-bag me-4 fs-5 icon-hover`}
-              onClick={toggleCartDrawer(true)}
-            >
-            </i>
+            <i key='heart' className={`bi bi-heart ms-4 fs-5 icon-hover`}></i>
+            <Badge badgeContent={cartItems.items?.length} color="error">
+              <i
+                key='bag'
+                className={`bi bi-bag ms-4 fs-5 icon-hover`}
+                onClick={toggleCartDrawer(true)}
+              >
+              </i>
+            </Badge>
             {isLoggedIn && (
               <UserMenu />
             )}

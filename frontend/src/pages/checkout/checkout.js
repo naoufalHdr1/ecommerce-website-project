@@ -26,7 +26,7 @@ const steps = ['Shipping address', 'Payment details', 'Review your order'];
 
 export default function Checkout(props) {
   const [activeStep, setActiveStep] = useState(0);
-  const { state } = useCart();
+  const { state } = useCart() ;
   const { items, totalAmount } = state;
   const [shippingAddress, setShippingAddress] = useState({
     firstName: '',
