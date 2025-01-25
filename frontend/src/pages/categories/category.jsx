@@ -60,27 +60,24 @@ const categories = [
 ];
 
 const Categories = () => {
-  const { category } = useParams();
+  const { categoryName } = useParams();
   const { state } = useStateContext(); 
-  const { products, categories } = state;
+  const { products, subcategories, categories } = state;
+  const category = categories.find((cat) => cat.name.toLowerCase() === categoryName)
+  console.log("category=", category);
+  console.log("categoryName=", categoryName);
   const featuredProducts = products.filter(product => product.isFeatured).slice(0, 4);
 
-  const data = categoryData[category];
-
   // Handle invalid category
-  if (!data) {
+  if (!category) {
     return <div>Category not found</div>;
   }
 
   return (
     <>
       <HeroSection
-        title={data.title}
-        description={data.description}
-        banner={data.banner}
         category={category}
       />
-      <CategoriesSection categories={categories} />
       <Title title="You might also like"/>
       <section className="container my-5">
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-2 g-md-4">
