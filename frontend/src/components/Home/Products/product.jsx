@@ -10,7 +10,7 @@ const Product = ({ product }) => {
       key={product._id}
       className="col-6 col-md-6 col-lg-3">
       <div className="product d-flex flex-column">
-        <a href={`/product/${product._id}`} className="img-prod position-relative">
+        <a href={`/shop/product/${product._id}`} className="img-prod position-relative">
           <img
             className="img-fluid w-100"
             src={product.images && `${API_BASE_URL}${product.images[0]}`}
