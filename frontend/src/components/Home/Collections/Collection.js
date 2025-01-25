@@ -1,5 +1,4 @@
 import CategoryCard from "./categoryCard.js";
-import {API_BASE_URL} from '../../../utils/config';
 
 const CategoriesSection = ({ categories }) => {
   return (
@@ -9,9 +8,7 @@ const CategoriesSection = ({ categories }) => {
         {categories.map((category) => (
           <div className="col-md-4" key={category._id}>
             <CategoryCard
-              title={category.name}
-              season={category.season}
-              image={category.images && `${API_BASE_URL}${category.images[0]}`}
+              category={category}
             />
           </div>
         ))}
