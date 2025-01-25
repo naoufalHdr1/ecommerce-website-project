@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { NavLink } from "react-router-dom";
 
 const DropdownSection = ({ title, sectionKey, isOpen, toggle, children }) => {
   return (
@@ -14,7 +15,7 @@ const DropdownSection = ({ title, sectionKey, isOpen, toggle, children }) => {
   );
 };
 
-const FilterSidebar = () => {
+const FilterSidebar = ({ subcategories }) => {
   const [openDropdown, setOpenDropdown] = useState("categories");
   const [isFilterMenuOpen, setFilterMenuOpen] = useState(false);
   const filterSidebarRef = useRef(null); // Ref for the sidebar
@@ -89,12 +90,7 @@ const FilterSidebar = () => {
       >
         <div className="responsive-box border-0 rounded-0">
           {/* Filter By Button */}
-          <button className="btn fw-bold" onClick={toggleFilterMenu}>
-            <span>FILTER BY</span>
-            <span>
-              <i className="bi bi-x-square"></i>
-            </span>
-          </button>
+          <span className='fw-bold'>FILTER BY:</span>
           <hr />
         </div>
 
@@ -120,13 +116,21 @@ const FilterSidebar = () => {
           toggle={toggleDropdown}
         >
           <ul className="filter-list">
-            <li>Men (20)</li>
-            <li>Women (20)</li>
-            <li>Bags (20)</li>
-            <li>Clothing (20)</li>
-            <li>Shoes (20)</li>
-            <li>Accessories (20)</li>
-            <li>Kids (20)</li>
+            {subcategories && subcategories.length > 0 ? (
+              subcategories.map((subcat) => (
+                <li key={subcat._id}>
+                  <NavLink
+                    to={`/shop/subcategories/${subcat._id}`}
+                    className="subcategory-link"
+                    activeClassName="active"
+                  >
+                    {subcat.name} ({subcat.products.length})
+                  </NavLink>
+                </li>
+              ))
+            ) : (
+              <p className="empty-message">No subcategories available.</p>
+            )}
           </ul>
         </DropdownSection>
 

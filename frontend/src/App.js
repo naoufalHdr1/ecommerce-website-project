@@ -45,7 +45,7 @@ function App() {
                   <Route path="/logout" element={<Logout />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/shop/categories/:categoryName" element={<Category />} />
-                  <Route path="/shop/subcategories/:id" element={<CategoryProductsPage />} />
+                  <Route path="/shop/categories/:categoryName/:subcategoryName/:id" element={<CategoryProductsPage />} />
                   <Route path="/shop/products/:id" element={<ProductPage />} />
                 </Routes>
               </Layout>

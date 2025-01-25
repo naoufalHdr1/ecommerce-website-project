@@ -17,14 +17,13 @@ const CategoryProductsPage = () => {
   });
 
   const handleFilterChange = (selectedFilters) => {
-    console.log("Selected Filters: ", selectedFilters);
     // Add filtering logic here
   };
 
   return (
     <div className="category-products-page d-md-flex">
       <div className="filter-sidebar-container">
-        <FilterSidebar filters={filters} onFilterChange={handleFilterChange} />
+        <FilterSidebar subcategories={subcategories} />
       </div>
 
       <section className="container my-5">

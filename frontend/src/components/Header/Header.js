@@ -88,7 +88,7 @@ const Header = () => {
                         {categories?.map((cat) => (
                           <div className="dropdown-column" key={cat._id}>
                             {/* Add hyperlink for category */}
-                            <NavLink to={`/shop/categories/${cat.name.toLowerCase()}`} className="category-link">
+                            <NavLink to={`/shop/categories/${cat.name}`} className="category-link">
                               <strong>{cat.name}</strong>
                             </NavLink>
                             <ul>
@@ -100,7 +100,7 @@ const Header = () => {
                                     <li key={subcat._id}>
                                       {/* Add hyperlink for subcategory */}
                                       <NavLink
-                                        to={`/shop/subcategories/${subcat._id}`}
+                                        to={`/shop/${cat.name}/${subcat.name}/${subcat._id}`}
                                         className="subcategory-link"
                                       >
                                         - {subcat.name}

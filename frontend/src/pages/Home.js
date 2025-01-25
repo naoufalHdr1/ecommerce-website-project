@@ -1,7 +1,7 @@
 import React from "react";
 import HomeBanner from '../components/Home/HomeBanner/HomeBanner.js';
 import Product from '../components/Home/Products/product.jsx';
-import CollectionSection from '../components/Home/Collections/Collection.js';
+import CategoryCard from '../components/Home/Collections/categoryCard';
 import BenefitsSection from '../components/Home/services/benefitsSection.js';
 import Title from "../components/Home/title/title.jsx";
 import { useStateContext } from '../components/dashboard/productSection/stateContext';
@@ -53,7 +53,7 @@ const Home = () => {
         description={titles[1].description}
       />
       {state.categories ? (
-        <CollectionSection categories={state.categories} />
+        <CategoryCard type='cat' categories={state.categories} />
       ) : (
         <p className="text-secondary fst-italic d-flex justify-content-center">
           <div className="border rounded-5 p-2">

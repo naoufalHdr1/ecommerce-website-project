@@ -1,5 +1,5 @@
 import HeroSection from '../../components/categories/heroSection/hero.jsx';
-import CategoriesSection  from '../../components/Home/Collections/Collection.js';
+import CategoryCard  from '../../components/Home/Collections/categoryCard';
 import Title from '../../components/Home/title/title.jsx';
 import Product from '../../components/Home/Products/product.jsx';
 import { useStateContext } from '../../components/dashboard/productSection/stateContext';
@@ -9,7 +9,7 @@ const Categories = () => {
   const { categoryName } = useParams();
   const { state } = useStateContext(); 
   const { products, subcategories, categories } = state;
-  const category = categories.find((cat) => cat.name.toLowerCase() === categoryName);
+  const category = categories.find((cat) => cat.name.toLowerCase() === categoryName.toLowerCase());
   const subcategory = subcategories.filter((subcat) => subcat.category_id === category._id) ;
   const subcategoryIds = subcategory.map((subcat) => subcat._id);
   const featuredProducts = products
@@ -29,7 +29,7 @@ const Categories = () => {
         category={category}
       />
       {subcategory && subcategory.length > 0 ? (
-        <CategoriesSection categories={subcategory} />
+        <CategoryCard type='subcat' categories={subcategory} categoryName={category.name}/>
       ) : (
         <p className="text-secondary fst-italic d-flex justify-content-center">
           <div className="border rounded-5 p-2">
