@@ -7,6 +7,7 @@ import Logout from "./pages/Logout";
 import Register from "./pages/Register";
 import Category from "./pages/categories/category";
 import ProductPage from "./pages/product/productPage";
+import UserPage from "./pages/userPage";
 import Checkout from "./pages/checkout/checkout";
 import CategoryProductsPage from "./components/categories/categoryProductsPage/categoryProductsPage";
 import Dashboard from "./pages/dashboard/dashboard";
@@ -47,6 +48,7 @@ function App() {
                   <Route path="/shop/categories/:categoryName" element={<Category />} />
                   <Route path="/shop/categories/:categoryName/:subcategoryName/:id" element={<CategoryProductsPage />} />
                   <Route path="/shop/products/:id" element={<ProductPage />} />
+                  <Route path="/user" element={<UserPage />} />
                 </Routes>
               </Layout>
             }
