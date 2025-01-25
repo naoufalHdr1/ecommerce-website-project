@@ -6,38 +6,14 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LogoutIcon from '@mui/icons-material/Logout';
 import UserMenu from './userMenu';
 import CartDrawer from './cart'
-
-const items = [
-  {
-    id: '678ef17b2f2f5d74c281ef46',
-    name: "Men's Ribbed Cashmere",
-    price: 54.99,
-    image: '/uploads/3954832144c86a56c776f07b383ac21c',
-    size: 'M',
-    color: 'Blue',
-    quantity: 5,
-    totalPrice: 109.98,
-    totalAmount: 109.98,
-  },
-  {
-    id: '678ef17b2f2f5d74c281ef46',
-    name: "Men's Ribbed Cashmere",
-    price: 54.99,
-    image: '/uploads/3954832144c86a56c776f07b383ac21c',
-    size: 'M',
-    color: 'Blue',
-    quantity: 5,
-    totalPrice: 109.98,
-    totalAmount: 109.98,
-  }
-
-];
-
+import { useStateContext } from '../../components/dashboard/productSection/stateContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoggedIn } = useAuth();
   const [cartOpen, setCartOpen] = useState(false);
+  const { state } = useStateContext(); 
+  const { categories, subcategories } = state; 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const toggleCartDrawer = (newOpen) => () => {
@@ -95,10 +71,51 @@ const Header = () => {
                 { to: "/blog", label: "Blog" },
                 { to: "/contacts", label: "Contacts" },
               ].map(({ to, label }) => (
-                <li className="nav-item" key={to}>
-                  <NavLink to={to} className="nav-link text-dark" activeClassName="active">
+                <li className="nav-item dropdown" key={to}>
+                  <NavLink
+                    to={to}
+                    className="nav-link text-dark"
+                    activeClassName="active"
+                  >
                     {label}
                   </NavLink>
+                  {/* Only display the dropdown for the "Shop" menu */}
+                    {label === "Shop" && (
+                      <div className="dropdown-menu">
+                        {categories?.map((cat) => (
+                          <div className="dropdown-column" key={cat._id}>
+                            {/* Add hyperlink for category */}
+                            <NavLink to={`/shop/categories/${cat.name.toLowerCase()}`} className="category-link">
+                              <strong>{cat.name}</strong>
+                            </NavLink>
+                            <ul>
+                              {cat.subcategories && cat.subcategories.length > 0 ? (
+                                cat.subcategories.map((subcatId) => {
+                                  // Find the subcategory by its ID
+                                  const subcat = subcategories.find((sc) => sc._id === subcatId);
+                                  return subcat ? (
+                                    <li key={subcat._id}>
+                                      {/* Add hyperlink for subcategory */}
+                                      <NavLink
+                                        to={`/shop/categories/${cat.name.toLowerCase()}/${subcat.name.toLowerCase()}`}
+                                        className="subcategory-link"
+                                      >
+                                        - {subcat.name}
+                                      </NavLink>
+                                    </li>
+                                  ) : null;
+                                })
+                              ) : (
+                                <li>
+                                  <em>No subcategories available</em>
+                                </li>
+                              )}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                 </li>
               ))}
             </ul>
@@ -123,7 +140,6 @@ const Header = () => {
 
       {/* Cart Drawer */}
       <CartDrawer
-        cartItems={items}
         open={cartOpen}
         onClose={toggleCartDrawer(false)}
       />

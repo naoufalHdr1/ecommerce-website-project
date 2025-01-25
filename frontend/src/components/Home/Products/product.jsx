@@ -10,7 +10,7 @@ const Product = ({ product }) => {
       key={product._id}
       className="col-6 col-md-6 col-lg-3">
       <div className="product d-flex flex-column">
-        <a href="#" className="img-prod position-relative">
+        <a href={`/product/${product._id}`} className="img-prod position-relative">
           <img
             className="img-fluid w-100"
             src={product.images && `${API_BASE_URL}${product.images[0]}`}
@@ -34,7 +34,7 @@ const Product = ({ product }) => {
               </p>
             </div>
           <h3 className="product-name fs-6 fw-normal">
-            <a href="#">{product.name}</a>
+            <a href={`/product/${product._id}`}>{product.name}</a>
           </h3>
           <div className="pricing">
             <p className="price fs-6 fw-bold">

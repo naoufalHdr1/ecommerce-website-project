@@ -44,9 +44,9 @@ function App() {
                   <Route path="/login" element={<Login />} />
                   <Route path="/logout" element={<Logout />} />
                   <Route path="/register" element={<Register />} />
-                  <Route path="/categories/:category" element={<Category />} />
-                  <Route path="/a" element={<CategoryProductsPage />} />
-                  <Route path="/product/:id" element={<ProductPage />} />
+                  <Route path="/shop/categories/:category" element={<Category />} />
+                  <Route path="/shop/categories/:category/:subcategory" element={<CategoryProductsPage />} />
+                  <Route path="/shop/product/:id" element={<ProductPage />} />
                 </Routes>
               </Layout>
             }

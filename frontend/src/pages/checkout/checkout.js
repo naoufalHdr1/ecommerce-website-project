@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -17,7 +17,6 @@ import Info from '../../components/checkout/info';
 import InfoMobile from '../../components/checkout/infoMobile';
 import PaymentForm from '../../components/checkout/paymentForm';
 import Review from '../../components/checkout/review';
-import SitemarkIcon from '../../components/checkout/sitemarkIcon';
 import AppTheme from '../../components/checkout/appTheme';
 import ColorModeIconDropdown from '../../components/checkout/colorModeIconDropdown';
 import { useCart } from '../../contexts/cartContext';
