@@ -9,7 +9,7 @@ const CategoryCard = ({ title, season, image }) => {
         <p className="text-muted mb-0 fs-6">{season}</p>
       </div>
       <div className="shop-now-container position-absolute bottom-0 start-0 p-3">
-        <a href="#" className="btn btn-sm btn-dark shop-now d-none rounded-0">
+        <a href={`/shop/subcategories/${title.toLowerCase()}`} className="btn btn-sm btn-dark shop-now d-none rounded-0">
           SHOP NOW
         </a>
       </div>

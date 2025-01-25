@@ -1,6 +1,6 @@
 /* Fixed Background Image Section */
 .hero-background-image {
-  width: 105%;
+  max-width: 100%;
   background-position: center;
 }
 
