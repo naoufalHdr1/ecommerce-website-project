@@ -72,9 +72,26 @@ class UsersController {
       console.error(err);
       res.status(500).json({ error: err.message });
     }
-
   }
 
+  /* Update a user by token stored in cookies */
+  static async updateByToken(req, res) {
+    const userId = req.userId;
+    if (!userId) return res.status(400).json({ error: 'UserId not valid' });
+
+    try {
+      const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
+        new: true,
+        runValidators: true,
+      }).select('-password');
+      if (!updatedUser) return res.status(404).json({ error: 'User not found' });
+
+      res.status(200).json(updatedUser);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+  }
 
   /* finds a user by their name. */
   static async findUserByName(req, res) {
