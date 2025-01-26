@@ -17,8 +17,10 @@ import SaveIcon from '@mui/icons-material/Save';
 import UndoIcon from '@mui/icons-material/Undo';
 import { useCart } from '../../contexts/cartContext';
 import { api } from '../../utils/api';
+import { useNavigate } from "react-router-dom";
 
 const CartDrawer = ({ open, onClose }) => {
+  const navigate = useNavigate();
   const { state, dispatch } = useCart();
   const [items, setItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
@@ -77,6 +79,10 @@ const CartDrawer = ({ open, onClose }) => {
     setItems(state.items);
     setTotalAmount(state.totalAmount);
     setHasChanges(false);
+  }
+
+  const handleCheckout = () => {
+    navigate('/checkout');
   }
 
   return (
@@ -260,6 +266,7 @@ const CartDrawer = ({ open, onClose }) => {
               },
             }}
             startIcon={<PaymentOutlinedIcon />}
+	  	      onClick={handleCheckout}
           >
             Proceed to Checkout
           </Button>

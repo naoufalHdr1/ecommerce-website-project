@@ -14,6 +14,9 @@ import Logout from '@mui/icons-material/Logout';
 import { useAuth } from '../../contexts/authContext';
 import { useNavigate } from "react-router-dom";
 import { useNotifications } from '../../utils/notificationContext';
+import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 
 export default function UserMenu() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -35,6 +38,14 @@ export default function UserMenu() {
     navigate('/');
     addNotification('Logout successful!', 'success');
   };
+
+  const handleUserAccount = () => {
+    navigate('/user/personal-details');
+  }
+
+  const handleViewOrders = () => {
+    navigate('/user/view-orders');
+  }
 
   return (
     <React.Fragment>
@@ -94,9 +105,29 @@ export default function UserMenu() {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         <MenuItem disabled>{user.fullName}:</MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Avatar /> My account
+
+        <MenuItem onClick={handleUserAccount}>
+          <ListItemIcon>
+            <PersonOutlineOutlinedIcon fontSize="small" />
+          </ListItemIcon>
+          My Account
         </MenuItem>
+
+        <MenuItem onClick={handleViewOrders}>
+          <ListItemIcon>
+            <Inventory2OutlinedIcon fontSize="small" />
+          </ListItemIcon>
+          My Orders
+        </MenuItem>
+
+        {user?.role === 'admin' && (
+          <MenuItem onClick={handleUserAccount}>
+            <ListItemIcon>
+              <SpaceDashboardOutlinedIcon />
+            </ListItemIcon>
+            Dashboard
+          </MenuItem>
+        )}
         <Divider />
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
