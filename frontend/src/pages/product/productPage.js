@@ -64,7 +64,6 @@ const SingleProductPage = () => {
     try {
       const totalPrice = parseFloat((selectedQuantity * product.price).toFixed(2));
       const item = {
-        user : user ? user._id : null,
         items: {
           product: product._id,
           size: selectedSize,
