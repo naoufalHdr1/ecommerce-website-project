@@ -4,11 +4,14 @@ import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import Sidebar from '../../components/userPage/sidebar.js';
 import { api } from '../../utils/api';
 import { API_BASE_URL } from '../../utils/config';
+import { useNotifications } from '../../utils/notificationContext';
+
 
 const PersonalDetails = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
+  const { addNotification } = useNotifications();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -53,6 +56,26 @@ const PersonalDetails = () => {
       return errors;
     }, {});
   };
+
+  const handleUpdateUser = async () => {
+    const newErrors = validateUser(user);
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    
+    try {
+      const res = await api.put('/users/update-user', user);    
+
+      if (res.data) {
+        addNotification('User Updated successfully!', 'success');
+        setUser(res.data)
+      };
+    } catch (err) {
+      console.error('Error updating a user', err.message);
+    }
+  }
 
   return (
     <Box
@@ -250,17 +273,17 @@ const PersonalDetails = () => {
               </Grid>
             </Grid>
 
-            <div style={{ marginTop: "24px", textAlign: "center" }}>
+            <div style={{ marginTop: "35px", textAlign: "right" }}>
               <Button
-                variant="contained"
+                variant="outlines"
                 style={{
                   backgroundColor: "crimson",
                   color: "white",
                   padding: "12px 24px",
-                  borderRadius: "8px",
                   textTransform: "none",
                   fontWeight: "bold",
                 }}
+                onClick={handleUpdateUser}
               >
                 Update
               </Button>
