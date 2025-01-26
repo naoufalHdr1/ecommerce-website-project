@@ -5,6 +5,7 @@ import App from "./App";
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css'
 
 /*
@@ -26,6 +27,7 @@ import './components/categories/categoryProductsPage/productsGrid.css';
 import './components/categories/categoryProductsPage/filterSidebar.css';
 import './components/categories/categoryProductsPage/categoryProductsPage.jsx';
 import './components/dashboard/sidebar.css'
+import './components/userPage/orderDetailsDialog.css'
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);

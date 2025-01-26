@@ -26,9 +26,9 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import dayjs from "dayjs";
 import { api } from '../utils/api';
 import { API_BASE_URL } from '../utils/config';
+import OrderDetailsDialog from '../components/userPage/orderDetailsDialog';
 
 dayjs().format()
-
 
 // Sidebar items data
 const sidebarMenu = [
@@ -62,12 +62,15 @@ const UserPage = () => {
   const [orders, setOrders] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const res = await api.get("/orders/my-orders");
         setOrders(res.data || []);
+        console.log(res.data)
       } catch (error) {
         console.error("Error fetching orders:", error);
       } finally {
@@ -82,14 +85,6 @@ const UserPage = () => {
     return <p>Loading orders...</p>;
   }
 
-  const calculateDeliveryDuration = (createdAt) => {
-    const deliveryDate = dayjs(createdAt).add(7, "day");
-    const deliveredOn = dayjs().format("ddd, D MMM");
-    return deliveryDate.isBefore(dayjs())
-      ? `Delivered on ${deliveredOn}`
-      : `Expected on ${deliveryDate.format("ddd, D MMM")}`;
-  };
-
   const statusOptions = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
   const calculateDeliveryDate = (createdAt) => {
@@ -98,6 +93,15 @@ const UserPage = () => {
 
   const calculateCreationDate = (createdAt) => {
     return dayjs(createdAt).format("ddd D, MMM");
+  };
+
+  const handleViewDetails = (order) => {
+    setSelectedOrder(order);
+    setModalOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setModalOpen(false);
   };
 
   return (
@@ -243,7 +247,7 @@ const UserPage = () => {
               <Grid container spacing={2} className="mt-0">
 
                 {/* Grid a (60% for large screens, 100% for small) */}
-                <Grid item xs={12} md={7} sx={{ marginBottom: 3 }}>
+                <Grid item xs={12} md={7} sx={{ marginBottom: { xs: 0, md: 3 } }}>
                   <div style={{ backgroundColor: '#fff', boxShadow: "0px 1px 3px rgba(0, 0, 0, 0.2)", padding: '18px', marginBottom: 11 }}>
 
                     <Box>
@@ -299,9 +303,7 @@ const UserPage = () => {
                               <hr sx={{ padding: 0, margin: '10px 0' }} />
                             )}
                         </React.Fragment>
-
                       ))}
-
                     </Box>
                   </div>
                   {/* Show number of remaining items if more than 2 */}
@@ -314,122 +316,61 @@ const UserPage = () => {
 
                 {/* Grid b (40% for large screens, 100% for small) */}
                 <Grid item xs={12} md={5}>
-                  <div style={{ backgroundColor: '#e0e0e0', padding: '20px' }}>
+                  <div style={{ padding: '20px' }}>
                     {/* Buttons inside Grid b */}
                     <Grid container spacing={2}>
+                      {!["Shipped", "Delivered", "Cancelled"].includes(order.status) && (
+                        <Grid item xs={12}>
+                          <Button variant="contained" color="success" fullWidth>
+                            Track order
+                          </Button>
+                        </Grid>
+                      )}
                       <Grid item xs={12}>
-                        <Button variant="contained" fullWidth>
-                          Button 1
-                        </Button>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Button variant="contained" fullWidth>
-                          Button 2
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          fullWidth
+                          onClick={() => handleViewDetails(order)}
+                        >
+                          View order details
                         </Button>
                       </Grid>
                       <Grid item xs={6}>
-                        <Button variant="contained" fullWidth>
-                          Button 3
+                        <Button color="secondary" fullWidth>
+                          Get invoice
                         </Button>
                       </Grid>
                       <Grid item xs={6}>
-                        <Button variant="contained" fullWidth>
-                          Button 4
+                        <Button
+                          color="secondary"
+                          fullWidth
+                          disabled={["Shipped", "Delivered", "Cancelled"].includes(order.status)}
+                        >
+                          Edit order
                         </Button>
                       </Grid>
                     </Grid>
                   </div>
                 </Grid>
+
               </Grid>
             </div>
           ))
         ) : (
           <p>No orders found.</p>
         )}
-
-
-	  {/*
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "flex-start",
-          padding: 2,
-          backgroundColor: "#F4F6F8",
-          borderRadius: 2,
-          boxShadow: "0px 1px 3px rgba(0, 0, 0, 0.2)",
-          marginBottom: 2,
-          marginTop: 3,
-        }}
-      >
-
-        {/* Status Indicator }
-        <Box
-          sx={{
-            width: "2px",
-            backgroundColor: isDelivered ? "#e0e0e0" : "#1a73e8",
-            borderRadius: "2px",
-          }}
-        ></Box>
-
-        <Box sx={{ flex: 1, marginLeft: 2 }}>
-          {/* Order Status }
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton
-              size="small"
-              sx={{ color: isDelivered ? "#9e9e9e" : "green", padding: 0, r: 4 }}
-            >
-              <FiberManualRecordIcon/>
-            </IconButton>
-            <Typography
-              variant="subtitle1"
-              sx={{ color: isDelivered ? "#9e9e9e" : "#1a73e8", fontWeight: 500 }}
-            >
-              {isDelivered
-                ? calculateDeliveryDuration(order.createdAt)
-                : order.status}
-            </Typography>
-          </Box>
-
-          {/* Items }
-          <Box>
-            {order.items.map((item, index) => (
-              <Box
-                key={index}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginY: 1,
-                }}
-              >
-                <LocalShippingIcon sx={{ marginRight: 1, color: "#757575" }} />
-                <Typography variant="body2">
-                  Product Name (Replace with actual name)
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        </Box>
-
-        {/* Action Buttons }
-        {!isDelivered && (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <Button variant="contained" color="success" size="small">
-              Track order
-            </Button>
-            <Button variant="outlined" size="small">
-              View order details
-            </Button>
-            <Button variant="text" size="small">
-              Get invoice
-            </Button>
-            <Button variant="text" size="small">
-              Edit order
-            </Button>
-          </Box>
-        )}
       </Box>
-	  */}
-      </Box>
+
+      {/* Order Details Dialog */}
+      {modalOpen && (
+        <OrderDetailsDialog
+          open={modalOpen}
+          onClose={handleCloseDialog}
+          order={selectedOrder}
+        />
+      )}
+
     </Box>
 
   );
