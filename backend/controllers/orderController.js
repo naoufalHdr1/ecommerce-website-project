@@ -86,6 +86,28 @@ export default class OrderContorller {
     }
   }
 
+  /* Finds Orders by userId or sessionId */
+  static async fetchOrdersByUser(req, res) {
+    const filter = req.userId ? { userId: req.userId } : { sessionId: req.sessionId };
+    console.log('filter=', filter);
+
+    try {
+      const orders = await Order.find(filter)
+        .populate('items.product')
+        .exec();
+    console.log('orders=', orders);
+
+      if (!orders.length) {
+        return res.status(404).json({ message: "No orders found." });
+      }
+
+      res.status(200).json(orders);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+  }
+
   /* Update an Item by Id */
   static async updateOrder(req, res) {
     const { id } = req.params

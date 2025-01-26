@@ -12,7 +12,7 @@ export default class CartController {
   static async addToCart(req, res) {
     try {
       let cart;
-      const filter = req.userId ? { userId: req.userId } : { sessionId: req.sessionId };
+      const filter = req.userId ? { user: req.userId } : { sessionId: req.sessionId };
       const { items, totalAmount } = req.body;
 
       cart = await Cart.findOne(filter);
@@ -20,8 +20,8 @@ export default class CartController {
       if (!cart) {
         // Create a new cart
         cart = new Cart({
-          user: filter.userId || null,
-          sessionId: filter.userId ? null : filter.sessionId,
+          user: filter.user || null,
+          sessionId: filter.user ? null : filter.sessionId,
           items: [ items ],
           totalAmount,
         });
@@ -40,7 +40,9 @@ export default class CartController {
           cart.items.push(items);
         }
 
-        cart.totalAmount = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+        cart.totalAmount = parseFloat(
+          cart.items.reduce((sum, item) => sum + item.totalPrice, 0).toFixed(2)
+        );
       }
 
       await cart.save();
@@ -55,7 +57,7 @@ export default class CartController {
 
   static async getCartItems(req, res) {
     try {
-      const filter = req.userId ? { userId: req.userId } : { sessionId: req.sessionId };
+      const filter = req.userId ? { user: req.userId } : { sessionId: req.sessionId };
 
       const cart = await Cart.findOne(filter)
         .populate('items.product')
@@ -70,8 +72,7 @@ export default class CartController {
 
   static async updateCart(req, res) {
     try {
-	    console.log('initiat upadating cart:');
-      const filter = req.userId ? { userId: req.userId } : { sessionId: req.sessionId };
+      const filter = req.userId ? { user: req.userId } : { sessionId: req.sessionId };
       const { items, totalAmount } = req.body;
       let cart;
 

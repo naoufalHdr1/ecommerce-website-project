@@ -9,9 +9,7 @@ const cartSchema = new mongoose.Schema(
     },
     sessionId: {
       type: String,
-      required: function () {
-        return !this.user;
-      },
+      required: false,
     },
     items: [
       {

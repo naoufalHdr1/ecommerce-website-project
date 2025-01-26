@@ -6,8 +6,11 @@ import { verifyToken, checkAdmin, handleAuthAndSession } from '../middleware/aut
 
 const router = express.Router();
 
-// Private Routes
+// Private Routes (for admins)
 router.get('/', verifyToken, checkAdmin, OrderController.fetchAllOrders);
+
+// Public Routes
+router.get('/my-orders', handleAuthAndSession, OrderController.fetchOrdersByUser);
 router.post('/', handleAuthAndSession, OrderController.createOrder);
 router.put('/:id', verifyToken, checkAdmin, OrderController.updateOrder);
 router.delete('/:id', verifyToken, checkAdmin, OrderController.deleteOrder);
