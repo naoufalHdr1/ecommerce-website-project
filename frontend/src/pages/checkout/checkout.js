@@ -22,11 +22,15 @@ import ColorModeIconDropdown from '../../components/checkout/colorModeIconDropdo
 import { useCart } from '../../contexts/cartContext';
 import { api } from '../../utils/api';
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { useNotifications } from '../../utils/notificationContext';
 
 const steps = ['Shipping address', 'Payment details', 'Review your order'];
 
 export default function Checkout(props) {
   const [activeStep, setActiveStep] = useState(0);
+  const navigate = useNavigate();
+  const { addNotification } = useNotifications();
 
   const cartState = useCart() ;
   const location = useLocation();
@@ -131,12 +135,20 @@ export default function Checkout(props) {
 
     try {
       const res = await api.post('/orders', orderData);
+      const cartItemsId = items.map((item) => item._id);
+      await api.delete('/cart', { data: { cartItemsId }, });
       if (res.data) {
+        addNotification('Order created successfully!', 'success');
         setActiveStep(activeStep + 1);
       }
     } catch (err) {
+      addNotification('Error creating order', 'error');
       console.error('Error placing order:', err.message);
     }
+  }
+  
+  const handleViewOrders = () => {
+    navigate('/user/view-orders');
   }
 
   return (
@@ -304,6 +316,7 @@ export default function Checkout(props) {
                 <Button
                   variant="contained"
                   sx={{ alignSelf: 'start', width: { xs: '100%', sm: 'auto' } }}
+		  onClick={handleViewOrders}
                 >
                   Go to my orders
                 </Button>
