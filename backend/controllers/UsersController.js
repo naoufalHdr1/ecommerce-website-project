@@ -57,6 +57,25 @@ class UsersController {
     }
   }
 
+  /* Finds a user by token stored in cookies */
+  static async findByToken(req, res) {
+    const userId = req.userId;
+
+    if (!userId) return res.status(400).json({ error: 'UserId not valid' });
+
+    try {
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ error: 'User not found' });
+
+      res.status(200).json(user);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+
+  }
+
+
   /* finds a user by their name. */
   static async findUserByName(req, res) {
     const query = req.query;

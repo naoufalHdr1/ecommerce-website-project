@@ -12,7 +12,6 @@ export default class OrderContorller {
   /* Creates a new order. */
   static async createOrder(req, res) {
     const filter = req.userId ? { userId: req.userId } : { sessionId: req.sessionId };
-	  console.log("req.body=", req.body)
     const { userId, items, totalAmount, shippingAddress, status } = req.body;
 
     try {
@@ -88,18 +87,14 @@ export default class OrderContorller {
 
   /* Finds Orders by userId or sessionId */
   static async fetchOrdersByUser(req, res) {
-    const filter = req.userId ? { userId: req.userId } : { sessionId: req.sessionId };
-    console.log('filter=', filter);
+    const filter = req.userId ? { user: req.userId } : { sessionId: req.sessionId };
 
     try {
       const orders = await Order.find(filter)
+        .populate('user')
         .populate('items.product')
         .exec();
-    console.log('orders=', orders);
 
-      if (!orders.length) {
-        return res.status(404).json({ message: "No orders found." });
-      }
 
       res.status(200).json(orders);
     } catch (err) {
