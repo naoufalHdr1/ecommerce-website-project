@@ -7,7 +7,8 @@ import Logout from "./pages/Logout";
 import Register from "./pages/Register";
 import Category from "./pages/categories/category";
 import ProductPage from "./pages/product/productPage";
-import UserPage from "./pages/userPage";
+import ViewOrders from "./pages/userPage/viewOrders";
+import PersonalDetails from "./pages/userPage/personalDetails";
 import Checkout from "./pages/checkout/checkout";
 import CategoryProductsPage from "./components/categories/categoryProductsPage/categoryProductsPage";
 import Dashboard from "./pages/dashboard/dashboard";
@@ -48,7 +49,12 @@ function App() {
                   <Route path="/shop/categories/:categoryName" element={<Category />} />
                   <Route path="/shop/categories/:categoryName/:subcategoryName/:id" element={<CategoryProductsPage />} />
                   <Route path="/shop/products/:id" element={<ProductPage />} />
-                  <Route path="/user" element={<UserPage />} />
+
+                  {/* User Routes with Nested Sub-Routes */}
+                  <Route path="/user">
+                    <Route path="view-orders" element={<ViewOrders />} />
+                    <Route path="personal-details" element={<PersonalDetails />} />
+                  </Route>
                 </Routes>
               </Layout>
             }

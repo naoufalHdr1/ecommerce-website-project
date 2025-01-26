@@ -2,43 +2,17 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
   Button,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
   Grid,
-  Chip,
 } from "@mui/material";
-import { useTheme } from "@mui/system";
-import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
-import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import dayjs from "dayjs";
-import { api } from '../utils/api';
-import { API_BASE_URL } from '../utils/config';
-import OrderDetailsDialog from '../components/userPage/orderDetailsDialog';
+import { api } from '../../utils/api';
+import { API_BASE_URL } from '../../utils/config';
+import OrderDetailsDialog from '../../components/userPage/orderDetailsDialog';
+import Sidebar from '../../components/userPage/sidebar.js';
 
 dayjs().format()
-
-// Sidebar items data
-const sidebarMenu = [
-  { text: "View orders", icon: <InventoryOutlinedIcon />},
-  { text: "Personal details", icon: <PersonOutlineOutlinedIcon /> },
-  { text: "Change password", icon: <LockOpenOutlinedIcon /> },
-  { text: "Payment methods", icon: <CreditCardOutlinedIcon /> },
-  { text: "Manage addresses", icon: <HomeOutlinedIcon /> },
-  { text: "Log out", icon: <LogoutOutlinedIcon /> },
-];
 
 const getStatusStyle = (status) => {
   switch (status) {
@@ -58,9 +32,7 @@ const getStatusStyle = (status) => {
 };
 
 const UserPage = () => {
-  const theme = useTheme();
   const [orders, setOrders] = useState([]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -83,8 +55,6 @@ const UserPage = () => {
   if (loading) {
     return <p>Loading orders...</p>;
   }
-
-  const statusOptions = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
   const calculateDeliveryDate = (createdAt) => {
     return dayjs(createdAt).add(7, "day").format("ddd D, MMM");
@@ -114,67 +84,7 @@ const UserPage = () => {
       }}
     >
       {/* Sidebar */}
-      <Box
-        sx={{
-          width: { xs: "100%", md: "25%" },
-          borderRadius: 2,
-          padding: 1,
-        }}
-      >
-        <List>
-          {sidebarMenu.map((item, index) => (
-            <ListItem
-              button
-              key={index}
-              selected={selectedIndex === index}
-              onClick={() => setSelectedIndex(index)}
-              sx={{
-                backgroundColor: selectedIndex === index ? "#E8F0FE" : "transparent",
-                borderRadius: "8px",
-                color: selectedIndex === index ? "#1A73E8" : "inherit",
-                marginBottom: 1,
-                cursor: 'pointer',
-                "&:hover": {
-                  backgroundColor: "#D6E4FC",
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  color: selectedIndex === index ? "#1A73E8" : "inherit",
-                }}
-              >
-                {React.cloneElement(item.icon, {
-                  sx: { marginRight: 1, color: selectedIndex === index ? "#1A73E8" : "inherit" },
-                })}
-                <ListItemText
-                  primary={
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontWeight: selectedIndex === index ? "bold" : "normal",
-                        color: selectedIndex === index ? "#1A73E8" : "inherit",
-                      }}
-                    >
-                      {item.text}
-                    </Typography>
-                  }
-                />
-              </Box>
-              {item.badge && selectedIndex === 0 && (
-                <Typography
-                  variant="body2"
-                  sx={{ color: "#1A73E8", fontWeight: "bold" }}
-                >
-                  {item.badge}
-                </Typography>
-              )}
-            </ListItem>
-          ))}
-        </List>
-      </Box>
+      <Sidebar />
 
       {/* Main Content */}
       <Box
@@ -380,3 +290,4 @@ const UserPage = () => {
 };
 
 export default UserPage;
+

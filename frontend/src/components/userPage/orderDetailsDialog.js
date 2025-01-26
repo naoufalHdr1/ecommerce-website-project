@@ -1,9 +1,6 @@
 import { API_BASE_URL } from '../../utils/config';
 import React from "react";
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Typography, Card, CardContent, IconButton, Box, TextField } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import { Close, Delete } from '@mui/icons-material';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Typography, Card, CardContent, Box } from "@mui/material";
 
 const OrderDetailsDialog = ({ open, onClose, order }) => {
   if (!order) return null;
@@ -54,7 +51,7 @@ const OrderDetailsDialog = ({ open, onClose, order }) => {
                   <Grid item xs={12} sm={6}>
                     <Typography variant="subtitle2" color='grey'>Status</Typography>
                     <Typography variant="subtitle2" fontWeight="bold">
-                      {order.status}
+                      {status}
                     </Typography>
 
                   </Grid>
