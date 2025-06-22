@@ -2,6 +2,10 @@
 
 A simple e-commerce website built using modern technologies to provide a seamless shopping experience. This project includes product listings, user authentication, shopping cart functionality, order history, and more.
 
+## Demo
+
+[![Watch the demo](assets/Screenshot.png)](https://youtu.be/1irNZTNZYB4?si=N-1jFcJ15CA-T9tU)
+
 ## Features
 
 - **Product Listings**: View products with details such as price, description, and images.
